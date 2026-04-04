@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Awesome Aqua</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Jost:wght@300;400;500&family=Noto+Serif+Thai:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .admin-login-screen {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #f0f4ff, #e8eeff);
+    }
+    .admin-login-box {
+      background: white; border-radius: 20px; padding: 2.5rem;
+      width: 100%; max-width: 380px;
+      box-shadow: 0 20px 60px rgba(26,58,143,0.12); text-align: center;
+    }
+    .admin-login-logo {
+      font-family: var(--font-display); font-size: 1.6rem; font-weight: 700;
+      color: var(--royal-blue); margin-bottom: 0.25rem;
+    }
+    .admin-login-logo span { color: var(--bright-blue); }
+    .admin-login-sub { font-size: 0.82rem; color: var(--gray); margin-bottom: 2rem; }
+    .admin-login-box input {
+      width: 100%; padding: 0.75rem 1rem;
+      border: 1.5px solid var(--border); border-radius: 10px;
+      font-size: 0.95rem; font-family: var(--font-body);
+      outline: none; margin-bottom: 1rem; transition: border-color 0.2s;
+      text-align: center; letter-spacing: 4px;
+    }
+    .admin-login-box input:focus { border-color: var(--royal-blue); }
+    .admin-login-btn {
+      width: 100%; padding: 0.8rem;
+      background: var(--royal-blue); color: white;
+      border: none; border-radius: 10px;
+      font-size: 0.95rem; font-weight: 500;
+      cursor: pointer; font-family: var(--font-body);
+      transition: background 0.2s;
+    }
+    .admin-login-btn:hover { background: var(--bright-blue); }
+    .admin-error {
+      color: #dc2626; font-size: 0.82rem;
+      margin-top: 0.75rem; display: none;
+    }
+
+    /* Dashboard */
+    .admin-dashboard { display: none; }
+    .admin-topbar {
+      background: var(--royal-blue); color: white;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5%; height: 60px;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .admin-topbar-logo {
+      font-family: var(--font-display); font-size: 1.2rem; font-weight: 700;
+    }
+    .admin-topbar-logo span { color: #7eb3ff; }
+    .admin-topbar-right { display: flex; align-items: center; gap: 1rem; }
+    .admin-topbar-right a {
+      color: rgba(255,255,255,0.75); text-decoration: none;
+      font-size: 0.82rem; transition: color 0.2s;
+    }
+    .admin-topbar-right a:hover { color: white; }
+    .admin-logout-btn {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: white; padding: 0.35rem 0.9rem;
+      border-radius: 8px; cursor: pointer;
+      font-size: 0.82rem; font-family: var(--font-body);
+      transition: background 0.2s;
+    }
+    .admin-logout-btn:hover { background: rgba(255,255,255,0.25); }
+    .admin-body {
+      padding: 2rem 5%; background: #f8faff;
+      min-height: calc(100vh - 60px);
+    }
+
+    /* Stats */
+    .admin-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem; margin-bottom: 2rem;
+    }
+    .admin-stat-card {
+      background: white; border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.25rem 1.5rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .admin-stat-icon { font-size: 1.75rem; }
+    .admin-stat-num {
+      font-family: var(--font-display); font-size: 1.75rem;
+      font-weight: 700; color: var(--royal-blue); line-height: 1;
+    }
+    .admin-stat-label { font-size: 0.78rem; color: var(--gray); margin-top: 0.2rem; }
+    .admin-panel-title {
+      font-family: var(--font-display); font-size: 1.3rem; font-weight: 700;
+      margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+    <script>
+        if (sessionStorage.getItem('isAdmin') === 'true') {
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('adminDashboard').style.display = 'block';
+        });
+        }
+    </script>
+
+<!-- ── LOGIN SCREEN ── -->
+<div class="admin-login-screen" id="loginScreen">
+  <div class="admin-login-box">
+    <div class="admin-login-logo">Awesome <span>Aqua</span></div>
+    <div class="admin-login-sub">แผงควบคุมผู้ดูแลระบบ</div>
+    <input type="password" id="adminPassInput" placeholder="••••••••"
+      onkeydown="if(event.key==='Enter') adminLogin()">
+    <button class="admin-login-btn" onclick="adminLogin()">เข้าสู่ระบบ</button>
+    <div class="admin-error" id="adminError">❌ รหัสผ่านไม่ถูกต้อง</div>
+  </div>
+</div>
+
+<!-- ── ADMIN DASHBOARD ── -->
+<div class="admin-dashboard" id="adminDashboard">
+
+  <div class="admin-topbar">
+    <div class="admin-topbar-logo">Awesome <span>Aqua</span>
+      <span style="font-size:0.72rem;opacity:0.6;font-family:var(--font-body);font-weight:400;margin-left:6px">Admin</span>
+    </div>
+    <div class="admin-topbar-right">
+      <a href="index.html" target="_blank">← ดูหน้าลูกค้า</a>
+      <button class="admin-logout-btn" onclick="adminLogout()">ออกจากระบบ</button>
+    </div>
+  </div>
+
+  <div class="admin-body">
+
+    <!-- Stats -->
+    <div class="admin-stats" id="adminStats"></div>
+
+    <!-- Add Fish -->
+    <div class="admin-card">
+      <div class="admin-panel-title">➕ เพิ่มปลาใหม่</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>อีโมจิปลา</label>
+          <input type="text" id="newEmoji" placeholder="🐠" maxlength="2" value="🐡">
+        </div>
+        <div class="form-group">
+          <label>ชื่อปลา (ภาษาไทย)</label>
+          <input type="text" id="newName" placeholder="ปลาการ์ตูน">
+        </div>
+        <div class="form-group">
+          <label>ชื่อวิทยาศาสตร์</label>
+          <input type="text" id="newSpecies" placeholder="Amphiprioninae">
+        </div>
+        <div class="form-group">
+          <label>ราคาต่ำสุด (บาท)</label>
+          <input type="number" id="newPriceMin" placeholder="350">
+        </div>
+        <div class="form-group">
+          <label>ราคาสูงสุด (ถ้ามี)</label>
+          <input type="number" id="newPriceMax" placeholder="1500">
+        </div>
+        <div class="form-group">
+          <label>จำนวนในสต็อก</label>
+          <input type="number" id="newStock" placeholder="10">
+        </div>
+        <div class="form-group">
+          <label>ระดับความยาก</label>
+          <select id="newLevel">
+            <option>มือใหม่</option>
+            <option>ปานกลาง</option>
+            <option>ผู้เชี่ยวชาญ</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>รูปปลา</label>
+          <input type="file" id="newImageFile" accept="image/*" onchange="previewNewImage(this)">
+          <img id="newImagePreview" style="display:none;width:100%;height:100px;object-fit:cover;border-radius:8px;margin-top:0.5rem">
+        </div>
+        <div class="form-group" style="grid-column: 1 / -1">
+          <label>ประเภท (คลิกเลือกได้หลายอัน)</label>
+          <div class="tag-selector" id="newTags">
+            <span class="tag-option" onclick="toggleTag(this)">ทะเล</span>
+            <span class="tag-option" onclick="toggleTag(this)">น้ำจืด</span>
+            <span class="tag-option" onclick="toggleTag(this)">น้ำกร่อย</span>
+            <span class="tag-option" onclick="toggleTag(this)">สีสวย</span>
+            <span class="tag-option" onclick="toggleTag(this)">เป็นมิตร</span>
+            <span class="tag-option" onclick="toggleTag(this)">ของแรร์</span>
+            <span class="tag-option" onclick="toggleTag(this)">ไทย</span>
+            <span class="tag-option" onclick="toggleTag(this)">ห่วงถิ่น</span>
+            <span class="tag-option" onclick="toggleTag(this)">เลี้ยงเดี่ยว</span>
+          </div>
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:1rem">
+        <label>รายละเอียด</label>
+        <textarea id="newDesc" placeholder="อธิบายนิสัย การดูแล น้ำที่เหมาะสม..."></textarea>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-outline" onclick="clearForm()">ล้างข้อมูล</button>
+        <button class="btn btn-primary" onclick="addFish()">เพิ่มปลา</button>
+      </div>
+    </div>
+
+    <!-- Fish Table -->
+    <div class="admin-card" style="margin-top:1.5rem">
+      <div class="admin-panel-title">📋 รายการสต็อกปลาทั้งหมด</div>
+      <div class="fish-table-wrap">
+        <table>
+          <thead>
+            <tr><th>ปลา</th><th>ชื่อ</th><th>ราคา</th><th>สต็อก</th><th>ระดับ</th><th>จัดการ</th></tr>
+          </thead>
+          <tbody id="fishTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL แก้ไขปลา -->
+<div class="modal-overlay" id="editModal" onclick="if(event.target===this)closeEditModal()">
+  <div class="modal" style="max-width:480px;overflow-y:auto;max-height:90vh">
+    <button class="modal-close" onclick="closeEditModal()">✕</button>
+    <div class="modal-logo" style="font-size:1.2rem">✏️ แก้ไขข้อมูลปลา</div>
+    <input type="hidden" id="editFishId">
+    <div class="form-grid" style="margin-top:1.5rem">
+      <div class="form-group"><label>ชื่อปลา</label><input type="text" id="editName"></div>
+      <div class="form-group"><label>ชื่อวิทยาศาสตร์</label><input type="text" id="editSpecies"></div>
+      <div class="form-group"><label>ราคาต่ำสุด</label><input type="number" id="editPriceMin"></div>
+      <div class="form-group"><label>ราคาสูงสุด (ถ้ามี)</label><input type="number" id="editPriceMax"></div>
+      <div class="form-group"><label>จำนวนสต็อก</label><input type="number" id="editStock"></div>
+      <div class="form-group">
+        <label>ระดับความยาก</label>
+        <select id="editLevel">
+          <option>มือใหม่</option><option>ปานกลาง</option><option>ผู้เชี่ยวชาญ</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>เปลี่ยนรูป</label>
+        <input type="file" id="editImageFile" accept="image/*" onchange="previewEditImage(this)">
+      </div>
+      <div class="form-group" style="grid-column: 1 / -1">
+        <label>ประเภท</label>
+        <div class="tag-selector" id="editTags">
+          <span class="tag-option" onclick="toggleTag(this)">ทะเล</span>
+          <span class="tag-option" onclick="toggleTag(this)">น้ำจืด</span>
+          <span class="tag-option" onclick="toggleTag(this)">น้ำกร่อย</span>
+          <span class="tag-option" onclick="toggleTag(this)">สีสวย</span>
+          <span class="tag-option" onclick="toggleTag(this)">เป็นมิตร</span>
+          <span class="tag-option" onclick="toggleTag(this)">ของแรร์</span>
+          <span class="tag-option" onclick="toggleTag(this)">ไทย</span>
+          <span class="tag-option" onclick="toggleTag(this)">ห่วงถิ่น</span>
+          <span class="tag-option" onclick="toggleTag(this)">เลี้ยงเดี่ยว</span>
+        </div>
+      </div>
+    </div>
+    <img id="editImagePreview" style="display:none;width:100%;height:160px;object-fit:cover;border-radius:10px;margin-top:0.75rem">
+    <div class="form-group" style="margin-top:1rem">
+      <label>รายละเอียด</label><textarea id="editDesc"></textarea>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-outline" onclick="closeEditModal()">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="saveEdit()">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="admin.js"></script>
+</body>
+</html>
