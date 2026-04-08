@@ -214,12 +214,6 @@ function addFish() {
   } else {
     finish();
   }
-
-  if (!name || priceMin <= 0) {
-    showToast('⚠️ กรุณากรอกราคา');
-    return;
-  }
-
 }
 
 function deleteFish(id) {
