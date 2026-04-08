@@ -54,7 +54,7 @@ function renderFishGrid() {
         <div class="fish-species">${f.species}</div>
         <div class="fish-meta">
           <div class="fish-price">฿${f.priceMin.toLocaleString()}${f.priceMax ? ' – ' + f.priceMax.toLocaleString() : ''}</div>
-          <div class="fish-stock ${f.stock <= 5 ? 'low' : ''}">
+          <div class="fish-stock ${f.stock <= 5 ? `low` : ''}">
             ${f.stock === 0 ? '❌ หมด' : f.stock <= 5 ? `⚠️ เหลือ ${f.stock}` : `✅ ${f.stock} ตัว`}
           </div>
         </div>
@@ -216,7 +216,7 @@ function addFish() {
   }
 
   if (!name || priceMin <= 0) {
-    showToast('กรอกข้อมูลให้ถูกต้อง');
+    showToast('⚠️ กรุณากรอกราคา');
     return;
   }
 
@@ -271,7 +271,7 @@ function closeEditModal() {
 }
 
 function saveEdit() {
-  const id = parseInt(document.getElementById('editFishId').value);
+  const id = document.getElementById('editFishId').value;
   const f  = fishData.find(x => x.id === id);
   if (!f) return;
 
@@ -396,7 +396,7 @@ function fakeLogin() {
 function openLine(fishName) {
   const msg = fishName ? `สนใจสั่งซื้อ ${fishName}` : 'สนใจสั่งซื้อปลา';
   showToast('📱 กำลังเปิด LINE @awesomeaqua...');
-  // window.open(`https://line.me/R/ti/p/@awesomeaqua?text=${encodeURIComponent(msg)}`);
+  window.open(`https://line.me/R/ti/p/~ltz321?text=${encodeURIComponent(msg)}`);
 }
 
 
@@ -467,8 +467,20 @@ function prevTiktok() {
   goTiktok((currentTiktok - 1 + total) % total);
 }
 
+// -- Serch Filter 
+function filterFish(keyword) {
+  const filtered = fishData.filter(f =>
+    f.name.toLowerCase().includes(keyword.toLowerCase()) ||
+    f.tags?.some(t => t.includes(keyword))
+  );
+  renderFilteredFish(filtered);
+}
+
+// -- Auto Sort
+fishData.sort((a, b) => b.stock - a.stock);
 
 // ============================================
 //   INIT
 // ============================================
+renderFishGrid();
 renderFishTable();

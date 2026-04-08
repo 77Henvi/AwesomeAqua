@@ -1,5 +1,18 @@
 const ADMIN_PASS = 'aqua1234';
-let fishData = JSON.parse(localStorage.getItem('fishData')) || [];
+let fishData = [];
+
+try {
+  fishData = JSON.parse(localStorage.getItem('fishData')) || [];
+} catch {
+  fishData = [];
+}
+
+function searchFish(keyword) {
+  const filtered = fishData.filter(f =>
+    f.name.toLowerCase().includes(keyword.toLowerCase())
+  );
+  renderFilteredTable(filtered);
+}
 
 function saveToStorage() {
   localStorage.setItem('fishData', JSON.stringify(fishData));
@@ -106,7 +119,7 @@ function addFish() {
   if (!name) { showToast('⚠️ กรุณากรอกชื่อปลา'); return; }
 
   const newFish = {
-    id: Date.now(), emoji, name,
+    id: crypto.randomUUID(), emoji, name,
     species: species || '-',
     priceMin, priceMax, stock, level, desc,
     tags: getSelectedTags('newTags'),
@@ -143,6 +156,9 @@ function clearForm() {
   document.querySelectorAll('#newTags .tag-option').forEach(el => el.classList.remove('selected'));
 }
 
+//-- Auto Save
+window.addEventListener('beforeunload', saveToStorage);
+
 // ── EDIT ──
 function openEditModal(id) {
   const f = fishData.find(x => x.id === id);
@@ -167,7 +183,7 @@ function closeEditModal() {
 }
 
 function saveEdit() {
-  const id = parseInt(document.getElementById('editFishId').value);
+  const id = document.getElementById('editFishId').value;
   const f  = fishData.find(x => x.id === id);
   if (!f) return;
   f.name     = document.getElementById('editName').value;
