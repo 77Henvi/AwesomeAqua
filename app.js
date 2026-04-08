@@ -414,8 +414,11 @@ function toggleMobile() {
   document.getElementById('mobileMenu').classList.toggle('open');
 }
 
-function scrollTo(id) {
-  document.querySelector(id)?.scrollIntoView({ behavior: 'smooth' });
+function scrollToSection(id) {
+  document.querySelector(id)?.scrollIntoView({
+    behavior: 'smooth',
+    block: 'start'
+  });
 }
 
 
