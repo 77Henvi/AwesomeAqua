@@ -153,26 +153,6 @@ function setSelectedTags(containerId, tags) {
   });
 }
 
-// ============================================
-//   ADMIN Logins
-// ============================================
-
-function adminLogin() {
-  const pass = document.getElementById('adminPassInput').value;
-
-  if (pass === '1234') {
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('adminDashboard').style.display = 'block';
-  } else {
-    document.getElementById('adminError').style.display = 'block';
-  }
-}
-
-function adminLogout() {
-  document.getElementById('loginScreen').style.display = 'flex';
-  document.getElementById('adminDashboard').style.display = 'none';
-}
-
 
 // ============================================
 //   ADMIN — เพิ่มปลาใหม่
@@ -406,6 +386,7 @@ function showToast(msg) {
 
 function toggleMobile() {
   document.getElementById('mobileMenu').classList.toggle('open');
+  document.querySelector('.hamburger').classList.toggle('open');
 }
 
 function scrollToSection(id) {
@@ -464,20 +445,20 @@ function prevTiktok() {
   goTiktok((currentTiktok - 1 + total) % total);
 }
 
-// -- Serch Filter 
-function filterFish(keyword) {
-  const filtered = fishData.filter(f =>
-    f.name.toLowerCase().includes(keyword.toLowerCase()) ||
-    f.tags?.some(t => t.includes(keyword))
-  );
-  renderFilteredFish(filtered);
-}
+// ── Scroll Animation ──
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1 });
 
-// -- Auto Sort
-fishData.sort((a, b) => b.stock - a.stock);
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
 // ============================================
 //   INIT
 // ============================================
 renderFishGrid();
-renderFishTable();
+

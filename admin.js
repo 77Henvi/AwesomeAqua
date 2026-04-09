@@ -7,12 +7,7 @@ try {
   fishData = [];
 }
 
-function searchFish(keyword) {
-  const filtered = fishData.filter(f =>
-    f.name.toLowerCase().includes(keyword.toLowerCase())
-  );
-  renderFilteredTable(filtered);
-}
+
 
 function saveToStorage() {
   localStorage.setItem('fishData', JSON.stringify(fishData));

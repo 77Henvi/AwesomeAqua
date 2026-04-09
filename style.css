@@ -744,3 +744,71 @@
     .about-contact-section { grid-template-columns: 1fr; }
     .about-contact-visual { min-height: 200px; }
   }
+
+  /* ── ANIMATIONS ── */
+
+.fade-up {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.fade-up:nth-child(2) { transition-delay: 0.1s; }
+.fade-up:nth-child(3) { transition-delay: 0.2s; }
+.fade-up:nth-child(4) { transition-delay: 0.3s; }
+
+
+.fish-card:hover {
+  animation: cardPop 0.25s ease forwards;
+}
+@keyframes cardPop {
+  0%   { transform: translateY(0) scale(1); }
+  50%  { transform: translateY(-6px) scale(1.02); }
+  100% { transform: translateY(-4px) scale(1); }
+}
+
+.stat-num {
+  animation: countFade 0.8s ease both;
+}
+@keyframes countFade {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.about-value-card {
+  transition: background 0.2s, transform 0.25s, box-shadow 0.25s;
+}
+.about-value-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(26,58,143,0.10);
+}
+
+.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+
+@media (max-width: 1024px) and (min-width: 769px) {
+  .nav-contact { display: none; }
+  .fish-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+  .about-hero { gap: 2rem; }
+  .tiktok-slides { width: 280px; }
+  .about-contact-section { grid-template-columns: 1fr; }
+  .about-contact-visual { min-height: 200px; }
+}
+
+@media (max-width: 480px) {
+  .hero h1 { font-size: 2.2rem; }
+  .hero-tag { font-size: 0.75rem; }
+  .stats { padding: 1.5rem 5%; }
+  .stat-num { font-size: 1.6rem; }
+  .fish-grid { grid-template-columns: 1fr; padding: 0.5rem; }
+  .section-title { font-size: 1.5rem; }
+  .about-contact-section { grid-template-columns: 1fr; }
+  .nav-actions .btn-outline { display: none; }
+  .modal { padding: 1.25rem; }
+}
