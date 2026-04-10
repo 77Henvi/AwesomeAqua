@@ -1,7 +1,30 @@
-let fishData = JSON.parse(localStorage.getItem('fishData')) || [];
+import { supabase } from './supabase.js';
 
-function saveToStorage() {
-  localStorage.setItem('fishData', JSON.stringify(fishData));
+let fishData = [];
+
+async function loadFishFromDB() {
+  const { data, error } = await supabase
+    .from('fish')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) { console.error(error); return; }
+
+  fishData = data.map(f => ({
+    id:       f.id,
+    name:     f.name,
+    species:  f.species,
+    emoji:    f.emoji,
+    image:    f.image,
+    priceMin: f.price_min,
+    priceMax: f.price_max,
+    stock:    f.stock,
+    level:    f.level,
+    desc:     f.desc,
+    tags:     f.tags || []
+  }));
+
+  renderFishGrid();
 }
 
 const LINE_ICON = (size = 16) => `
@@ -460,5 +483,4 @@ document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 // ============================================
 //   INIT
 // ============================================
-renderFishGrid();
-
+loadFishFromDB();
