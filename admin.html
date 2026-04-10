@@ -107,6 +107,8 @@
   <div class="admin-login-box">
     <div class="admin-login-logo">Awesome <span>Aqua</span></div>
     <div class="admin-login-sub">แผงควบคุมผู้ดูแลระบบ</div>
+    <input type="email" id="adminEmailInput" placeholder="อีเมล" 
+      style="letter-spacing:normal">
     <input type="password" id="adminPassInput" placeholder="••••••••"
       onkeydown="if(event.key==='Enter') adminLogin()">
     <button class="admin-login-btn" onclick="adminLogin()">เข้าสู่ระบบ</button>
@@ -263,6 +265,6 @@
 </div>
 
 <div class="toast" id="toast"></div>
-<script src="admin.js"></script>
+<script type="module" src="admin.js"></script>
 </body>
 </html>
