@@ -491,6 +491,14 @@ function prevTiktok() {
   goTiktok((currentTiktok - 1 + total) % total);
 }
 
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.querySelectorAll('.tiktok-placeholder').forEach(el => {
+      el.style.display = 'none';
+    });
+  }, 3000);
+});
+
 // ── Scroll Animation ──
 const observer = new IntersectionObserver(entries => {
   entries.forEach(e => {
