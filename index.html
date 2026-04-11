@@ -121,37 +121,36 @@
     </div>
 
     <!-- TikTok Slideshow -->
-    <div class="tiktok-slideshow">
-      <div class="tiktok-slides">
-        <div class="tiktok-slide active">
-          <blockquote class="tiktok-embed"
-            cite="https://www.tiktok.com/@fifahaka/video/7604378011323862292"
-            data-video-id="7604378011323862292" style="max-width:325px;min-width:325px">
-            <section></section>
-          </blockquote>
+        <div class="tiktok-slides">
+          <div class="tiktok-slide active">
+            <a href="https://www.tiktok.com/@fifahaka/video/7604378011323862292" target="_blank" class="tiktok-thumb">
+              <img src="https://www.tiktok.com/api/img/?itemId=7604378011323862292&location=0" 
+                  onerror="this.src='images/fish1.jpg'" alt="TikTok">
+              <div class="tiktok-play">▶</div>
+            </a>
+          </div>
+          <div class="tiktok-slide">
+            <a href="https://www.tiktok.com/@fifahaka/video/7565080266109160722" target="_blank" class="tiktok-thumb">
+              <img src="https://www.tiktok.com/api/img/?itemId=7565080266109160722&location=0"
+                  onerror="this.src='images/fish2.jpg'" alt="TikTok">
+              <div class="tiktok-play">▶</div>
+            </a>
+          </div>
+          <div class="tiktok-slide">
+            <a href="https://www.tiktok.com/@fifahaka/video/7542505954659650837" target="_blank" class="tiktok-thumb">
+              <img src="https://www.tiktok.com/api/img/?itemId=7542505954659650837&location=0"
+                  onerror="this.src='images/fish3.jpg'" alt="TikTok">
+              <div class="tiktok-play">▶</div>
+            </a>
+          </div>
+          <div class="tiktok-slide">
+            <a href="https://www.tiktok.com/@fifahaka/video/7513069658400951570" target="_blank" class="tiktok-thumb">
+              <img src="https://www.tiktok.com/api/img/?itemId=7513069658400951570&location=0"
+                  onerror="this.src='images/fish4.jpg'" alt="TikTok">
+              <div class="tiktok-play">▶</div>
+            </a>
+          </div>
         </div>
-        <div class="tiktok-slide">
-          <blockquote class="tiktok-embed"
-            cite="https://www.tiktok.com/@fifahaka/video/7565080266109160722"
-            data-video-id="7565080266109160722" style="max-width:325px;min-width:325px">
-            <section></section>
-          </blockquote>
-        </div>
-        <div class="tiktok-slide">
-          <blockquote class="tiktok-embed"
-            cite="https://www.tiktok.com/@fifahaka/video/7542505954659650837"
-            data-video-id="7542505954659650837" style="max-width:325px;min-width:325px">
-            <section></section>
-          </blockquote>
-        </div>
-        <div class="tiktok-slide">
-          <blockquote class="tiktok-embed"
-            cite="https://www.tiktok.com/@fifahaka/video/7513069658400951570"
-            data-video-id="7513069658400951570" style="max-width:325px;min-width:325px">
-            <section></section>
-          </blockquote>
-        </div>
-      </div>
 
       <!-- ปุ่มเปลี่ยนคลิป -->
       <div class="tiktok-controls">
@@ -235,8 +234,9 @@
            style="background:#1877f2;color:white;padding:0.75rem 1.25rem;border-radius:8px;font-size:0.875rem;font-weight:500;text-decoration:none;display:flex;align-items:center;gap:0.5rem">
           📘 Facebook
         </a>
-        <a href="https://www.tiktok.com/@fifahaka" target="_blank"
-           style="background:#010101;color:white;padding:0.75rem 1.25rem;border-radius:8px;font-size:0.875rem;font-weight:500;text-decoration:none;display:flex;align-items:center;gap:0.5rem">
+        <a href="tiktok://www.tiktok.com/@fifahaka" 
+          onclick="setTimeout(()=>{ window.location='https://www.tiktok.com/@fifahaka' }, 500)"
+          style="background:#010101;color:white;padding:0.75rem 1.25rem;border-radius:8px;font-size:0.875rem;font-weight:500;text-decoration:none;display:flex;align-items:center;gap:0.5rem">
           🎵 TikTok
         </a>
       </div>
@@ -252,8 +252,6 @@
   </div>
 
 </section>
-
-<script async src="https://www.tiktok.com/embed.js"></script>
 
 
 <!-- ========== FOOTER ========== -->

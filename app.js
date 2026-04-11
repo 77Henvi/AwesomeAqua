@@ -419,6 +419,17 @@ function openLine(fishName) {
   window.open(`https://line.me/R/ti/p/~ltz321?text=${encodeURIComponent(msg)}`);
 }
 
+// ============================================
+//   TIKTOK BUTTON
+// ============================================
+
+function openTikTok() {
+  window.location.href = "tiktok://user?username=fifahaka";
+
+  setTimeout(() => {
+    window.open("https://www.tiktok.com/@fifahaka", "_blank");
+  }, 500);
+}
 
 // ============================================
 //   UTILITIES
