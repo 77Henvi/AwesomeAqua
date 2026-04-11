@@ -150,20 +150,33 @@ async function saveEdit() {
 
 // ── UPLOAD รูปไปยัง Supabase Storage ──
 async function uploadImage(file) {
+  const filename = `fish_${Date.now()}.jpg`;
+
   const compressed = await new Promise(resolve => compressImage(file, resolve));
-  const blob       = await fetch(compressed).then(r => r.blob());
-  const filename   = `fish_${Date.now()}.jpg`;
+  
+  // แปลง base64 เป็น blob
+  const res    = await fetch(compressed);
+  const blob   = await res.blob();
 
-  const { error } = await supabase.storage
+  const { data, error } = await supabase.storage
     .from('fish-images')
-    .upload(filename, blob, { contentType: 'image/jpeg', upsert: true });
+    .upload(filename, blob, {
+      contentType: 'image/jpeg',
+      upsert: false
+    });
 
-  if (error) { showToast('❌ อัปโหลดรูปไม่ได้'); return null; }
+  if (error) {
+    console.error('Upload error:', error);
+    showToast('❌ อัปโหลดรูปไม่ได้: ' + error.message);
+    return null;
+  }
 
-  const { data } = supabase.storage.from('fish-images').getPublicUrl(filename);
-  return data.publicUrl;
+  const { data: urlData } = supabase.storage
+    .from('fish-images')
+    .getPublicUrl(filename);
+
+  return urlData.publicUrl;
 }
-
 // ── STATS ──
 function renderAdminStats() {
   const total    = fishData.length;
