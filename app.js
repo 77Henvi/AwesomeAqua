@@ -53,6 +53,29 @@ function escapeHTML(str) {
   }[tag]));
 }
 
+// ── Expose functions to global scope ──
+window.openFishDetail      = openFishDetail;
+window.closeFishModal      = closeFishModal;
+window.closeFishModalOutside = closeFishModalOutside;
+window.openEditModal       = openEditModal;
+window.closeEditModal      = closeEditModal;
+window.saveEdit            = saveEdit;
+window.deleteFish          = deleteFish;
+window.openLine            = openLine;
+window.toggleTag           = toggleTag;
+window.toggleMobile        = toggleMobile;
+window.scrollToSection     = scrollToSection;
+window.goSlide             = goSlide;
+window.goTiktok            = goTiktok;
+window.nextTiktok          = nextTiktok;
+window.prevTiktok          = prevTiktok;
+window.previewEditImage    = previewEditImage;
+window.openModal           = openModal;
+window.closeModal          = closeModal;
+window.closeModalOutside   = closeModalOutside;
+window.switchTab           = switchTab;
+window.fakeLogin           = fakeLogin;
+
 
 // ============================================
 //   RENDER — การ์ดปลา

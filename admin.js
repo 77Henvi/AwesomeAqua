@@ -31,6 +31,19 @@ function showDashboard() {
   renderAdminStats();
 }
 
+// ── Expose functions to global scope ──
+window.adminLogin      = adminLogin;
+window.adminLogout     = adminLogout;
+window.addFish         = addFish;
+window.deleteFish      = deleteFish;
+window.saveEdit        = saveEdit;
+window.openEditModal   = openEditModal;
+window.closeEditModal  = closeEditModal;
+window.clearForm       = clearForm;
+window.toggleTag       = toggleTag;
+window.previewNewImage = previewNewImage;
+window.previewEditImage= previewEditImage;
+
 // ── LOAD จาก Supabase ──
 async function loadFishFromDB() {
   const { data, error } = await supabase
