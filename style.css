@@ -722,6 +722,7 @@
     padding: 4rem 5%;
     background: #f8faff;
     border-top: 1px solid var(--border);
+    z-index: 2;
   }
   .contact-items { display: flex; flex-direction: column; gap: 1.25rem; margin-top: 1.5rem; }
   .contact-item { display: flex; align-items: flex-start; gap: 1rem; }
@@ -733,6 +734,7 @@
     background: linear-gradient(135deg, var(--royal-blue), var(--bright-blue));
     display: flex; align-items: center; justify-content: center;
     text-align: center;
+    z-index: 1;
   }
   .contact-visual-inner { padding: 2rem; }
 
