@@ -4,23 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Awesome Aqua — จำหน่ายปลาสวยงามและความรู้</title>
-
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-
 <!-- ========== NAVBAR ========== -->
 <nav>
   <div class="logo">Awesome <span>Aqua</span></div>
-
   <ul class="nav-links">
     <li><a href="#fish">ปลาทั้งหมด</a></li>
     <li><a href="#about">เกี่ยวกับเรา</a></li>
   </ul>
-
   <div class="nav-actions">
     <div class="nav-contact">
       <span>📞 082-237-2512</span>
@@ -31,7 +26,6 @@
       สั่งซื้อผ่านไลน์
     </button>
   </div>
-
   <button class="hamburger" onclick="toggleMobile()">
     <span></span><span></span><span></span>
   </button>
@@ -46,30 +40,20 @@
 
 <!-- ========== HERO ========== -->
 <section class="hero">
-
-  <!-- Slideshow พื้นหลัง -->
   <div class="hero-slideshow">
     <div class="slide active" style="background-image: url('images/fish7.jpg')"></div>
     <div class="slide"        style="background-image: url('images/fish5.jpg')"></div>
     <div class="slide"        style="background-image: url('images/fish3.jpg')"></div>
     <div class="slide"        style="background-image: url('images/fish4.jpg')"></div>
-    <!-- overlay มืดทับภาพ -->
     <div class="hero-overlay"></div>
   </div>
-
-  <!-- ข้อความ -->
   <div class="hero-content">
     <div class="hero-tag">🐟 จำหน่ายปลาสวยงามและความรู้</div>
-
-    <!-- แก้ข้อความหัวข้อหลักตรงนี้ -->
     <h1>ปลาสวยงาม<br/><span>คัดสรรพิเศษ</span><br/>ส่งตรงถึงบ้าน</h1>
     <p>คัดสรรปลาสวยงามคุณภาพดี พร้อมความรู้การดูแลรักษาปลาที่ถูกต้อง</p>
-
     <div class="hero-btns">
       <button class="btn btn-primary" onclick="scrollToSection('#fish')">ดูปลาทั้งหมด</button>
     </div>
-
-    <!-- จุดบอกสไลด์ -->
     <div class="slide-dots">
       <span class="dot active" onclick="goSlide(0)"></span>
       <span class="dot"        onclick="goSlide(1)"></span>
@@ -77,12 +61,10 @@
       <span class="dot"        onclick="goSlide(3)"></span>
     </div>
   </div>
-
 </section>
 
 
 <!-- ========== STATS ========== -->
-<!-- แก้ตัวเลขสถิติตรงนี้ -->
 <div class="stats fade-up">
   <div class="stat"><span class="stat-num">20+</span><span class="stat-label">ชนิดปลาในร้าน</span></div>
   <div class="stat"><span class="stat-num">10+</span><span class="stat-label">ลูกค้าที่ไว้วางใจ</span></div>
@@ -90,7 +72,7 @@
 </div>
 
 
-<!-- ========== รายการปลา (ฝั่งลูกค้า) ========== -->
+<!-- ========== รายการปลา ========== -->
 <section id="fish">
   <div class="section-header fade-up">
     <div>
@@ -99,17 +81,14 @@
       <p class="section-sub">คัดสรรปลาคุณภาพพร้อมข้อมูลครบ กดสั่งซื้อผ่านไลน์ได้เลย</p>
     </div>
   </div>
-
-  <!-- การ์ดปลาถูก generate โดย app.js -->
   <div class="fish-grid" id="fishGrid"></div>
 </section>
 
 
 <!-- ========== ABOUT ========== -->
-<!-- ========== ABOUT ========== -->
 <section id="about" style="padding:0">
 
-  <!-- ส่วนที่ 1 — เรื่องราวร้าน + TikTok -->
+  <!-- ส่วนที่ 1 — เรื่องราวร้าน + วิดีโอ -->
   <div class="about-hero">
     <div class="about-hero-content">
       <div class="section-tag">เกี่ยวกับเรา</div>
@@ -120,39 +99,22 @@
       </p>
     </div>
 
-    <!-- TikTok Slideshow -->
-    <div class="tiktok-slideshow">
-      <div class="tiktok-slides">
-        <div class="tiktok-slide active">
-          <div class="tiktok-placeholder">
-            <span>🐠</span>
-            <p>กำลังโหลดวิดีโอ...</p>
-          </div>
-          <blockquote class="tiktok-embed"
-            cite="https://www.tiktok.com/@fifahaka/video/7604378011323862292"
-            data-video-id="7604378011323862292" style="max-width:325px;min-width:325px">
-            <section></section>
-          </blockquote>
-        </div>
-        <div class="tiktok-slide">
-          <blockquote class="tiktok-embed"
-            cite="https://www.tiktok.com/@fifahaka/video/7513069658400951570"
-            data-video-id="7513069658400951570" style="max-width:325px;min-width:325px">
-            <section></section>
-          </blockquote>
-        </div>
-      </div>
-
-      <div class="tiktok-controls">
-        <button class="tiktok-btn" onclick="prevTiktok()">‹</button>
-        <div class="tiktok-dots">
-          <span class="tiktok-dot active" onclick="goTiktok(0)"></span>
-          <span class="tiktok-dot" onclick="goTiktok(1)"></span>
-        </div>
-        <button class="tiktok-btn" onclick="nextTiktok()">›</button>
+    <!-- Video Showcase -->
+    <div class="video-showcase">
+      <div class="fish-video-wrap">
+        <video
+          src="https://vfihczafjrkcyncnosgj.supabase.co/storage/v1/object/public/videos/showcase.mp4"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+        ></video>
+        <div class="video-glow"></div>
       </div>
     </div>
   </div>
+  <!-- ปิด .about-hero -->
 
   <!-- ส่วนที่ 2 — ค่านิยม -->
   <div class="about-values">
@@ -161,17 +123,17 @@
       <h3>คัดสรรคุณภาพ</h3>
       <p>เราคัดปลาและรับเลือกปลาที่ผ่านการตรวจสอบสุขภาพก่อนส่งถึงมือลูกค้า</p>
     </div>
-    <div class="about-value-card">
+    <div class="about-value-card fade-up">
       <div class="about-value-icon">📚</div>
       <h3>ความรู้คู่ปลา</h3>
       <p>ไม่ใช่แค่ขายปลา แต่เราแบ่งปันความรู้การดูแลปลาให้ถูกต้องและมีความสุข</p>
     </div>
-    <div class="about-value-card">
+    <div class="about-value-card fade-up">
       <div class="about-value-icon">💬</div>
       <h3>บริการใส่ใจ</h3>
       <p>พร้อมให้คำปรึกษาตลอด ไม่ว่าจะก่อนหรือหลังการซื้อ</p>
     </div>
-    <div class="about-value-card">
+    <div class="about-value-card fade-up">
       <div class="about-value-icon">🚚</div>
       <h3>ส่งถึงบ้าน</h3>
       <p>บรรจุภัณฑ์ปลอดภัย ปลาถึงมือคุณอย่างสดใสพร้อมเลี้ยง</p>
@@ -229,7 +191,6 @@
       </div>
     </div>
 
-    <!-- ภาพตกแต่ง -->
     <div class="about-contact-visual">
       <div class="contact-visual-inner">
         <div style="font-size:5rem">🐠</div>
@@ -240,8 +201,6 @@
 
 </section>
 
-<script async src="https://www.tiktok.com/embed.js"></script>
-
 
 <!-- ========== FOOTER ========== -->
 <footer>
@@ -249,7 +208,6 @@
   <p>จำหน่ายปลาสวยงามและความรู้ | ติดต่อผ่านไลน์ @ltz321</p>
   <p style="margin-top:0.5rem;font-size:0.75rem;opacity:0.5">© 2025 Awesome Aqua. All rights reserved.</p>
 </footer>
-
 
 
 <!-- ========== MODAL รายละเอียดปลา ========== -->
@@ -260,9 +218,7 @@
   </div>
 </div>
 
-
 <div class="toast" id="toast"></div>
-
 <script type="module" src="app.js"></script>
 
 </body>

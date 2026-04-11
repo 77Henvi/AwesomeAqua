@@ -42,10 +42,6 @@ const LINE_ICON = (size = 16) => `
     6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/>
   </svg>`;
 
-// ============================================
-//   XSS Protection
-// ============================================
-
 function escapeHTML(str) {
   return str.replace(/[&<>"']/g, tag => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;',
@@ -54,27 +50,24 @@ function escapeHTML(str) {
 }
 
 // ── Expose functions to global scope ──
-window.openFishDetail      = openFishDetail;
-window.closeFishModal      = closeFishModal;
+window.openFishDetail        = openFishDetail;
+window.closeFishModal        = closeFishModal;
 window.closeFishModalOutside = closeFishModalOutside;
-window.openEditModal       = openEditModal;
-window.closeEditModal      = closeEditModal;
-window.saveEdit            = saveEdit;
-window.deleteFish          = deleteFish;
-window.openLine            = openLine;
-window.toggleTag           = toggleTag;
-window.toggleMobile        = toggleMobile;
-window.scrollToSection     = scrollToSection;
-window.goSlide             = goSlide;
-window.goTiktok            = goTiktok;
-window.nextTiktok          = nextTiktok;
-window.prevTiktok          = prevTiktok;
-window.previewEditImage    = previewEditImage;
-window.openModal           = openModal;
-window.closeModal          = closeModal;
-window.closeModalOutside   = closeModalOutside;
-window.switchTab           = switchTab;
-window.fakeLogin           = fakeLogin;
+window.openEditModal         = openEditModal;
+window.closeEditModal        = closeEditModal;
+window.saveEdit              = saveEdit;
+window.deleteFish            = deleteFish;
+window.openLine              = openLine;
+window.toggleTag             = toggleTag;
+window.toggleMobile          = toggleMobile;
+window.scrollToSection       = scrollToSection;
+window.goSlide               = goSlide;
+window.previewEditImage      = previewEditImage;
+window.openModal             = openModal;
+window.closeModal            = closeModal;
+window.closeModalOutside     = closeModalOutside;
+window.switchTab             = switchTab;
+window.fakeLogin             = fakeLogin;
 
 
 // ============================================
@@ -82,7 +75,7 @@ window.fakeLogin           = fakeLogin;
 // ============================================
 function renderFishGrid() {
   const grid = document.getElementById('fishGrid');
-  if (!grid) return; 
+  if (!grid) return;
   grid.innerHTML = fishData.map(f => `
     <div class="fish-card" onclick="openFishDetail(${f.id})">
       <div class="fish-img">
@@ -100,7 +93,7 @@ function renderFishGrid() {
         <div class="fish-species">${f.species}</div>
         <div class="fish-meta">
           <div class="fish-price">฿${f.priceMin.toLocaleString()}${f.priceMax ? ' – ' + f.priceMax.toLocaleString() : ''}</div>
-          <div class="fish-stock ${f.stock <= 5 ? `low` : ''}">
+          <div class="fish-stock ${f.stock <= 5 ? 'low' : ''}">
             ${f.stock === 0 ? '❌ หมด' : f.stock <= 5 ? `⚠️ เหลือ ${f.stock}` : `✅ ${f.stock} ตัว`}
           </div>
         </div>
@@ -184,9 +177,7 @@ function previewEditImage(input) {
 // ============================================
 //   TAG SELECTOR
 // ============================================
-function toggleTag(el) {
-  el.classList.toggle('selected');
-}
+function toggleTag(el) { el.classList.toggle('selected'); }
 
 function getSelectedTags(containerId) {
   return [...document.querySelectorAll(`#${containerId} .tag-option.selected`)]
@@ -201,73 +192,11 @@ function setSelectedTags(containerId, tags) {
 
 
 // ============================================
-//   ADMIN — เพิ่มปลาใหม่
-// ============================================
-function addFish() {
-  const emoji    = document.getElementById('newEmoji').value    || '🐟';
-  const name     = document.getElementById('newName').value;
-  const species  = document.getElementById('newSpecies').value;
-  const priceMin = parseInt(document.getElementById('newPriceMin').value) || 0;
-  const priceMax = parseInt(document.getElementById('newPriceMax').value) || 0;
-  const stock    = parseInt(document.getElementById('newStock').value)    || 0;
-  const level    = document.getElementById('newLevel').value;
-  const desc     = document.getElementById('newDesc').value;
-  const file     = document.getElementById('newImageFile').files[0];
-
-  if (!name) { showToast('⚠️ กรุณากรอกชื่อปลา'); return; }
-
-  const newFish = {
-    id: crypto.randomUUID(), emoji, name,
-    species: species || '-',
-    priceMin, priceMax, stock, level, desc,
-    tags: getSelectedTags('newTags'),
-    image: null
-  };
-
-  const finish = () => {
-    fishData.push(newFish);
-    saveToStorage();
-    renderFishGrid(); renderFishTable();
-    clearForm();
-    showToast('✅ เพิ่มปลา ' + name + ' เรียบร้อย!');
-  };
-
-  if (file) {
-    compressImage(file, compressed => {
-      newFish.image = compressed;
-      finish();
-    });
-  } else {
-    finish();
-  }
-}
-
-function deleteFish(id) {
-  if (!confirm('ยืนยันลบปลานี้?')) return;
-  fishData = fishData.filter(f => f.id !== id);
-  saveToStorage();
-  renderFishGrid();
-  renderFishTable();
-  showToast('🗑️ ลบปลาเรียบร้อย');
-}
-
-function clearForm() {
-  ['newEmoji','newName','newSpecies','newPriceMin','newPriceMax','newStock','newDesc']
-    .forEach(id => document.getElementById(id).value = '');
-  document.getElementById('newEmoji').value = '🐡';
-  document.getElementById('newImageFile').value = '';
-  document.getElementById('newImagePreview').style.display = 'none';
-  document.querySelectorAll('#newTags .tag-option').forEach(el => el.classList.remove('selected'));
-}
-
-
-// ============================================
 //   ADMIN — แก้ไขปลา
 // ============================================
 function openEditModal(id) {
   const f = fishData.find(x => x.id === id);
   if (!f) return;
-
   document.getElementById('editFishId').value   = f.id;
   document.getElementById('editName').value     = f.name;
   document.getElementById('editSpecies').value  = f.species;
@@ -276,13 +205,10 @@ function openEditModal(id) {
   document.getElementById('editStock').value    = f.stock;
   document.getElementById('editLevel').value    = f.level;
   document.getElementById('editDesc').value     = f.desc || '';
-
   const preview = document.getElementById('editImagePreview');
   preview.src = f.image || '';
   preview.style.display = f.image ? 'block' : 'none';
-
   setSelectedTags('editTags', f.tags || []);
-
   document.getElementById('editModal').classList.add('open');
 }
 
@@ -294,7 +220,6 @@ function saveEdit() {
   const id = document.getElementById('editFishId').value;
   const f  = fishData.find(x => x.id === id);
   if (!f) return;
-
   f.name     = document.getElementById('editName').value;
   f.species  = document.getElementById('editSpecies').value;
   f.priceMin = parseInt(document.getElementById('editPriceMin').value) || 0;
@@ -303,23 +228,22 @@ function saveEdit() {
   f.level    = document.getElementById('editLevel').value;
   f.desc     = document.getElementById('editDesc').value;
   f.tags     = getSelectedTags('editTags');
-
   const finish = () => {
-    saveToStorage();
     renderFishGrid(); renderFishTable();
     closeEditModal();
     showToast('✅ บันทึกข้อมูล ' + f.name + ' เรียบร้อย');
   };
-
   const fileInput = document.getElementById('editImageFile');
   if (fileInput.files[0]) {
-    compressImage(fileInput.files[0], compressed => {
-      f.image = compressed;
-      finish();
-    });
-  } else {
-    finish();
-  }
+    compressImage(fileInput.files[0], compressed => { f.image = compressed; finish(); });
+  } else { finish(); }
+}
+
+function deleteFish(id) {
+  if (!confirm('ยืนยันลบปลานี้?')) return;
+  fishData = fishData.filter(f => f.id !== id);
+  renderFishGrid(); renderFishTable();
+  showToast('🗑️ ลบปลาเรียบร้อย');
 }
 
 
@@ -329,7 +253,6 @@ function saveEdit() {
 function openFishDetail(id) {
   const f = fishData.find(x => x.id === id);
   if (!f) return;
-
   document.getElementById('fishDetailContent').innerHTML = `
     <div class="fish-detail-emoji">
       ${f.image
@@ -357,7 +280,6 @@ function openFishDetail(id) {
       }
     </div>
   `;
-
   document.getElementById('fishModal').classList.add('open');
 }
 
@@ -390,21 +312,14 @@ function switchTab(tab) {
 }
 
 function fakeLogin() {
-  const email = document.querySelector('#loginForm input[type="email"]').value;
+  const email    = document.querySelector('#loginForm input[type="email"]').value;
   const password = document.querySelector('#loginForm input[type="password"]').value;
-
   if (email === 'admin' && password === 'aqua1234') {
-    sessionStorage.setItem('isAdmin', 'true'); 
-
+    sessionStorage.setItem('isAdmin', 'true');
     showToast('🔐 เข้าสู่ระบบ Admin...');
-    
-    setTimeout(() => {
-      window.location.href = 'admin.html';
-    }, 500);
-
+    setTimeout(() => { window.location.href = 'admin.html'; }, 500);
     return;
   }
-
   closeModal();
   showToast('✅ เข้าสู่ระบบเรียบร้อย');
 }
@@ -415,7 +330,7 @@ function fakeLogin() {
 // ============================================
 function openLine(fishName) {
   const msg = fishName ? `สนใจสั่งซื้อ ${fishName}` : 'สนใจสั่งซื้อปลา';
-  showToast('📱 กำลังเปิด LINE @awesomeaqua...');
+  showToast('📱 กำลังเปิด LINE...');
   window.open(`https://line.me/R/ti/p/~ltz321?text=${encodeURIComponent(msg)}`);
 }
 
@@ -436,10 +351,7 @@ function toggleMobile() {
 }
 
 function scrollToSection(id) {
-  document.querySelector(id)?.scrollIntoView({
-    behavior: 'smooth',
-    block: 'start'
-  });
+  document.querySelector(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 
@@ -461,8 +373,7 @@ function goSlide(index) {
 function nextSlide() {
   const slides = document.querySelectorAll('.slide');
   if (!slides.length) return;
-  const total = slides.length;
-  goSlide((currentSlide + 1) % total);
+  goSlide((currentSlide + 1) % slides.length);
 }
 
 setInterval(nextSlide, 5000);
@@ -471,35 +382,10 @@ window.addEventListener('scroll', () => {
   document.querySelector('nav').classList.toggle('scrolled', window.scrollY > 40);
 });
 
-// ── TikTok Slideshow ──
-let currentTiktok = 0;
 
-function goTiktok(index) {
-  const slides = document.querySelectorAll('.tiktok-slide');
-  const dots   = document.querySelectorAll('.tiktok-dot');
-  slides[currentTiktok].classList.remove('active');
-  dots[currentTiktok].classList.remove('active');
-  currentTiktok = index;
-  slides[currentTiktok].classList.add('active');
-  dots[currentTiktok].classList.add('active');
-}
-function nextTiktok() {
-  goTiktok((currentTiktok + 1) % document.querySelectorAll('.tiktok-slide').length);
-}
-function prevTiktok() {
-  const total = document.querySelectorAll('.tiktok-slide').length;
-  goTiktok((currentTiktok - 1 + total) % total);
-}
-
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    document.querySelectorAll('.tiktok-placeholder').forEach(el => {
-      el.style.display = 'none';
-    });
-  }, 3000);
-});
-
-// ── Scroll Animation ──
+// ============================================
+//   SCROLL ANIMATION
+// ============================================
 const observer = new IntersectionObserver(entries => {
   entries.forEach(e => {
     if (e.isIntersecting) {
@@ -510,6 +396,7 @@ const observer = new IntersectionObserver(entries => {
 }, { threshold: 0.1 });
 
 document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
 
 // ============================================
 //   INIT
