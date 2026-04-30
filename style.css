@@ -543,3 +543,268 @@ nav.scrolled .nav-contact { color: var(--gray); }
   .fish-video-wrap { width: 180px; }
   .modal { padding: 1.25rem; }
 }
+/* ============================================================
+   ADMIN DASHBOARD — paste ต่อท้าย style.css
+   ============================================================ */
+
+/* ── Card / Panel ── */
+.admin-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.75rem;
+  box-shadow: 0 2px 12px rgba(26,58,143,0.06);
+}
+
+/* ── Form Grid ── */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-group label {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--gray);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 0.65rem 0.9rem;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-family: var(--font-body);
+  color: inherit;
+  background: white;
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--royal-blue);
+}
+
+.form-group textarea {
+  min-height: 90px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.form-group input[type="file"] {
+  padding: 0.5rem;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  flex-wrap: wrap;
+}
+
+/* ── Buttons ── */
+.btn {
+  padding: 0.65rem 1.5rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  font-family: var(--font-body);
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: var(--royal-blue);
+  color: white;
+}
+.btn-primary:hover { background: var(--bright-blue); }
+
+.btn-outline {
+  background: transparent;
+  color: var(--royal-blue);
+  border: 1.5px solid var(--royal-blue);
+}
+.btn-outline:hover {
+  background: var(--royal-blue);
+  color: white;
+}
+
+/* ── Tag Selector ── */
+.tag-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.tag-option {
+  padding: 0.35rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  border: 1.5px solid var(--border);
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+  color: var(--gray);
+}
+
+.tag-option:hover {
+  border-color: var(--royal-blue);
+  color: var(--royal-blue);
+}
+
+.tag-option.selected {
+  background: var(--royal-blue);
+  border-color: var(--royal-blue);
+  color: white;
+}
+
+/* ── Fish Table ── */
+.fish-table-wrap {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+.fish-table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.fish-table-wrap thead { background: #f8faff; }
+
+.fish-table-wrap th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--gray);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border);
+}
+
+.fish-table-wrap td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #f0f4ff;
+  vertical-align: middle;
+}
+
+.fish-table-wrap tbody tr:last-child td { border-bottom: none; }
+.fish-table-wrap tbody tr:hover { background: #fafbff; }
+
+/* ── Status Dot ── */
+.status-dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.status-dot.ok  { background: #22c55e; }
+.status-dot.low { background: #f59e0b; }
+.status-dot.out { background: #ef4444; }
+
+/* ── Action Buttons ── */
+.action-btn {
+  padding: 0.3rem 0.75rem;
+  border-radius: 7px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  font-family: var(--font-body);
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+  margin-right: 4px;
+}
+
+.action-edit   { background: #eff6ff; color: var(--royal-blue); }
+.action-edit:hover  { background: var(--royal-blue); color: white; }
+.action-delete { background: #fef2f2; color: #dc2626; }
+.action-delete:hover { background: #dc2626; color: white; }
+
+/* ── Modal ── */
+.modal-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  width: 100%;
+  position: relative;
+  box-shadow: 0 25px 80px rgba(0,0,0,0.2);
+}
+
+.modal-close {
+  position: absolute;
+  top: 1rem; right: 1rem;
+  background: #f1f5f9;
+  border: none;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+.modal-close:hover { background: #e2e8f0; }
+
+/* ── Toast ── */
+.toast {
+  position: fixed;
+  bottom: 1.5rem; left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: #1e293b;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  z-index: 9999;
+  opacity: 0;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .admin-body { padding: 1rem; }
+  .form-grid  { grid-template-columns: 1fr; }
+  .admin-stats { grid-template-columns: 1fr 1fr; }
+  .form-actions { justify-content: stretch; }
+  .form-actions .btn { flex: 1; text-align: center; }
+}
