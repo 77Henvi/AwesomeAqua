@@ -6,11 +6,14 @@
 
 ##  Overview
 
-A simple web platform for buying and selling aquarium fish
+A Fullstack Fish Shop web platform for buying and selling aquarium fish
 connected directly through LINE
 
-No complex system
-— just fast, direct communication between buyer and seller
+Auth → Supabase
+DB → Supabase
+Storage → Supabase
+Frontend → Vanilla JS
+Admin → CRUD + Dashboard
 
 ---
 
