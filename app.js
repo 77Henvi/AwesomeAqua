@@ -481,69 +481,35 @@ document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 //   FISH MOTION BACKGROUND
 // ============================================
 
-// SVG fish shapes — 3 variants, all facing right
-const FISH_SVGS = [
-  // Classic tropical fish
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 40">
-    <ellipse cx="38" cy="20" rx="28" ry="13" fill="currentColor"/>
-    <polygon points="66,20 80,6 80,34" fill="currentColor"/>
-    <ellipse cx="18" cy="17" rx="3" ry="3" fill="white" opacity="0.6"/>
-    <circle cx="17" cy="17" r="1.2" fill="currentColor"/>
-    <path d="M10,12 Q2,20 10,28" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.4"/>
-    <path d="M22,8 Q38,4 52,8" stroke="white" stroke-width="1" fill="none" opacity="0.25"/>
-  </svg>`,
-  // Small round fish
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 36">
-    <ellipse cx="34" cy="18" rx="24" ry="14" fill="currentColor"/>
-    <polygon points="58,18 72,4 72,32" fill="currentColor"/>
-    <ellipse cx="16" cy="15" rx="3.5" ry="3.5" fill="white" opacity="0.55"/>
-    <circle cx="15" cy="15" r="1.4" fill="currentColor"/>
-    <path d="M28,6 Q34,2 44,6" stroke="white" stroke-width="1.2" fill="none" opacity="0.2"/>
-    <path d="M28,30 Q34,34 44,30" stroke="white" stroke-width="1.2" fill="none" opacity="0.2"/>
-  </svg>`,
-  // Elongated fish
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 32">
-    <ellipse cx="42" cy="16" rx="34" ry="10" fill="currentColor"/>
-    <polygon points="76,16 90,4 90,28" fill="currentColor"/>
-    <ellipse cx="16" cy="13" rx="2.8" ry="2.8" fill="white" opacity="0.6"/>
-    <circle cx="15.2" cy="13" r="1.1" fill="currentColor"/>
-    <path d="M8,10 Q2,16 8,22" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.35"/>
-    <line x1="30" y1="8" x2="60" y2="8" stroke="white" stroke-width="0.8" opacity="0.18"/>
-    <line x1="30" y1="24" x2="60" y2="24" stroke="white" stroke-width="0.8" opacity="0.18"/>
-  </svg>`,
-];
+// ── ปลา emoji — ไม่ต้องวาด SVG เอง, flip ด้วย scaleX ได้เลย
+// 🐟 หัวชี้ขวาโดย default ใน Unicode
+const FISH_EMOJIS = ['🐟', '🐠', '🐡', '🐟', '🐠', '🐡'];
 
 function injectFishBackgrounds() {
   const targets = [
-    { selector: '#fish',              dark: false },
-    { selector: '.stats',             dark: true  },
-    { selector: '.about-values',      dark: false },
-    { selector: '.about-contact-info',dark: false },
-    { selector: '.about-contact-visual', dark: true },
+    { selector: '#fish',                dark: false },
+    { selector: '.stats',               dark: true  },
+    { selector: '.about-values',        dark: false },
+    { selector: '.about-contact-info',  dark: false },
+    { selector: '.about-contact-visual',dark: true  },
   ];
 
   targets.forEach(({ selector, dark }) => {
     const el = document.querySelector(selector);
     if (!el) return;
-
-    // Ensure the container is positioned
     const cs = getComputedStyle(el);
     if (cs.position === 'static') el.style.position = 'relative';
 
     const wrap = document.createElement('div');
     wrap.className = 'fish-bg' + (dark ? ' fish-bg--dark' : '');
 
-    const color = dark ? 'rgba(255,255,255,0.9)' : `rgba(26,58,143,0.9)`;
-
     for (let i = 1; i <= 6; i++) {
       const fish = document.createElement('div');
       fish.className = `fish-bg__fish fish-bg__fish--${i}`;
-      const svgIndex = (i - 1) % FISH_SVGS.length;
-      fish.innerHTML = FISH_SVGS[svgIndex].replace(/currentColor/g, color);
+      fish.textContent = FISH_EMOJIS[i - 1];
       wrap.appendChild(fish);
     }
 
-    // Insert as first child so it's behind content
     el.insertBefore(wrap, el.firstChild);
   });
 }
