@@ -439,7 +439,6 @@ body.is-admin .fish-card:hover .card-admin-actions { display: flex; opacity: 1; 
 .fish-card--coming {
   cursor: default;
   overflow: hidden;
-  position: relative;
   border-color: #d1d9f0;
   background: #fafbff;
 }
