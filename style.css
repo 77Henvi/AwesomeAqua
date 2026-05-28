@@ -689,46 +689,39 @@ nav.scrolled .nav-contact { color: var(--gray); }
 .stats        { position: relative; }
 .about-contact-info { position: relative; }
 
-/* outer wrapper — flip เท่านั้น ไม่มี animation */
+/* Generic fish — emoji text node */
 .fish-bg__fish {
   position: absolute;
   left: 0;
   display: inline-block;
   line-height: 1;
   user-select: none;
-}
-/* inner span — movement เท่านั้น ไม่มี scaleX */
-.fish-bg__fish span {
-  display: inline-block;
+  /* transform-origin ต้องเป็น left center เพราะ translateX ขยับ element
+     แล้ว scaleX flip รอบจุดนั้น — ใช้ left center ทำให้ flip ถูก axis */
+  transform-origin: left center;
 }
 
-/* movement only */
+/* 🐟 emoji หัวชี้ซ้าย by default
+   LTR (ว่ายไปขวา) → ต้อง scaleX(-1) เพื่อหันหัวขวา
+   RTL (ว่ายไปซ้าย) → scaleX(1) หัวชี้ซ้ายพอดี */
 @keyframes fishLTR {
-  0%   { transform: translateX(-15vw); }
-  100% { transform: translateX(105vw); }
+  0%   { transform: translateX(-15vw) scaleX(-1); }
+  100% { transform: translateX(105vw) scaleX(-1); }
 }
 @keyframes fishRTL {
-  0%   { transform: translateX(105vw); }
-  100% { transform: translateX(-15vw); }
+  0%   { transform: translateX(105vw) scaleX(1); }
+  100% { transform: translateX(-15vw) scaleX(1); }
 }
 
-/* LTR — flip emoji ให้หัวชี้ขวา */
-.fish-bg__fish--1 { top: 10%; font-size: 2.2rem; opacity: 0.18; transform: scaleX(-1); }
-.fish-bg__fish--1 span { animation: fishLTR 30s linear infinite -4s; }
-.fish-bg__fish--3 { top: 55%; font-size: 2.8rem; opacity: 0.16; transform: scaleX(-1); }
-.fish-bg__fish--3 span { animation: fishLTR 38s linear infinite -16s; }
-.fish-bg__fish--5 { top: 20%; font-size: 1.3rem; opacity: 0.12; transform: scaleX(-1); }
-.fish-bg__fish--5 span { animation: fishLTR 28s linear infinite -20s; }
+/* ── Individual fish ── */
+.fish-bg__fish--1 { top: 10%; font-size: 2.2rem; opacity: 0.18; animation: fishLTR 30s linear infinite -4s;  }
+.fish-bg__fish--2 { top: 34%; font-size: 1.6rem; opacity: 0.14; animation: fishRTL 24s linear infinite -9s;  }
+.fish-bg__fish--3 { top: 55%; font-size: 2.8rem; opacity: 0.16; animation: fishLTR 38s linear infinite -16s; }
+.fish-bg__fish--4 { top: 75%; font-size: 1.8rem; opacity: 0.13; animation: fishRTL 20s linear infinite -2s;  }
+.fish-bg__fish--5 { top: 20%; font-size: 1.3rem; opacity: 0.12; animation: fishLTR 28s linear infinite -20s; }
+.fish-bg__fish--6 { top: 84%; font-size: 2.4rem; opacity: 0.15; animation: fishRTL 33s linear infinite -11s; }
 
-/* RTL — emoji หัวชี้ซ้ายอยู่แล้ว */
-.fish-bg__fish--2 { top: 34%; font-size: 1.6rem; opacity: 0.14; }
-.fish-bg__fish--2 span { animation: fishRTL 24s linear infinite -9s; }
-.fish-bg__fish--4 { top: 75%; font-size: 1.8rem; opacity: 0.13; }
-.fish-bg__fish--4 span { animation: fishRTL 20s linear infinite -2s; }
-.fish-bg__fish--6 { top: 84%; font-size: 2.4rem; opacity: 0.15; }
-.fish-bg__fish--6 span { animation: fishRTL 33s linear infinite -11s; }
-
-/* dark sections */
+/* dark sections ใช้ opacity เดิมได้เพราะ emoji มีสีในตัว */
 .fish-bg--dark .fish-bg__fish--1 { opacity: 0.22; }
 .fish-bg--dark .fish-bg__fish--2 { opacity: 0.18; }
 .fish-bg--dark .fish-bg__fish--3 { opacity: 0.20; }
