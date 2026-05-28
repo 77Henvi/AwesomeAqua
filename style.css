@@ -694,6 +694,7 @@ nav.scrolled .nav-contact { color: var(--gray); }
   position: absolute;
   left: 0;
   will-change: transform;
+  transform-origin: center center;
 }
 
 /* ปลาว่ายซ้ายไปขวา — หัวชี้ขวา */
