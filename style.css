@@ -323,23 +323,205 @@ body.is-admin .fish-card:hover .card-admin-actions { display: flex; opacity: 1; 
 #editModal .modal { max-width: 480px; }
 #fishModal .modal { max-width: 400px; }
 
-/* ── MODAL รายละเอียดปลา ── */
-.fish-detail-body { text-align: center; }
-.fish-detail-emoji { font-size: 5rem; margin-bottom: 1rem; }
-.fish-detail-name { font-family: 'Playfair Display',serif; font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; }
-.fish-detail-species { color: var(--gray); font-size: 0.9rem; font-style: italic; margin-bottom: 1rem; }
-.fish-detail-desc {
-  color: var(--gray); font-size: 0.9rem; line-height: 1.6;
-  margin-bottom: 1.5rem; text-align: left;
-  background: var(--light-blue); padding: 1rem; border-radius: 10px;
+/* ── MODAL รายละเอียดปลา — NEW DESIGN ── */
+#fishModal .modal {
+  max-width: 440px;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 24px;
 }
-.fish-detail-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border); font-size: 0.88rem; }
-.fish-detail-row:last-of-type { border-bottom: none; }
-.fish-detail-row span:first-child { color: var(--gray); }
-.fish-detail-row span:last-child { font-weight: 600; }
-.fish-detail-price-box { background: var(--royal-blue); color: white; padding: 1rem; border-radius: 12px; margin: 1rem 0; }
-.fish-detail-price { font-family: 'Playfair Display',serif; font-size: 1.75rem; font-weight: 700; }
-.fish-detail-price-label { font-size: 0.8rem; opacity: 0.8; }
+#fishModal .modal-close {
+  top: 0.85rem; right: 0.85rem; z-index: 10;
+  background: rgba(0,0,0,0.35);
+  color: white; backdrop-filter: blur(6px);
+}
+#fishModal .modal-close:hover { background: rgba(0,0,0,0.55); }
+
+/* Hero image area */
+.fd-hero {
+  position: relative;
+  width: 100%; height: 240px; flex-shrink: 0;
+  background: linear-gradient(135deg, #0d1f5e, #1a3a8f);
+  overflow: hidden;
+}
+.fd-hero-img {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center;
+  display: block;
+}
+.fd-hero-emoji {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 6rem;
+}
+.fd-hero-grad {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(10,20,60,0.82) 0%, transparent 55%);
+}
+.fd-hero-bottom {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 1rem 1.5rem;
+}
+.fd-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem; font-weight: 700;
+  color: white; line-height: 1.15;
+}
+.fd-species {
+  color: rgba(255,255,255,0.65);
+  font-size: 0.82rem; font-style: italic; margin-top: 0.2rem;
+}
+.fd-out-ribbon {
+  position: absolute; top: 1rem; left: 0;
+  background: #ef4444; color: white;
+  font-size: 0.72rem; font-weight: 600;
+  padding: 0.25rem 0.75rem 0.25rem 1rem;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 50%, 100% 100%, 0 100%);
+  letter-spacing: 0.05em; text-transform: uppercase;
+}
+
+/* Body */
+.fd-body { padding: 1.25rem 1.5rem 1.75rem; }
+
+/* Tags */
+.fd-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.1rem; }
+.fd-tag {
+  background: var(--light-blue); color: var(--royal-blue);
+  padding: 0.22rem 0.65rem; border-radius: 100px;
+  font-size: 0.72rem; font-weight: 500;
+}
+.fd-tag--level {
+  background: color-mix(in srgb, var(--lc, #6b7280) 15%, white);
+  color: var(--lc, #6b7280);
+}
+
+/* Info row */
+.fd-info-row {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 0.75rem; margin-bottom: 1.25rem;
+}
+.fd-info-block {
+  background: #f8faff; border-radius: 12px;
+  padding: 0.75rem 1rem;
+}
+.fd-info-label { font-size: 0.7rem; color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem; }
+.fd-info-value { font-weight: 600; font-size: 0.9rem; }
+.fd-price {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem; color: var(--royal-blue);
+}
+.fd-price--dim { color: var(--gray); }
+.fd-price-sep { margin: 0 0.25rem; opacity: 0.5; }
+
+/* Description */
+.fd-desc-wrap {
+  background: #f0f4ff; border-radius: 12px;
+  padding: 1rem 1.1rem; margin-bottom: 1.25rem;
+}
+.fd-desc-title { font-size: 0.75rem; font-weight: 600; color: var(--royal-blue); margin-bottom: 0.5rem; letter-spacing: 0.03em; }
+.fd-desc { color: #374151; font-size: 0.875rem; line-height: 1.75; }
+
+/* CTA */
+.fd-cta { margin-top: 0.25rem; }
+.fd-btn-line {
+  width: 100%; justify-content: center;
+  font-size: 1rem; padding: 0.9rem;
+  border-radius: 12px;
+}
+.fd-btn-disabled {
+  width: 100%; padding: 0.9rem;
+  background: #f3f4f6; color: #9ca3af;
+  border-radius: 12px; cursor: not-allowed;
+  font-size: 0.95rem; font-family: var(--font-body);
+}
+
+/* ── COMING SOON CARD ── */
+.fish-card--coming {
+  cursor: default;
+  overflow: hidden;
+  position: relative;
+  border-color: #d1d9f0;
+  background: #fafbff;
+}
+.fish-img--coming {
+  position: relative; overflow: hidden;
+  width: 100%; height: 180px;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #e8eeff, #d4ddff);
+}
+.fish-img--coming img,
+.fish-img--coming span.coming-emoji {
+  opacity: 0.35;
+  filter: grayscale(0.6) blur(1px);
+  font-size: 5rem;
+  user-select: none;
+}
+.fish-img--coming img {
+  width: 100%; height: 100%; object-fit: cover; opacity: 0.28;
+}
+.coming-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(26,58,143,0.06), rgba(34,85,204,0.08));
+}
+
+/* Tape track — sits at vertical center of the image */
+.coming-tape-track {
+  position: absolute;
+  left: -10%; right: -10%;
+  top: 50%; transform: translateY(-50%) rotate(-8deg);
+  overflow: hidden; z-index: 3;
+  pointer-events: none;
+}
+.coming-tape {
+  display: flex;
+  background: var(--royal-blue);
+  padding: 0.35rem 0;
+  white-space: nowrap;
+  animation: tapeScroll 14s linear infinite;
+}
+.coming-tape span {
+  display: inline-block;
+  color: rgba(255,255,255,0.9);
+  font-size: 0.7rem; font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 0 0.5rem;
+}
+@keyframes tapeScroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* Coming soon card — info area */
+.fish-info--coming {
+  padding: 1.25rem;
+  opacity: 0.7;
+}
+.fish-info--coming .fish-name { color: #4b5e9e; }
+.fish-info--coming .fish-species { margin-bottom: 0.75rem; }
+.tag--dim { background: #eaecf7; color: #7080b0; }
+
+.coming-badge {
+  display: inline-flex; align-items: center;
+  gap: 0.35rem;
+  background: #e8eeff; color: #1a3a8f;
+  border: 1px dashed #b0c0ee;
+  border-radius: 8px; padding: 0.5rem 0.75rem;
+  font-size: 0.78rem; font-weight: 500;
+  width: 100%; justify-content: center;
+  margin-top: 0.5rem;
+}
+
+/* Out-of-stock badge on regular cards */
+.out-badge {
+  position: absolute; top: 0.6rem; left: 0;
+  background: rgba(239,68,68,0.9); color: white;
+  font-size: 0.68rem; font-weight: 600;
+  padding: 0.2rem 0.65rem 0.2rem 0.85rem;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 6px) 50%, 100% 100%, 0 100%);
+  letter-spacing: 0.04em;
+}
+.fish-card--out .fish-img { opacity: 0.75; }
+.fish-price--dim { color: var(--gray); }
 
 /* ── TOAST ── */
 .toast {

@@ -73,41 +73,81 @@ window.fakeLogin             = fakeLogin;
 // ============================================
 //   RENDER — การ์ดปลา
 // ============================================
+
+// Fish that are "coming soon" — no stock AND no price set (price_min = 0)
+// They render as a special teaser card with tape animation
+function isComingSoon(f) {
+  return f.stock === 0 && f.priceMin === 0;
+}
+
+const TAPE_TEXT = '✦ COMING SOON ✦ เร็วๆ นี้ ✦ COMING SOON ✦ เร็วๆ นี้ ✦ COMING SOON ✦ เร็วๆ นี้ ✦ ';
+
 function renderFishGrid() {
   const grid = document.getElementById('fishGrid');
   if (!grid) return;
-  grid.innerHTML = fishData.map(f => `
-    <div class="fish-card" onclick="openFishDetail(${f.id})">
-      <div class="fish-img">
-        ${f.image
-          ? `<img src="${f.image}" alt="${f.name}" onerror="this.parentElement.innerHTML='🐟'">`
-          : `<span>${f.emoji || '🐟'}</span>`
-        }
-        <div class="card-admin-actions">
-          <button onclick="event.stopPropagation(); openEditModal(${f.id})" title="แก้ไข">✏️</button>
-          <button onclick="event.stopPropagation(); deleteFish(${f.id})" title="ลบ">🗑️</button>
-        </div>
-      </div>
-      <div class="fish-info">
-        <div class="fish-name">${f.name}</div>
-        <div class="fish-species">${f.species}</div>
-        <div class="fish-meta">
-          <div class="fish-price">฿${f.priceMin.toLocaleString()}${f.priceMax ? ' – ' + f.priceMax.toLocaleString() : ''}</div>
-          <div class="fish-stock ${f.stock <= 5 ? 'low' : ''}">
-            ${f.stock === 0 ? '❌ หมด' : f.stock <= 5 ? `⚠️ เหลือ ${f.stock}` : `✅ ${f.stock} ตัว`}
+
+  grid.innerHTML = fishData.map(f => {
+    if (isComingSoon(f)) {
+      return `
+        <div class="fish-card fish-card--coming" tabindex="0">
+          <div class="fish-img fish-img--coming">
+            ${f.image
+              ? `<img src="${f.image}" alt="${f.name}" onerror="this.parentElement.innerHTML='<span>${f.emoji || '🐟'}</span>'">`
+              : `<span class="coming-emoji">${f.emoji || '🐟'}</span>`
+            }
+            <div class="coming-tape-track" aria-hidden="true">
+              <div class="coming-tape">
+                <span>${TAPE_TEXT}${TAPE_TEXT}</span>
+                <span aria-hidden="true">${TAPE_TEXT}${TAPE_TEXT}</span>
+              </div>
+            </div>
+            <div class="coming-overlay"></div>
+          </div>
+          <div class="fish-info fish-info--coming">
+            <div class="fish-name">${f.name}</div>
+            <div class="fish-species">${f.species}</div>
+            <div class="fish-tags">${(f.tags || []).map(t => `<span class="tag tag--dim">${t}</span>`).join('')}</div>
+            <div class="coming-badge">🔔 แจ้งเตือนเมื่อมีสินค้า</div>
+          </div>
+        </div>`;
+    }
+
+    const outOfStock = f.stock === 0;
+    return `
+      <div class="fish-card ${outOfStock ? 'fish-card--out' : ''}" onclick="openFishDetail('${f.id}')">
+        <div class="fish-img">
+          ${f.image
+            ? `<img src="${f.image}" alt="${f.name}" onerror="this.parentElement.innerHTML='<span>${f.emoji || '🐟'}</span>'">`
+            : `<span>${f.emoji || '🐟'}</span>`
+          }
+          ${outOfStock ? `<div class="out-badge">หมดสต็อก</div>` : ''}
+          <div class="card-admin-actions">
+            <button onclick="event.stopPropagation(); openEditModal('${f.id}')" title="แก้ไข">✏️</button>
+            <button onclick="event.stopPropagation(); deleteFish('${f.id}')" title="ลบ">🗑️</button>
           </div>
         </div>
-        <div class="fish-tags">${(f.tags || []).map(t => `<span class="tag">${t}</span>`).join('')}</div>
-        ${f.stock > 0
-          ? `<button class="btn-line" style="width:100%;justify-content:center"
-               onclick="event.stopPropagation(); openLine('${f.name}')">
-               ${LINE_ICON(16)} สั่งซื้อ
-             </button>`
-          : `<button class="btn" style="width:100%;background:#f3f4f6;color:#9ca3af;cursor:not-allowed">หมดสต็อก</button>`
-        }
-      </div>
-    </div>
-  `).join('');
+        <div class="fish-info">
+          <div class="fish-name">${f.name}</div>
+          <div class="fish-species">${f.species}</div>
+          <div class="fish-meta">
+            <div class="fish-price ${outOfStock ? 'fish-price--dim' : ''}">
+              ฿${f.priceMin.toLocaleString()}${f.priceMax ? ' – ' + f.priceMax.toLocaleString() : ''}
+            </div>
+            <div class="fish-stock ${f.stock > 0 && f.stock <= 5 ? 'low' : ''}">
+              ${f.stock === 0 ? '❌ หมด' : f.stock <= 5 ? `⚠️ ${f.stock} ตัว` : `✅ ${f.stock} ตัว`}
+            </div>
+          </div>
+          <div class="fish-tags">${(f.tags || []).map(t => `<span class="tag">${t}</span>`).join('')}</div>
+          ${f.stock > 0
+            ? `<button class="btn-line" style="width:100%;justify-content:center"
+                 onclick="event.stopPropagation(); openLine('${f.name}')">
+                 ${LINE_ICON(16)} สั่งซื้อ
+               </button>`
+            : `<button class="btn" style="width:100%;background:#f3f4f6;color:#9ca3af;cursor:not-allowed" disabled>หมดสต็อก</button>`
+          }
+        </div>
+      </div>`;
+  }).join('');
 }
 
 
@@ -253,31 +293,70 @@ function deleteFish(id) {
 function openFishDetail(id) {
   const f = fishData.find(x => x.id === id);
   if (!f) return;
+
+  const outOfStock = f.stock === 0;
+  const levelColor = { 'มือใหม่': '#22c55e', 'ปานกลาง': '#f59e0b', 'ผู้เชี่ยวชาญ': '#ef4444' };
+  const lc = levelColor[f.level] || '#6b7280';
+
   document.getElementById('fishDetailContent').innerHTML = `
-    <div class="fish-detail-emoji">
+    <div class="fd-hero">
       ${f.image
-        ? `<img src="${f.image}" alt="${f.name}" style="width:100%;height:220px;object-fit:cover;border-radius:12px;" onerror="this.parentElement.innerHTML='🐟'">`
-        : `${f.emoji || '🐟'}`
+        ? `<img src="${f.image}" alt="${f.name}" class="fd-hero-img" onerror="this.outerHTML='<div class=fd-hero-emoji>${f.emoji||'🐟'}</div>'">`
+        : `<div class="fd-hero-emoji">${f.emoji || '🐟'}</div>`
       }
+      ${outOfStock ? `<div class="fd-out-ribbon">หมดสต็อก</div>` : ''}
+      <div class="fd-hero-grad"></div>
+      <div class="fd-hero-bottom">
+        <div class="fd-name">${f.name}</div>
+        <div class="fd-species">${f.species}</div>
+      </div>
     </div>
-    <div class="fish-detail-name">${f.name}</div>
-    <div class="fish-detail-species">${f.species}</div>
-    <div class="fish-detail-desc">${f.desc || 'ไม่มีรายละเอียด'}</div>
-    <div class="fish-detail-price-box">
-      <div class="fish-detail-price-label">ราคา</div>
-      <div class="fish-detail-price">฿${f.priceMin.toLocaleString()}${f.priceMax ? ' – ' + f.priceMax.toLocaleString() : ''}</div>
-    </div>
-    <div class="fish-detail-row"><span>จำนวนในสต็อก</span><span>${f.stock === 0 ? '❌ หมดแล้ว' : f.stock + ' ตัว'}</span></div>
-    <div class="fish-detail-row"><span>ระดับความยาก</span><span>${f.level}</span></div>
-    <div class="fish-detail-row"><span>ประเภท</span><span>${(f.tags || []).join(', ') || '-'}</span></div>
-    <div style="margin-top:1.5rem">
-      ${f.stock > 0
-        ? `<button class="btn-line" style="width:100%;justify-content:center;font-size:1rem;padding:0.85rem"
-             onclick="openLine('${f.name}')">
-             ${LINE_ICON(20)} สั่งซื้อผ่านไลน์
-           </button>`
-        : `<button class="btn" style="width:100%;padding:0.85rem;background:#f3f4f6;color:#9ca3af;cursor:not-allowed">หมดสต็อก</button>`
+
+    <div class="fd-body">
+      <!-- Tags -->
+      <div class="fd-tags">
+        ${(f.tags || []).map(t => `<span class="fd-tag">${t}</span>`).join('')}
+        <span class="fd-tag fd-tag--level" style="--lc:${lc}">${f.level}</span>
+      </div>
+
+      <!-- Price + Stock row -->
+      <div class="fd-info-row">
+        <div class="fd-info-block">
+          <div class="fd-info-label">ราคา</div>
+          <div class="fd-info-value fd-price ${outOfStock ? 'fd-price--dim' : ''}">
+            ฿${f.priceMin.toLocaleString()}${f.priceMax ? '<span class="fd-price-sep">–</span>฿' + f.priceMax.toLocaleString() : ''}
+          </div>
+        </div>
+        <div class="fd-info-block">
+          <div class="fd-info-label">สต็อก</div>
+          <div class="fd-info-value">
+            ${f.stock === 0
+              ? `<span style="color:#ef4444">❌ หมดแล้ว</span>`
+              : f.stock <= 5
+                ? `<span style="color:#f59e0b">⚠️ เหลือ ${f.stock} ตัว</span>`
+                : `<span style="color:#22c55e">✅ ${f.stock} ตัว</span>`
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Description -->
+      ${f.desc ? `
+        <div class="fd-desc-wrap">
+          <div class="fd-desc-title">📖 รายละเอียด</div>
+          <div class="fd-desc">${f.desc}</div>
+        </div>` : ''
       }
+
+      <!-- CTA -->
+      <div class="fd-cta">
+        ${f.stock > 0
+          ? `<button class="btn-line fd-btn-line" onclick="openLine('${f.name}')">
+               ${LINE_ICON(20)} สั่งซื้อผ่านไลน์
+             </button>`
+          : `<button class="btn fd-btn-disabled" disabled>หมดสต็อก</button>`
+        }
+      </div>
     </div>
   `;
   document.getElementById('fishModal').classList.add('open');
