@@ -701,15 +701,16 @@ nav.scrolled .nav-contact { color: var(--gray); }
   transform-origin: left center;
 }
 
-/* ปลาว่ายซ้ายไปขวา 🐟 หัวชี้ขวา scaleX(1) = ปกติ */
+/* 🐟 emoji หัวชี้ซ้าย by default
+   LTR (ว่ายไปขวา) → ต้อง scaleX(-1) เพื่อหันหัวขวา
+   RTL (ว่ายไปซ้าย) → scaleX(1) หัวชี้ซ้ายพอดี */
 @keyframes fishLTR {
-  0%   { transform: translateX(-15vw) scaleX(1); }
-  100% { transform: translateX(105vw) scaleX(1); }
+  0%   { transform: translateX(-15vw) scaleX(-1); }
+  100% { transform: translateX(105vw) scaleX(-1); }
 }
-/* ปลาว่ายขวาไปซ้าย 🐟 หัวชี้ซ้าย scaleX(-1) = กลับด้าน */
 @keyframes fishRTL {
-  0%   { transform: translateX(105vw) scaleX(-1); }
-  100% { transform: translateX(-15vw) scaleX(-1); }
+  0%   { transform: translateX(105vw) scaleX(1); }
+  100% { transform: translateX(-15vw) scaleX(1); }
 }
 
 /* ── Individual fish ── */
