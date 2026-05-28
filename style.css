@@ -692,59 +692,45 @@ nav.scrolled .nav-contact { color: var(--gray); }
 /* Generic fish shape */
 .fish-bg__fish {
   position: absolute;
-  will-change: left, top;
+  left: 0;
+  will-change: transform;
 }
 
-/* Fish swim LEFT → RIGHT */
+/* ปลาว่ายซ้ายไปขวา — หัวชี้ขวา */
 @keyframes fishLTR {
-  0%   { left: -12%; transform: scaleX(1); }
-  100% { left: 110%;  transform: scaleX(1); }
+  0%   { transform: translateX(-15vw) scaleX(1); }
+  100% { transform: translateX(105vw) scaleX(1); }
 }
-/* Fish swim RIGHT → LEFT */
+/* ปลาว่ายขวาไปซ้าย — หัวชี้ซ้าย */
 @keyframes fishRTL {
-  0%   { left: 110%; transform: scaleX(-1); }
-  100% { left: -12%; transform: scaleX(-1); }
-}
-/* Vertical wobble — translateY only, no margin tricks */
-@keyframes fishWobbleA {
-  0%, 100% { top: var(--fish-top); }
-  50%       { top: calc(var(--fish-top) + 14px); }
-}
-@keyframes fishWobbleB {
-  0%, 100% { top: var(--fish-top); }
-  50%       { top: calc(var(--fish-top) - 14px); }
+  0%   { transform: translateX(105vw) scaleX(-1); }
+  100% { transform: translateX(-15vw) scaleX(-1); }
 }
 
 /* ── Individual fish ── */
 .fish-bg__fish--1 {
-  --fish-top: 12%; top: 12%; width: 56px; opacity: 0.08;
-  animation: fishLTR 30s linear infinite -4s,
-             fishWobbleA 4s ease-in-out infinite;
+  top: 10%; width: 56px; opacity: 0.08;
+  animation: fishLTR 30s linear infinite -4s;
 }
 .fish-bg__fish--2 {
-  --fish-top: 34%; top: 34%; width: 40px; opacity: 0.06;
-  animation: fishRTL 24s linear infinite -9s,
-             fishWobbleB 5s ease-in-out infinite 1s;
+  top: 34%; width: 40px; opacity: 0.06;
+  animation: fishRTL 24s linear infinite -9s;
 }
 .fish-bg__fish--3 {
-  --fish-top: 57%; top: 57%; width: 70px; opacity: 0.07;
-  animation: fishLTR 38s linear infinite -16s,
-             fishWobbleA 6s ease-in-out infinite 0.5s;
+  top: 55%; width: 70px; opacity: 0.07;
+  animation: fishLTR 38s linear infinite -16s;
 }
 .fish-bg__fish--4 {
-  --fish-top: 76%; top: 76%; width: 46px; opacity: 0.055;
-  animation: fishRTL 20s linear infinite -2s,
-             fishWobbleB 4.5s ease-in-out infinite 2s;
+  top: 75%; width: 46px; opacity: 0.055;
+  animation: fishRTL 20s linear infinite -2s;
 }
 .fish-bg__fish--5 {
-  --fish-top: 20%; top: 20%; width: 32px; opacity: 0.05;
-  animation: fishLTR 28s linear infinite -20s,
-             fishWobbleA 3.5s ease-in-out infinite;
+  top: 20%; width: 32px; opacity: 0.05;
+  animation: fishLTR 28s linear infinite -20s;
 }
 .fish-bg__fish--6 {
-  --fish-top: 86%; top: 86%; width: 62px; opacity: 0.07;
-  animation: fishRTL 33s linear infinite -11s,
-             fishWobbleB 5.5s ease-in-out infinite 0.8s;
+  top: 84%; width: 62px; opacity: 0.07;
+  animation: fishRTL 33s linear infinite -11s;
 }
 
 /* ── Dark sections — brighter fish ── */
