@@ -666,6 +666,107 @@ nav.scrolled .nav-contact { color: var(--gray); }
 .fade-up:nth-child(3) { transition-delay: 0.2s; }
 .fade-up:nth-child(4) { transition-delay: 0.3s; }
 
+/* ══════════════════════════════════════════════
+   FISH MOTION BACKGROUND
+   CSS-only. Uses .fish-bg wrapper injected by JS
+   into each section. All animation via transform
+   so GPU-composited — no layout thrash.
+   ══════════════════════════════════════════════ */
+
+/* Container sits behind all content */
+.fish-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+  contain: strict;
+}
+
+/* Every section that gets fish bg needs position:relative */
+#fish       { position: relative; }
+.about-values { position: relative; }
+.stats        { position: relative; }
+.about-contact-info { position: relative; }
+
+/* Generic fish shape via inline SVG data-uri background */
+.fish-bg__fish {
+  position: absolute;
+  will-change: transform;
+  animation: fishSwim linear infinite;
+  /* each fish overrides size / top / duration / delay / opacity */
+}
+
+/* Fish facing right → left (default swim direction) */
+@keyframes fishSwim {
+  0%   { transform: translateX(110vw) scaleX(1); }
+  49%  { transform: translateX(-20vw) scaleX(1); }
+  50%  { transform: translateX(-20vw) scaleX(-1); }
+  99%  { transform: translateX(110vw) scaleX(-1); }
+  100% { transform: translateX(110vw) scaleX(1); }
+}
+
+/* Subtle up-down wobble layered in */
+@keyframes fishWobble {
+  0%, 100% { margin-top: 0; }
+  50%       { margin-top: -18px; }
+}
+
+/* ── Individual fish — light sections (section#fish, about-values, contact) ── */
+.fish-bg__fish--1 {
+  width: 56px; top: 12%;
+  opacity: 0.07;
+  animation-duration: 28s; animation-delay: 0s;
+}
+.fish-bg__fish--2 {
+  width: 38px; top: 35%;
+  opacity: 0.055;
+  animation-duration: 22s; animation-delay: -7s;
+  animation-direction: reverse;
+}
+.fish-bg__fish--3 {
+  width: 72px; top: 58%;
+  opacity: 0.065;
+  animation-duration: 34s; animation-delay: -14s;
+}
+.fish-bg__fish--4 {
+  width: 44px; top: 78%;
+  opacity: 0.05;
+  animation-duration: 19s; animation-delay: -3s;
+  animation-direction: reverse;
+}
+.fish-bg__fish--5 {
+  width: 30px; top: 22%;
+  opacity: 0.045;
+  animation-duration: 26s; animation-delay: -18s;
+}
+.fish-bg__fish--6 {
+  width: 60px; top: 88%;
+  opacity: 0.06;
+  animation-duration: 31s; animation-delay: -9s;
+  animation-direction: reverse;
+}
+
+/* ── Dark sections (stats, about-hero) — brighter fish ── */
+.fish-bg--dark .fish-bg__fish--1 { opacity: 0.12; }
+.fish-bg--dark .fish-bg__fish--2 { opacity: 0.09; }
+.fish-bg--dark .fish-bg__fish--3 { opacity: 0.11; }
+.fish-bg--dark .fish-bg__fish--4 { opacity: 0.08; }
+.fish-bg--dark .fish-bg__fish--5 { opacity: 0.07; }
+.fish-bg--dark .fish-bg__fish--6 { opacity: 0.10; }
+
+/* Wobble applied per fish with different timing */
+.fish-bg__fish--1,
+.fish-bg__fish--3,
+.fish-bg__fish--5 {
+  animation: fishSwim linear infinite, fishWobble 4s ease-in-out infinite;
+}
+.fish-bg__fish--2,
+.fish-bg__fish--4,
+.fish-bg__fish--6 {
+  animation: fishSwim linear infinite, fishWobble 5.5s ease-in-out infinite 1.2s;
+}
+
 /* ── MOBILE MENU ── */
 .nav-mobile-menu {
   display: none;
