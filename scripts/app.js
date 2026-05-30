@@ -13,9 +13,9 @@ import { openModal, closeModal,
 import { goSlide }                                 from './modules/slideshow.js';
 import { injectFishBackgrounds }                   from './modules/fishBackground.js';
 import { openLine, toggleMobile,
-         scrollToSection }                         from '../Scripts/shared/utils.js';
-import { toggleTag }                               from '../Scripts/shared/tags.js';
-import { previewEditImage }                        from '../Scripts/shared/image.js';
+         scrollToSection }                         from './shared/utils.js';
+import { toggleTag }                               from './shared/tags.js';
+import { previewEditImage }                        from './shared/image.js';
 
 // ── Expose ไว้บน window เพื่อให้ HTML inline onclick ทำงานได้ ──
 window.openFishDetail        = openFishDetail;
