@@ -2,12 +2,12 @@
 //   ENTRY POINT — admin.html
 // ============================================
 
-import { supabase }                               from '../supabase.js';
-import { showToast }                              from '../scripts/shared/utils.js';
+import { supabase }                         from '../supabase.js';
+import { showToast }                        from './shared/utils.js';
 import { compressImage, previewNewImage,
-         previewEditImage }                       from '../scripts/shared/image.js';
+         previewEditImage }                 from './shared/image.js';
 import { toggleTag, getSelectedTags,
-         setSelectedTags }                        from '../scripts/shared/tags.js';
+         setSelectedTags }                  from './shared/tags.js';
 
 // ── Expose ไว้บน window ──
 window.adminLogin       = adminLogin;
