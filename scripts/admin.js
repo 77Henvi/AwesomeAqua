@@ -3,11 +3,11 @@
 // ============================================
 
 import { supabase }                               from '../supabase.js';
-import { showToast }                              from '../Scripts/shared/utils.js';
+import { showToast }                              from '../scripts/shared/utils.js';
 import { compressImage, previewNewImage,
-         previewEditImage }                       from '../Scripts/shared/image.js';
+         previewEditImage }                       from '../scripts/shared/image.js';
 import { toggleTag, getSelectedTags,
-         setSelectedTags }                        from '../Scripts/shared/tags.js';
+         setSelectedTags }                        from '../scripts/shared/tags.js';
 
 // ── Expose ไว้บน window ──
 window.adminLogin       = adminLogin;
