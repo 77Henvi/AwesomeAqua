@@ -54,6 +54,7 @@ function showDashboard() {
   document.getElementById('adminDashboard').style.display = 'block';
   loadFishFromDB();
   renderAdminStats();
+  renderFinancialInsights();
 }
 
 // ── LOAD ──
@@ -81,6 +82,7 @@ async function loadFishFromDB() {
 
   renderFishTable();
   renderAdminStats();
+  renderFinancialInsights();
 }
 
 // ── ADD ──
@@ -214,6 +216,93 @@ function renderAdminStats() {
 }
 
 // ── TABLE ──
+function formatMoney(value) {
+  return '฿' + Math.round(value || 0).toLocaleString('th-TH');
+}
+
+function getAveragePrice(fish) {
+  if (fish.priceMin && fish.priceMax) return (fish.priceMin + fish.priceMax) / 2;
+  return fish.priceMin || fish.priceMax || 0;
+}
+
+function getStockValue(fish, priceKey) {
+  const price = priceKey === 'min'
+    ? fish.priceMin
+    : priceKey === 'max'
+      ? (fish.priceMax || fish.priceMin)
+      : getAveragePrice(fish);
+
+  return (price || 0) * (fish.stock || 0);
+}
+
+function renderFinancialInsights() {
+  const panel = document.getElementById('financialInsights');
+  if (!panel) return;
+
+  const totalMinValue = fishData.reduce((sum, f) => sum + getStockValue(f, 'min'), 0);
+  const totalMaxValue = fishData.reduce((sum, f) => sum + getStockValue(f, 'max'), 0);
+  const totalAvgValue = fishData.reduce((sum, f) => sum + getStockValue(f), 0);
+  const stockedFish = fishData.filter(f => f.stock > 0);
+
+  const topValueFish = [...stockedFish]
+    .map(f => ({ ...f, value: getStockValue(f), avgPrice: getAveragePrice(f) }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 5);
+
+  const urgentFish = [...stockedFish]
+    .map(f => ({ ...f, value: getStockValue(f), avgPrice: getAveragePrice(f) }))
+    .filter(f => f.stock <= 5 && f.avgPrice > 0)
+    .sort((a, b) => b.avgPrice - a.avgPrice)
+    .slice(0, 5);
+
+  const renderRows = (list, emptyText) => {
+    if (!list.length) return `<div class="finance-empty">${emptyText}</div>`;
+
+    return list.map(f => `
+      <div class="finance-row">
+        <div class="finance-row-main">
+          <strong>${f.name}</strong>
+          <span>${f.species || '-'}</span>
+        </div>
+        <div class="finance-row-meta">
+          <span>${f.stock} ตัว</span>
+          <span>${formatMoney(f.value)}</span>
+        </div>
+      </div>
+    `).join('');
+  };
+
+  panel.innerHTML = `
+    <div class="finance-summary-grid">
+      <div class="finance-summary-card">
+        <div class="finance-label">มูลค่าสต็อกประมาณการ</div>
+        <div class="finance-value">${formatMoney(totalAvgValue)}</div>
+        <div class="finance-note">คำนวณจากราคาเฉลี่ย x จำนวนคงเหลือ</div>
+      </div>
+      <div class="finance-summary-card">
+        <div class="finance-label">ช่วงมูลค่าสต็อก</div>
+        <div class="finance-value">${formatMoney(totalMinValue)} - ${formatMoney(totalMaxValue)}</div>
+        <div class="finance-note">อิงจากราคาต่ำสุดถึงสูงสุด</div>
+      </div>
+      <div class="finance-summary-card">
+        <div class="finance-label">สินค้าในสต็อกที่มีราคา</div>
+        <div class="finance-value">${stockedFish.filter(f => getAveragePrice(f) > 0).length}</div>
+        <div class="finance-note">ชนิดปลาที่นำมาคิดมูลค่าได้</div>
+      </div>
+    </div>
+    <div class="finance-lists">
+      <div>
+        <div class="finance-list-title">ปลามูลค่าสต็อกสูงสุด</div>
+        ${renderRows(topValueFish, 'ยังไม่มีปลาที่มีมูลค่าสต็อก')}
+      </div>
+      <div>
+        <div class="finance-list-title">ปลาราคาสูงที่ใกล้หมด</div>
+        ${renderRows(urgentFish, 'ตอนนี้ยังไม่มีปลาราคาสูงที่ใกล้หมด')}
+      </div>
+    </div>
+  `;
+}
+
 function renderFishTable() {
   const tbody = document.getElementById('fishTableBody');
   if (!tbody) return;

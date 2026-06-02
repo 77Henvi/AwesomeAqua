@@ -801,6 +801,112 @@ nav.scrolled .nav-contact { color: var(--gray); }
 }
 
 /* ── Form Grid ── */
+.finance-panel {
+  margin-bottom: 1.5rem;
+}
+
+.finance-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.finance-summary-card {
+  background: #f8faff;
+  border: 1px solid #e3e9ff;
+  border-radius: 12px;
+  padding: 1.1rem;
+}
+
+.finance-label {
+  color: var(--gray);
+  font-size: 0.78rem;
+  margin-bottom: 0.35rem;
+}
+
+.finance-value {
+  color: var(--royal-blue);
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.finance-note {
+  color: var(--gray);
+  font-size: 0.76rem;
+  margin-top: 0.4rem;
+}
+
+.finance-lists {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.finance-list-title {
+  color: var(--black);
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.finance-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 1px solid #edf2ff;
+  padding: 0.8rem 0;
+}
+
+.finance-row:last-child {
+  padding-bottom: 0;
+}
+
+.finance-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.finance-row-main strong {
+  color: var(--black);
+  font-size: 0.9rem;
+}
+
+.finance-row-main span,
+.finance-row-meta span:first-child {
+  color: var(--gray);
+  font-size: 0.76rem;
+}
+
+.finance-row-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.finance-row-meta span:last-child {
+  color: var(--royal-blue);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.finance-empty {
+  color: var(--gray);
+  background: #f8faff;
+  border: 1px dashed #dbe5ff;
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.85rem;
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
