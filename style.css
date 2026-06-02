@@ -12,6 +12,7 @@
   --border: #e5e7eb;
   --font-display: 'Cormorant Garamond', serif;
   --font-body: 'Jost', 'Noto Serif Thai', sans-serif;
+  --font-number: 'DM Sans', 'Jost', sans-serif;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -188,7 +189,7 @@ nav:not(.scrolled) .btn-primary:hover { background: rgba(255,255,255,0.28); }
 .stat { padding: 1rem; border-right: 1px solid rgba(255,255,255,0.15); }
 .stat:last-child { border-right: none; }
 .stat-num {
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-number);
   font-size: 2rem; font-weight: 700; display: block;
   animation: countFade 0.8s ease both;
 }
@@ -256,8 +257,8 @@ section { padding: 5rem 5%; }
 .fish-name { font-family: 'Playfair Display',serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.25rem; }
 .fish-species { font-size: 0.8rem; color: var(--gray); font-style: italic; margin-bottom: 0.75rem; }
 .fish-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-.fish-price { font-size: 1.1rem; font-weight: 700; color: var(--royal-blue); }
-.fish-stock { font-size: 0.78rem; color: var(--gray); }
+.fish-price { font-family: var(--font-number); font-size: 1.1rem; font-weight: 700; color: var(--royal-blue); }
+.fish-stock { font-family: var(--font-number); font-size: 0.78rem; color: var(--gray); }
 .fish-stock.low { color: #dc2626; }
 .fish-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1rem; }
 .tag {
@@ -405,9 +406,9 @@ body.is-admin .fish-card:hover .card-admin-actions { display: flex; opacity: 1; 
   padding: 0.75rem 1rem;
 }
 .fd-info-label { font-size: 0.7rem; color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem; }
-.fd-info-value { font-weight: 600; font-size: 0.9rem; }
+.fd-info-value { font-family: var(--font-number); font-weight: 600; font-size: 0.9rem; }
 .fd-price {
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-number);
   font-size: 1.2rem; color: var(--royal-blue);
 }
 .fd-price--dim { color: var(--gray); }
@@ -826,7 +827,7 @@ nav.scrolled .nav-contact { color: var(--gray); }
 
 .finance-value {
   color: var(--royal-blue);
-  font-family: var(--font-display);
+  font-family: var(--font-number);
   font-size: 1.5rem;
   font-weight: 700;
   line-height: 1.15;
@@ -884,6 +885,7 @@ nav.scrolled .nav-contact { color: var(--gray); }
 }
 
 .finance-row-meta {
+  font-family: var(--font-number);
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
@@ -895,6 +897,13 @@ nav.scrolled .nav-contact { color: var(--gray); }
   color: var(--royal-blue);
   font-weight: 600;
   font-size: 0.9rem;
+}
+
+.admin-stat-num,
+.fish-table-wrap td:nth-child(3),
+.fish-table-wrap td:nth-child(4),
+.form-group input[type="number"] {
+  font-family: var(--font-number);
 }
 
 .finance-empty {
