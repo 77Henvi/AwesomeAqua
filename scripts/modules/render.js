@@ -55,12 +55,9 @@ function _comingSoonCard(f) {
           ? `<img src="${f.image}" alt="${f.name}" onerror="this.parentElement.innerHTML='<span class=coming-emoji>${f.emoji || '🐟'}</span>'">`
           : `<span class="coming-emoji">${f.emoji || '🐟'}</span>`
         }
-        <div class="coming-tape-track" aria-hidden="true">
-          <div class="coming-tape">
-            <span>${TAPE_TEXT}${TAPE_TEXT}</span>
-            <span aria-hidden="true">${TAPE_TEXT}${TAPE_TEXT}</span>
-          </div>
-        </div>
+        
+        <div class="coming-badge-center">✨ เร็วๆ นี้</div>
+        
         <div class="coming-overlay"></div>
       </div>
       <div class="fish-info fish-info--coming">
