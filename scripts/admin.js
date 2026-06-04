@@ -337,7 +337,7 @@ function renderFishTable() {
         <td>
         <strong>${f.name}</strong>
         <br><small style="color:var(--gray)">${f.species || '—'}</small>
-        ${f.sizeMin || f.sizeMax ? `<br><small style="color:var(--bright-blue)">📏 ${f.sizeMin || '?'}${f.sizeMax && f.sizeMax !== f.sizeMin ? '–' + f.sizeMax : ''} ซม.</small>` : ''}
+        ${f.sizeMin || f.sizeMax ? `<br><small style="color:var(--bright-blue)">📏 ${f.sizeMin || '?'}${f.sizeMax && f.sizeMax !== f.sizeMin ? '–' + f.sizeMax : ''} นิ้ว</small>` : ''}
       </td>
         <td style="font-family:var(--font-number);font-weight:600;color:var(--royal-blue);">
           ฿${(f.priceMin || 0).toLocaleString('th-TH')}${f.priceMax ? ' – ฿' + f.priceMax.toLocaleString('th-TH') : ''}
