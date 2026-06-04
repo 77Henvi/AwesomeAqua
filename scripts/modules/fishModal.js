@@ -1,6 +1,7 @@
 import { fishData } from './fishData.js';
 import { LINE_ICON } from '../shared/utils.js';
 
+// ── Modal ปลาปกติ ──
 export function openFishDetail(id) {
   const f = fishData.find(x => x.id === id);
   if (!f) return;
@@ -22,13 +23,11 @@ export function openFishDetail(id) {
         <div class="fd-species">${f.species}</div>
       </div>
     </div>
-
     <div class="fd-body">
       <div class="fd-tags">
         ${(f.tags || []).map(t => `<span class="fd-tag">${t}</span>`).join('')}
         <span class="fd-tag fd-tag--level" style="--lc:${lc}">${f.level}</span>
       </div>
-
       <div class="fd-info-row">
         <div class="fd-info-block">
           <div class="fd-info-label">ราคา</div>
@@ -48,14 +47,11 @@ export function openFishDetail(id) {
           </div>
         </div>
       </div>
-
       ${f.desc ? `
         <div class="fd-desc-wrap">
           <div class="fd-desc-title">📖 รายละเอียด</div>
           <div class="fd-desc">${f.desc}</div>
-        </div>` : ''
-      }
-
+        </div>` : ''}
       <div class="fd-cta">
         ${f.stock > 0
           ? `<button class="btn-line fd-btn-line" onclick="openLine('${f.name}')">
@@ -69,10 +65,77 @@ export function openFishDetail(id) {
   document.getElementById('fishModal').classList.add('open');
 }
 
+// ── Modal Coming Soon ──
+export function openComingSoonDetail(id) {
+  const f = fishData.find(x => x.id === id);
+  if (!f) return;
+
+  const levelColor = { 'มือใหม่': '#22c55e', 'ปานกลาง': '#f59e0b', 'ผู้เชี่ยวชาญ': '#ef4444' };
+  const lc = levelColor[f.level] || '#6b7280';
+
+  document.getElementById('csModalContent').innerHTML = `
+    <div class="fd-hero cs-hero">
+      ${f.image
+        ? `<img src="${f.image}" alt="${f.name}" class="fd-hero-img cs-hero-img" onerror="this.outerHTML='<div class=fd-hero-emoji>${f.emoji||'🐟'}</div>'">`
+        : `<div class="fd-hero-emoji">${f.emoji || '🐟'}</div>`
+      }
+      <div class="cs-hero-tape" aria-hidden="true">
+        <div class="cs-tape-inner">
+          <span>✦ COMING SOON ✦ เร็วๆ นี้ ✦ COMING SOON ✦ เร็วๆ นี้ ✦ </span>
+          <span aria-hidden="true">✦ COMING SOON ✦ เร็วๆ นี้ ✦ COMING SOON ✦ เร็วๆ นี้ ✦ </span>
+        </div>
+      </div>
+      <div class="fd-hero-grad"></div>
+      <div class="fd-hero-bottom">
+        <div class="fd-name">${f.name}</div>
+        <div class="fd-species">${f.species || '—'}</div>
+      </div>
+    </div>
+    <div class="fd-body">
+      <div class="fd-tags">
+        ${(f.tags || []).map(t => `<span class="fd-tag">${t}</span>`).join('')}
+        ${f.level ? `<span class="fd-tag fd-tag--level" style="--lc:${lc}">${f.level}</span>` : ''}
+      </div>
+
+      <div class="cs-coming-banner">
+        <div class="cs-banner-icon">🔜</div>
+        <div>
+          <div class="cs-banner-title">กำลังจะมาเร็วๆ นี้</div>
+          <div class="cs-banner-sub">ปลาชนิดนี้อยู่ในแผนนำเข้า ติดต่อสอบถามล่วงหน้าได้เลย</div>
+        </div>
+      </div>
+
+      ${f.desc ? `
+        <div class="fd-desc-wrap">
+          <div class="fd-desc-title">📖 เกี่ยวกับปลาชนิดนี้</div>
+          <div class="fd-desc">${f.desc}</div>
+        </div>` : ''}
+
+      <div class="cs-cta-row">
+        <button class="btn-line fd-btn-line" onclick="openLine('สอบถามปลา ${f.name}')">
+          ${LINE_ICON(18)} สอบถามผ่านไลน์
+        </button>
+        <button class="cs-notify-btn" onclick="closeCsModal()">
+          🔔 รับทราบ
+        </button>
+      </div>
+    </div>
+  `;
+  document.getElementById('csModal').classList.add('open');
+}
+
 export function closeFishModal() {
   document.getElementById('fishModal').classList.remove('open');
 }
 
 export function closeFishModalOutside(e) {
   if (e.target === document.getElementById('fishModal')) closeFishModal();
+}
+
+export function closeCsModal() {
+  document.getElementById('csModal').classList.remove('open');
+}
+
+export function closeCsModalOutside(e) {
+  if (e.target === document.getElementById('csModal')) closeCsModal();
 }

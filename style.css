@@ -12,7 +12,6 @@
   --border: #e5e7eb;
   --font-display: 'Cormorant Garamond', serif;
   --font-body: 'Jost', 'Noto Serif Thai', sans-serif;
-  --font-number: 'DM Sans', 'Jost', sans-serif;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -189,7 +188,7 @@ nav:not(.scrolled) .btn-primary:hover { background: rgba(255,255,255,0.28); }
 .stat { padding: 1rem; border-right: 1px solid rgba(255,255,255,0.15); }
 .stat:last-child { border-right: none; }
 .stat-num {
-  font-family: var(--font-number);
+  font-family: 'Playfair Display', serif;
   font-size: 2rem; font-weight: 700; display: block;
   animation: countFade 0.8s ease both;
 }
@@ -257,8 +256,8 @@ section { padding: 5rem 5%; }
 .fish-name { font-family: 'Playfair Display',serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.25rem; }
 .fish-species { font-size: 0.8rem; color: var(--gray); font-style: italic; margin-bottom: 0.75rem; }
 .fish-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-.fish-price { font-family: var(--font-number); font-size: 1.1rem; font-weight: 700; color: var(--royal-blue); }
-.fish-stock { font-family: var(--font-number); font-size: 0.78rem; color: var(--gray); }
+.fish-price { font-size: 1.1rem; font-weight: 700; color: var(--royal-blue); }
+.fish-stock { font-size: 0.78rem; color: var(--gray); }
 .fish-stock.low { color: #dc2626; }
 .fish-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1rem; }
 .tag {
@@ -406,9 +405,9 @@ body.is-admin .fish-card:hover .card-admin-actions { display: flex; opacity: 1; 
   padding: 0.75rem 1rem;
 }
 .fd-info-label { font-size: 0.7rem; color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem; }
-.fd-info-value { font-family: var(--font-number); font-weight: 600; font-size: 0.9rem; }
+.fd-info-value { font-weight: 600; font-size: 0.9rem; }
 .fd-price {
-  font-family: var(--font-number);
+  font-family: 'Playfair Display', serif;
   font-size: 1.2rem; color: var(--royal-blue);
 }
 .fd-price--dim { color: var(--gray); }
@@ -509,7 +508,66 @@ body.is-admin .fish-card:hover .card-admin-actions { display: flex; opacity: 1; 
   font-size: 0.78rem; font-weight: 500;
   width: 100%; justify-content: center;
   margin-top: 0.5rem;
+  cursor: pointer;
+  transition: background 0.2s;
 }
+.coming-badge:hover { background: #d4ddff; }
+
+/* ── COMING SOON MODAL ── */
+/* hero tape overlay on modal image */
+.cs-hero { position: relative; overflow: hidden; }
+.cs-hero-img { filter: brightness(0.85) saturate(0.8); }
+
+.cs-hero-tape {
+  position: absolute;
+  left: -10%; right: -10%;
+  top: 50%; transform: translateY(-50%) rotate(-6deg);
+  overflow: hidden; z-index: 3; pointer-events: none;
+}
+.cs-tape-inner {
+  display: flex;
+  background: var(--royal-blue);
+  padding: 0.4rem 0;
+  white-space: nowrap;
+  animation: tapeScroll 12s linear infinite;
+}
+.cs-tape-inner span {
+  display: inline-block;
+  color: rgba(255,255,255,0.92);
+  font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 0.08em; padding: 0 0.5rem;
+}
+
+/* Coming soon banner inside modal body */
+.cs-coming-banner {
+  display: flex; align-items: flex-start; gap: 0.85rem;
+  background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+  border: 1px solid #c7d2fe;
+  border-radius: 12px; padding: 1rem 1.1rem;
+  margin-bottom: 1.25rem;
+}
+.cs-banner-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 0.1rem; }
+.cs-banner-title {
+  font-weight: 700; font-size: 0.9rem;
+  color: #3730a3; margin-bottom: 0.25rem;
+}
+.cs-banner-sub { font-size: 0.82rem; color: #4b5e9e; line-height: 1.5; }
+
+/* CTA row */
+.cs-cta-row {
+  display: flex; gap: 0.75rem; margin-top: 0.25rem;
+}
+.cs-cta-row .fd-btn-line { flex: 1; }
+.cs-notify-btn {
+  flex: 1; padding: 0.9rem;
+  background: #eef2ff; color: #3730a3;
+  border: 1px solid #c7d2fe;
+  border-radius: 12px; cursor: pointer;
+  font-size: 0.9rem; font-weight: 500;
+  font-family: var(--font-body);
+  transition: background 0.2s;
+}
+.cs-notify-btn:hover { background: #e0e7ff; }
 
 /* Out-of-stock badge on regular cards */
 .out-badge {
@@ -690,39 +748,46 @@ nav.scrolled .nav-contact { color: var(--gray); }
 .stats        { position: relative; }
 .about-contact-info { position: relative; }
 
-/* Generic fish — emoji text node */
+/* outer wrapper — flip เท่านั้น ไม่มี animation */
 .fish-bg__fish {
   position: absolute;
   left: 0;
   display: inline-block;
   line-height: 1;
   user-select: none;
-  /* transform-origin ต้องเป็น left center เพราะ translateX ขยับ element
-     แล้ว scaleX flip รอบจุดนั้น — ใช้ left center ทำให้ flip ถูก axis */
-  transform-origin: left center;
+}
+/* inner span — movement เท่านั้น ไม่มี scaleX */
+.fish-bg__fish span {
+  display: inline-block;
 }
 
-/* 🐟 emoji หัวชี้ซ้าย by default
-   LTR (ว่ายไปขวา) → ต้อง scaleX(-1) เพื่อหันหัวขวา
-   RTL (ว่ายไปซ้าย) → scaleX(1) หัวชี้ซ้ายพอดี */
+/* movement only */
 @keyframes fishLTR {
-  0%   { transform: translateX(-15vw) scaleX(-1); }
-  100% { transform: translateX(105vw) scaleX(-1); }
+  0%   { transform: translateX(-15vw); }
+  100% { transform: translateX(105vw); }
 }
 @keyframes fishRTL {
-  0%   { transform: translateX(105vw) scaleX(1); }
-  100% { transform: translateX(-15vw) scaleX(1); }
+  0%   { transform: translateX(105vw); }
+  100% { transform: translateX(-15vw); }
 }
 
-/* ── Individual fish ── */
-.fish-bg__fish--1 { top: 10%; font-size: 2.2rem; opacity: 0.18; animation: fishLTR 30s linear infinite -4s;  }
-.fish-bg__fish--2 { top: 34%; font-size: 1.6rem; opacity: 0.14; animation: fishRTL 24s linear infinite -9s;  }
-.fish-bg__fish--3 { top: 55%; font-size: 2.8rem; opacity: 0.16; animation: fishLTR 38s linear infinite -16s; }
-.fish-bg__fish--4 { top: 75%; font-size: 1.8rem; opacity: 0.13; animation: fishRTL 20s linear infinite -2s;  }
-.fish-bg__fish--5 { top: 20%; font-size: 1.3rem; opacity: 0.12; animation: fishLTR 28s linear infinite -20s; }
-.fish-bg__fish--6 { top: 84%; font-size: 2.4rem; opacity: 0.15; animation: fishRTL 33s linear infinite -11s; }
+/* LTR — flip emoji ให้หัวชี้ขวา */
+.fish-bg__fish--1 { top: 10%; font-size: 2.2rem; opacity: 0.18; transform: scaleX(-1); }
+.fish-bg__fish--1 span { animation: fishLTR 30s linear infinite -4s; }
+.fish-bg__fish--3 { top: 55%; font-size: 2.8rem; opacity: 0.16; transform: scaleX(-1); }
+.fish-bg__fish--3 span { animation: fishLTR 38s linear infinite -16s; }
+.fish-bg__fish--5 { top: 20%; font-size: 1.3rem; opacity: 0.12; transform: scaleX(-1); }
+.fish-bg__fish--5 span { animation: fishLTR 28s linear infinite -20s; }
 
-/* dark sections ใช้ opacity เดิมได้เพราะ emoji มีสีในตัว */
+/* RTL — emoji หัวชี้ซ้ายอยู่แล้ว */
+.fish-bg__fish--2 { top: 34%; font-size: 1.6rem; opacity: 0.14; }
+.fish-bg__fish--2 span { animation: fishRTL 24s linear infinite -9s; }
+.fish-bg__fish--4 { top: 75%; font-size: 1.8rem; opacity: 0.13; }
+.fish-bg__fish--4 span { animation: fishRTL 20s linear infinite -2s; }
+.fish-bg__fish--6 { top: 84%; font-size: 2.4rem; opacity: 0.15; }
+.fish-bg__fish--6 span { animation: fishRTL 33s linear infinite -11s; }
+
+/* dark sections */
 .fish-bg--dark .fish-bg__fish--1 { opacity: 0.22; }
 .fish-bg--dark .fish-bg__fish--2 { opacity: 0.18; }
 .fish-bg--dark .fish-bg__fish--3 { opacity: 0.20; }
@@ -802,120 +867,6 @@ nav.scrolled .nav-contact { color: var(--gray); }
 }
 
 /* ── Form Grid ── */
-.finance-panel {
-  margin-bottom: 1.5rem;
-}
-
-.finance-summary-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1rem;
-}
-
-.finance-summary-card {
-  background: #f8faff;
-  border: 1px solid #e3e9ff;
-  border-radius: 12px;
-  padding: 1.1rem;
-}
-
-.finance-label {
-  color: var(--gray);
-  font-size: 0.78rem;
-  margin-bottom: 0.35rem;
-}
-
-.finance-value {
-  color: var(--royal-blue);
-  font-family: var(--font-number);
-  font-size: 1.5rem;
-  font-weight: 700;
-  line-height: 1.15;
-}
-
-.finance-note {
-  color: var(--gray);
-  font-size: 0.76rem;
-  margin-top: 0.4rem;
-}
-
-.finance-lists {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem;
-  margin-top: 1.5rem;
-}
-
-.finance-list-title {
-  color: var(--black);
-  font-size: 0.9rem;
-  font-weight: 600;
-  margin-bottom: 0.75rem;
-}
-
-.finance-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  border-top: 1px solid #edf2ff;
-  padding: 0.8rem 0;
-}
-
-.finance-row:last-child {
-  padding-bottom: 0;
-}
-
-.finance-row-main {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  min-width: 0;
-}
-
-.finance-row-main strong {
-  color: var(--black);
-  font-size: 0.9rem;
-}
-
-.finance-row-main span,
-.finance-row-meta span:first-child {
-  color: var(--gray);
-  font-size: 0.76rem;
-}
-
-.finance-row-meta {
-  font-family: var(--font-number);
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  text-align: right;
-  white-space: nowrap;
-}
-
-.finance-row-meta span:last-child {
-  color: var(--royal-blue);
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-
-.admin-stat-num,
-.fish-table-wrap td:nth-child(3),
-.fish-table-wrap td:nth-child(4),
-.form-group input[type="number"] {
-  font-family: var(--font-number);
-}
-
-.finance-empty {
-  color: var(--gray);
-  background: #f8faff;
-  border: 1px dashed #dbe5ff;
-  border-radius: 10px;
-  padding: 1rem;
-  text-align: center;
-  font-size: 0.85rem;
-}
-
 .form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));

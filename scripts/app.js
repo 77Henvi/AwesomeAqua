@@ -36,6 +36,9 @@ window.closeModal            = closeModal;
 window.closeModalOutside     = closeModalOutside;
 window.switchTab             = switchTab;
 window.fakeLogin             = fakeLogin;
+window.openComingSoonDetail = openComingSoonDetail;
+window.closeCsModal         = closeCsModal;
+window.closeCsModalOutside  = closeCsModalOutside;
 
 // ── Nav shadow on scroll ──
 window.addEventListener('scroll', () => {
