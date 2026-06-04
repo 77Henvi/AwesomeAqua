@@ -92,7 +92,9 @@ async function loadFishFromDB() {
     stock:    f.stock,
     level:    f.level,
     desc:     f.desc,
-    tags:     f.tags || []
+    tags:     f.tags || [],
+    sizeMin:  f.size_min || null,
+    sizeMax:  f.size_max || null
   }));
 
   renderAll();
@@ -120,6 +122,8 @@ async function addFish() {
   const stock    = parseInt(document.getElementById('newStock').value)    || 0;
   const level    = document.getElementById('newLevel').value;
   const desc     = document.getElementById('newDesc').value;
+  const sizeMin  = parseFloat(document.getElementById('newSizeMin').value) || null;
+  const sizeMax  = parseFloat(document.getElementById('newSizeMax').value) || null;
   const file     = document.getElementById('newImageFile').files[0];
 
   if (!name) { showToast('⚠️ กรุณากรอกชื่อปลา'); return; }
@@ -135,7 +139,9 @@ async function addFish() {
     price_min: priceMin, price_max: priceMax,
     stock, level, desc,
     tags: getSelectedTags('newTags'),
-    image: imageUrl
+    image: imageUrl,
+    size_min: sizeMin,
+    size_max: sizeMax
   });
 
   if (error) { showToast('❌ เพิ่มปลาไม่ได้: ' + error.message); return; }
@@ -182,7 +188,9 @@ async function saveEdit() {
     level:     document.getElementById('editLevel').value,
     desc:      document.getElementById('editDesc').value,
     tags:      getSelectedTags('editTags'),
-    image:     imageUrl
+    image:     imageUrl,
+    size_min:  parseFloat(document.getElementById('editSizeMin').value) || null,
+    size_max:  parseFloat(document.getElementById('editSizeMax').value) || null
   }).eq('id', id);
 
   if (error) { showToast('❌ บันทึกไม่ได้'); return; }
@@ -327,9 +335,10 @@ function renderFishTable() {
       <tr>
         <td>${imgCell}</td>
         <td>
-          <strong>${f.name}</strong>
-          <br><small style="color:var(--gray)">${f.species || '—'}</small>
-        </td>
+        <strong>${f.name}</strong>
+        <br><small style="color:var(--gray)">${f.species || '—'}</small>
+        ${f.sizeMin || f.sizeMax ? `<br><small style="color:var(--bright-blue)">📏 ${f.sizeMin || '?'}${f.sizeMax && f.sizeMax !== f.sizeMin ? '–' + f.sizeMax : ''} ซม.</small>` : ''}
+      </td>
         <td style="font-family:var(--font-number);font-weight:600;color:var(--royal-blue);">
           ฿${(f.priceMin || 0).toLocaleString('th-TH')}${f.priceMax ? ' – ฿' + f.priceMax.toLocaleString('th-TH') : ''}
         </td>
@@ -431,6 +440,8 @@ function openEditModal(id) {
   document.getElementById('editStock').value    = f.stock;
   document.getElementById('editLevel').value    = f.level;
   document.getElementById('editDesc').value     = f.desc || '';
+  document.getElementById('editSizeMin').value  = f.sizeMin || '';
+  document.getElementById('editSizeMax').value  = f.sizeMax || '';
 
   const preview     = document.getElementById('editImagePreview');
   preview.src       = f.image || '';
@@ -451,7 +462,7 @@ function closeEditModal() {
 //   CLEAR FORM
 // ════════════════════════════════════════════
 function clearForm() {
-  ['newEmoji', 'newName', 'newSpecies', 'newPriceMin', 'newPriceMax', 'newStock', 'newDesc']
+  ['newEmoji', 'newName', 'newSpecies', 'newPriceMin', 'newPriceMax', 'newStock', 'newSizeMin', 'newSizeMax', 'newDesc']
     .forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
