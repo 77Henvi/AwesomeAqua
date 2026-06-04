@@ -739,53 +739,64 @@ nav.scrolled .nav-contact { color: var(--gray); }
   overflow: hidden;
   pointer-events: none;
   z-index: 0;
-  contain: strict;
 }
 
 /* Every section that gets fish bg needs position:relative */
-#fish       { position: relative; }
-.about-values { position: relative; }
-.stats        { position: relative; }
-.about-contact-info { position: relative; }
+#fish                { position: relative; }
+.about-values        { position: relative; }
+.stats               { position: relative; }
+.about-contact-info  { position: relative; }
 
-/* outer wrapper — flip เท่านั้น ไม่มี animation */
+/* fish div — animate left% ซึ่ง reference .fish-bg (=100% of section width) */
 .fish-bg__fish {
   position: absolute;
-  left: 0;
   display: inline-block;
   line-height: 1;
   user-select: none;
-}
-/* inner span — movement เท่านั้น ไม่มี scaleX */
-.fish-bg__fish span {
-  display: inline-block;
+  white-space: nowrap;
 }
 
-/* movement only */
+/* LTR: ว่ายซ้าย→ขวา, scaleX(-1) flip emoji หัวชี้ขวา */
 @keyframes fishLTR {
-  0%   { transform: translateX(-15vw); }
-  100% { transform: translateX(105vw); }
+  0%   { left: -8%; }
+  100% { left: 108%; }
 }
+/* RTL: ว่ายขวา→ซ้าย, emoji หัวชี้ซ้ายอยู่แล้ว */
 @keyframes fishRTL {
-  0%   { transform: translateX(105vw); }
-  100% { transform: translateX(-15vw); }
+  0%   { left: 108%; }
+  100% { left: -8%; }
 }
 
-/* LTR — flip emoji ให้หัวชี้ขวา */
-.fish-bg__fish--1 { top: 10%; font-size: 2.2rem; opacity: 0.18; transform: scaleX(-1); }
-.fish-bg__fish--1 span { animation: fishLTR 30s linear infinite -4s; }
-.fish-bg__fish--3 { top: 55%; font-size: 2.8rem; opacity: 0.16; transform: scaleX(-1); }
-.fish-bg__fish--3 span { animation: fishLTR 38s linear infinite -16s; }
-.fish-bg__fish--5 { top: 20%; font-size: 1.3rem; opacity: 0.12; transform: scaleX(-1); }
-.fish-bg__fish--5 span { animation: fishLTR 28s linear infinite -20s; }
+/* Individual fish — LTR */
+.fish-bg__fish--1 {
+  top: 10%; font-size: 2.2rem; opacity: 0.18;
+  transform: scaleX(-1);
+  animation: fishLTR 30s linear infinite -4s;
+}
+.fish-bg__fish--3 {
+  top: 55%; font-size: 2.8rem; opacity: 0.16;
+  transform: scaleX(-1);
+  animation: fishLTR 38s linear infinite -16s;
+}
+.fish-bg__fish--5 {
+  top: 20%; font-size: 1.3rem; opacity: 0.12;
+  transform: scaleX(-1);
+  animation: fishLTR 28s linear infinite -20s;
+}
 
-/* RTL — emoji หัวชี้ซ้ายอยู่แล้ว */
-.fish-bg__fish--2 { top: 34%; font-size: 1.6rem; opacity: 0.14; }
-.fish-bg__fish--2 span { animation: fishRTL 24s linear infinite -9s; }
-.fish-bg__fish--4 { top: 75%; font-size: 1.8rem; opacity: 0.13; }
-.fish-bg__fish--4 span { animation: fishRTL 20s linear infinite -2s; }
-.fish-bg__fish--6 { top: 84%; font-size: 2.4rem; opacity: 0.15; }
-.fish-bg__fish--6 span { animation: fishRTL 33s linear infinite -11s; }
+/* Individual fish — RTL */
+.fish-bg__fish--2 {
+  top: 34%; font-size: 1.6rem; opacity: 0.14;
+  animation: fishRTL 24s linear infinite -9s;
+}
+.fish-bg__fish--4 {
+  top: 75%; font-size: 1.8rem; opacity: 0.13;
+  animation: fishRTL 20s linear infinite -2s;
+}
+.fish-bg__fish--6 {
+  top: 84%; font-size: 2.4rem; opacity: 0.15;
+  animation: fishRTL 33s linear infinite -11s;
+}
 
 /* dark sections */
 .fish-bg--dark .fish-bg__fish--1 { opacity: 0.22; }
