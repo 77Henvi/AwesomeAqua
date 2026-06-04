@@ -5,8 +5,6 @@ export function isComingSoon(f) {
   return f.stock === 0 && f.priceMin === 0;
 }
 
-const TAPE_TEXT = '✦ COMING SOON ✦ เร็วๆ นี้ ✦ COMING SOON ✦ เร็วๆ นี้ ✦ COMING SOON ✦ เร็วๆ นี้ ✦ ';
-
 // ── การ์ดปลาขายปกติ ──
 function _availableCard(f) {
   const outOfStock = f.stock === 0;
