@@ -491,24 +491,42 @@ body.is-admin .fish-card:hover .card-admin-actions { display: flex; opacity: 1; 
   to   { transform: translateX(-50%); }
 }
 
-.coming-badge-center {
+/* ── BUG-FREE ANIMATED TAPE ── */
+.coming-tape-wrapper {
   position: absolute;
   top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: #ffffff; /* ขาวล้วนคลีนๆ */
-  color: var(--gray); /* ใช้สีเทาเพื่อให้ดูซอฟต์ ไม่ตะโกน */
-  padding: 0.4rem 1.2rem;
-  border-radius: 100px;
-  font-size: 0.7rem;
-  font-weight: 500; /* ลดความหนาของตัวอักษรลง */
-  letter-spacing: 0.15em; /* ถ่างช่องไฟให้มากที่สุด */
-  text-transform: uppercase;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05); /* เงาฟุ้งๆ เหมือนลอยอยู่ */
-  border: none; /* เอาขอบออกเพื่อความคลีนที่สุด */
+  left: -25%; /* ดันไปทางซ้ายเยอะๆ เพื่อเผื่อพื้นที่ตอนหมุน */
+  width: 150%; /* ขยายความกว้างให้ยาวทะลุการ์ดไปเลย ขอบจะได้ไม่แหว่ง */
+  transform: translateY(-50%) rotate(-10deg); /* องศาการเอียง */
+  background: rgba(26, 58, 143, 0.9); /* สีน้ำเงินของแบรนด์ (โปร่งแสงนิดๆ ให้ดูแพง) */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   z-index: 3;
-  white-space: nowrap;
   pointer-events: none;
+  overflow: hidden; 
+  display: flex;
+}
+
+.coming-tape-content {
+  display: flex;
+  width: max-content;
+  /* ปรับความเร็วตรงนี้ได้เลย (12s คือกำลังสวย) */
+  animation: tapeScrollInfinite 20s linear infinite; 
+}
+
+.coming-tape-content span {
+  display: inline-block;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  padding: 0.4rem 0.5rem;
+  white-space: nowrap;
+}
+
+@keyframes tapeScrollInfinite {
+  0% { transform: translateX(0); }
+  /* ขยับไปแค่ครึ่งเดียว (-50%) เพราะเราก็อปปี้ span ไว้ 2 ชุด มันจะวนลูปเนียนกริบ */
+  100% { transform: translateX(-50%); } 
 }
 
 /* Coming soon card — info area */
@@ -541,9 +559,13 @@ body.is-admin .fish-card:hover .card-admin-actions { display: flex; opacity: 1; 
 
 .cs-hero-tape {
   position: absolute;
-  left: -10%; right: -10%;
-  top: 50%; transform: translateY(-50%) rotate(-6deg);
-  overflow: hidden; z-index: 3; pointer-events: none;
+  left: -25%; /* ถอยไปซ้ายเยอะๆ เผื่อพื้นที่ตอนเอียง */
+  width: 150%; /* ขยายความกว้างให้ยาวทะลุกรอบ */
+  top: 50%; 
+  transform: translateY(-50%) rotate(-6deg);
+  overflow: hidden; 
+  z-index: 3; 
+  pointer-events: none;
 }
 .cs-tape-inner {
   display: flex;

@@ -54,7 +54,12 @@ function _comingSoonCard(f) {
           : `<span class="coming-emoji">${f.emoji || '🐟'}</span>`
         }
         
-        <div class="coming-badge-center">✨ เร็วๆ นี้</div>
+        <div class="coming-tape-wrapper">
+          <div class="coming-tape-content">
+            <span>✦ COMING SOON ✦ เร็วๆ นี้ ✦ COMING SOON ✦ เร็วๆ นี้ ✦ COMING SOON ✦ เร็วๆ นี้ ✦ </span>
+            <span>✦ COMING SOON ✦ เร็วๆ นี้ ✦ COMING SOON ✦ เร็วๆ นี้ ✦ COMING SOON ✦ เร็วๆ นี้ ✦ </span>
+          </div>
+        </div>
         
         <div class="coming-overlay"></div>
       </div>

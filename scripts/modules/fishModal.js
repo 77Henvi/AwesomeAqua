@@ -79,12 +79,7 @@ export function openComingSoonDetail(id) {
         ? `<img src="${f.image}" alt="${f.name}" class="fd-hero-img cs-hero-img" onerror="this.outerHTML='<div class=fd-hero-emoji>${f.emoji||'🐟'}</div>'">`
         : `<div class="fd-hero-emoji">${f.emoji || '🐟'}</div>`
       }
-      <div class="cs-hero-tape" aria-hidden="true">
-        <div class="cs-tape-inner">
-          <span>✦ COMING SOON ✦ เร็วๆ นี้ ✦ COMING SOON ✦ เร็วๆ นี้ ✦ </span>
-          <span aria-hidden="true">✦ COMING SOON ✦ เร็วๆ นี้ ✦ COMING SOON ✦ เร็วๆ นี้ ✦ </span>
-        </div>
-      </div>
+      <div class="coming-badge-center">✨ เร็วๆ นี้</div>
       <div class="fd-hero-grad"></div>
       <div class="fd-hero-bottom">
         <div class="fd-name">${f.name}</div>
