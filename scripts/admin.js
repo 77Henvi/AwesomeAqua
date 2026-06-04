@@ -2,12 +2,12 @@
 //   ENTRY POINT — admin.html
 // ============================================
 
-import { supabase }                         from '../supabase.js';
-import { showToast }                        from './shared/utils.js';
+import { supabase }                       from '../supabase.js';
+import { showToast }                      from './shared/utils.js';
 import { compressImage, previewNewImage,
-         previewEditImage }                 from './shared/image.js';
+         previewEditImage }               from './shared/image.js';
 import { toggleTag, getSelectedTags,
-         setSelectedTags }                  from './shared/tags.js';
+         setSelectedTags }                from './shared/tags.js';
 
 // ── Expose ไว้บน window ──
 window.adminLogin       = adminLogin;
@@ -22,10 +22,23 @@ window.toggleTag        = toggleTag;
 window.previewNewImage  = previewNewImage;
 window.previewEditImage = previewEditImage;
 
-// ── State ──
-let fishData = [];
+// ── UI helpers (called from inline onclick in HTML) ──
+window.switchTab        = switchTab;
+window.toggleAddPanel   = toggleAddPanel;
+window.calcPricePreview = calcPricePreview;
+window.setStockFilter   = setStockFilter;
+window.addTodo          = addTodo;
+window.toggleTodoItem   = toggleTodoItem;
+window.deleteTodoItem   = deleteTodoItem;
 
-// ── AUTH ──
+// ── State ──
+let fishData     = [];
+let _todos       = [];
+let _stockFilter = 'all';
+
+// ════════════════════════════════════════════
+//   AUTH
+// ════════════════════════════════════════════
 async function adminLogin() {
   const email    = document.getElementById('adminEmailInput').value;
   const password = document.getElementById('adminPassInput').value;
@@ -34,7 +47,7 @@ async function adminLogin() {
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
-    err.textContent = '❌ ' + error.message;
+    err.textContent  = '❌ ' + error.message;
     err.style.display = 'block';
     return;
   }
@@ -44,6 +57,7 @@ async function adminLogin() {
 }
 
 async function adminLogout() {
+  if (!confirm('ต้องการออกจากระบบ?')) return;
   await supabase.auth.signOut();
   document.getElementById('adminDashboard').style.display = 'none';
   document.getElementById('loginScreen').style.display    = 'flex';
@@ -52,12 +66,13 @@ async function adminLogout() {
 function showDashboard() {
   document.getElementById('loginScreen').style.display    = 'none';
   document.getElementById('adminDashboard').style.display = 'block';
+  _setDateHeaders();
   loadFishFromDB();
-  renderAdminStats();
-  renderFinancialInsights();
 }
 
-// ── LOAD ──
+// ════════════════════════════════════════════
+//   LOAD
+// ════════════════════════════════════════════
 async function loadFishFromDB() {
   const { data, error } = await supabase
     .from('fish')
@@ -80,14 +95,24 @@ async function loadFishFromDB() {
     tags:     f.tags || []
   }));
 
-  renderFishTable();
-  renderAdminStats();
-  renderFinancialInsights();
+  renderAll();
 }
 
-// ── ADD ──
+// ════════════════════════════════════════════
+//   RENDER ALL
+// ════════════════════════════════════════════
+function renderAll() {
+  renderAdminStats();
+  renderFishTable();
+  renderFinancialInsights();
+  renderDashboardCards();
+}
+
+// ════════════════════════════════════════════
+//   ADD
+// ════════════════════════════════════════════
 async function addFish() {
-  const name     = document.getElementById('newName').value;
+  const name     = document.getElementById('newName').value.trim();
   const emoji    = document.getElementById('newEmoji').value    || '🐟';
   const species  = document.getElementById('newSpecies').value;
   const priceMin = parseInt(document.getElementById('newPriceMin').value) || 0;
@@ -117,10 +142,13 @@ async function addFish() {
 
   showToast('✅ เพิ่มปลา ' + name + ' เรียบร้อย!');
   clearForm();
+  toggleAddPanel(false); // ปิด panel
   loadFishFromDB();
 }
 
-// ── DELETE ──
+// ════════════════════════════════════════════
+//   DELETE
+// ════════════════════════════════════════════
 async function deleteFish(id) {
   if (!confirm('ยืนยันลบปลานี้?')) return;
 
@@ -132,7 +160,9 @@ async function deleteFish(id) {
   loadFishFromDB();
 }
 
-// ── SAVE EDIT ──
+// ════════════════════════════════════════════
+//   SAVE EDIT
+// ════════════════════════════════════════════
 async function saveEdit() {
   const id   = document.getElementById('editFishId').value;
   const file = document.getElementById('editImageFile').files[0];
@@ -162,14 +192,14 @@ async function saveEdit() {
   loadFishFromDB();
 }
 
-// ── UPLOAD รูป ──
+// ════════════════════════════════════════════
+//   UPLOAD IMAGE
+// ════════════════════════════════════════════
 async function uploadImage(file) {
-  const filename = `fish_${Date.now()}.jpg`;
-
+  const filename   = `fish_${Date.now()}.jpg`;
   const compressed = await new Promise(resolve => compressImage(file, resolve));
-
-  const res  = await fetch(compressed);
-  const blob = await res.blob();
+  const res        = await fetch(compressed);
+  const blob       = await res.blob();
 
   const { error } = await supabase.storage
     .from('fish-images')
@@ -188,7 +218,9 @@ async function uploadImage(file) {
   return urlData.publicUrl;
 }
 
-// ── STATS ──
+// ════════════════════════════════════════════
+//   STATS
+// ════════════════════════════════════════════
 function renderAdminStats() {
   const total    = fishData.length;
   const inStock  = fishData.filter(f => f.stock > 0).length;
@@ -215,78 +247,159 @@ function renderAdminStats() {
   `;
 }
 
-// ── TABLE ──
-function formatMoney(value) {
-  return '฿' + Math.round(value || 0).toLocaleString('th-TH');
+// ════════════════════════════════════════════
+//   DASHBOARD CARDS (low stock + recent)
+// ════════════════════════════════════════════
+function renderDashboardCards() {
+  // Low stock
+  const lowEl    = document.getElementById('dash-lowstock');
+  const lowItems = fishData.filter(f => f.stock <= 5);
+
+  if (!lowItems.length) {
+    lowEl.innerHTML = _empty('🎉', 'สต็อกครบทุกรายการ');
+  } else {
+    lowEl.innerHTML = lowItems.slice(0, 5).map(f => {
+      const cls  = f.stock === 0 ? 'out' : 'low';
+      const text = f.stock === 0 ? 'หมด' : `${f.stock} ตัว`;
+      return `
+        <div class="dash-mini-row">
+          <div>
+            <div class="dash-mini-name">${f.emoji || '🐟'} ${f.name}</div>
+            <div class="dash-mini-sub">${f.species || '—'}</div>
+          </div>
+          <span class="admin-stock-badge ${cls}">${text}</span>
+        </div>`;
+    }).join('');
+  }
+
+  // Recent
+  const recEl = document.getElementById('dash-recent');
+  if (!fishData.length) {
+    recEl.innerHTML = _empty('🐟', 'ยังไม่มีปลา');
+  } else {
+    recEl.innerHTML = [...fishData].slice(0, 5).map(f => `
+      <div class="dash-mini-row">
+        <div>
+          <div class="dash-mini-name">${f.emoji || '🐟'} ${f.name}</div>
+          <div class="dash-mini-sub">${f.species || '—'}</div>
+        </div>
+        <span style="font-size:0.82rem;font-weight:600;color:var(--royal-blue);font-family:var(--font-number);">
+          ฿${(f.priceMin || 0).toLocaleString('th-TH')}
+        </span>
+      </div>`).join('');
+  }
 }
 
-function getAveragePrice(fish) {
-  if (fish.priceMin && fish.priceMax) return (fish.priceMin + fish.priceMax) / 2;
-  return fish.priceMin || fish.priceMax || 0;
+// ════════════════════════════════════════════
+//   FISH TABLE
+// ════════════════════════════════════════════
+function renderFishTable() {
+  const q    = (document.getElementById('fishSearch')?.value || '').toLowerCase();
+  const list = fishData.filter(f => {
+    const match = (f.name + ' ' + (f.species || '')).toLowerCase().includes(q);
+    if (_stockFilter === 'ok')  return match && f.stock > 5;
+    if (_stockFilter === 'low') return match && f.stock > 0 && f.stock <= 5;
+    if (_stockFilter === 'out') return match && f.stock === 0;
+    return match;
+  });
+
+  const countEl = document.getElementById('fishCount');
+  if (countEl) countEl.textContent = list.length + ' รายการ';
+
+  const tbody = document.getElementById('fishTableBody');
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:2rem">
+      ${q ? 'ไม่พบปลาที่ค้นหา' : 'ยังไม่มีปลาครับ'}
+    </td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = list.map(f => {
+    const sc   = f.stock === 0 ? 'out' : f.stock <= 5 ? 'low' : 'ok';
+    const st   = f.stock === 0 ? 'หมดสต็อก' : f.stock <= 5 ? `⚠️ ${f.stock} ตัว` : `${f.stock} ตัว`;
+    const lvMap = { 'มือใหม่': 'easy', 'ปานกลาง': 'medium', 'ผู้เชี่ยวชาญ': 'hard' };
+    const lvCls = lvMap[f.level] || '';
+    const imgCell = f.image
+      ? `<img src="${f.image}" style="width:44px;height:44px;object-fit:cover;border-radius:8px;">`
+      : `<span style="font-size:1.8rem;">${f.emoji || '🐟'}</span>`;
+
+    return `
+      <tr>
+        <td>${imgCell}</td>
+        <td>
+          <strong>${f.name}</strong>
+          <br><small style="color:var(--gray)">${f.species || '—'}</small>
+        </td>
+        <td style="font-family:var(--font-number);font-weight:600;color:var(--royal-blue);">
+          ฿${(f.priceMin || 0).toLocaleString('th-TH')}${f.priceMax ? ' – ฿' + f.priceMax.toLocaleString('th-TH') : ''}
+        </td>
+        <td><span class="admin-stock-badge ${sc}">${st}</span></td>
+        <td><span class="admin-level-badge ${lvCls}">${f.level}</span></td>
+        <td>
+          <button class="action-btn action-edit"   onclick="openEditModal('${f.id}')">แก้ไข</button>
+          <button class="action-btn action-delete" onclick="deleteFish('${f.id}')">ลบ</button>
+        </td>
+      </tr>`;
+  }).join('');
 }
 
-function getStockValue(fish, priceKey) {
-  const price = priceKey === 'min'
-    ? fish.priceMin
-    : priceKey === 'max'
-      ? (fish.priceMax || fish.priceMin)
-      : getAveragePrice(fish);
-
-  return (price || 0) * (fish.stock || 0);
-}
-
+// ════════════════════════════════════════════
+//   FINANCIAL INSIGHTS
+// ════════════════════════════════════════════
 function renderFinancialInsights() {
   const panel = document.getElementById('financialInsights');
   if (!panel) return;
 
-  const totalMinValue = fishData.reduce((sum, f) => sum + getStockValue(f, 'min'), 0);
-  const totalMaxValue = fishData.reduce((sum, f) => sum + getStockValue(f, 'max'), 0);
-  const totalAvgValue = fishData.reduce((sum, f) => sum + getStockValue(f), 0);
+  const avgPrice  = f => (f.priceMin && f.priceMax) ? (f.priceMin + f.priceMax) / 2 : (f.priceMin || f.priceMax || 0);
+  const stockVal  = f => avgPrice(f) * (f.stock || 0);
+  const fmt       = v => '฿' + Math.round(v || 0).toLocaleString('th-TH');
+
+  const totalMin    = fishData.reduce((s, f) => s + (f.priceMin || 0) * (f.stock || 0), 0);
+  const totalMax    = fishData.reduce((s, f) => s + ((f.priceMax || f.priceMin) || 0) * (f.stock || 0), 0);
+  const totalAvg    = fishData.reduce((s, f) => s + stockVal(f), 0);
   const stockedFish = fishData.filter(f => f.stock > 0);
 
   const topValueFish = [...stockedFish]
-    .map(f => ({ ...f, value: getStockValue(f), avgPrice: getAveragePrice(f) }))
+    .map(f => ({ ...f, value: stockVal(f), avgPrice: avgPrice(f) }))
     .sort((a, b) => b.value - a.value)
     .slice(0, 5);
 
   const urgentFish = [...stockedFish]
-    .map(f => ({ ...f, value: getStockValue(f), avgPrice: getAveragePrice(f) }))
+    .map(f => ({ ...f, value: stockVal(f), avgPrice: avgPrice(f) }))
     .filter(f => f.stock <= 5 && f.avgPrice > 0)
     .sort((a, b) => b.avgPrice - a.avgPrice)
     .slice(0, 5);
 
   const renderRows = (list, emptyText) => {
     if (!list.length) return `<div class="finance-empty">${emptyText}</div>`;
-
     return list.map(f => `
       <div class="finance-row">
         <div class="finance-row-main">
           <strong>${f.name}</strong>
-          <span>${f.species || '-'}</span>
+          <span>${f.species || '—'}</span>
         </div>
         <div class="finance-row-meta">
           <span>${f.stock} ตัว</span>
-          <span>${formatMoney(f.value)}</span>
+          <span>${fmt(f.value)}</span>
         </div>
-      </div>
-    `).join('');
+      </div>`).join('');
   };
 
   panel.innerHTML = `
     <div class="finance-summary-grid">
       <div class="finance-summary-card">
         <div class="finance-label">มูลค่าสต็อกประมาณการ</div>
-        <div class="finance-value">${formatMoney(totalAvgValue)}</div>
-        <div class="finance-note">คำนวณจากราคาเฉลี่ย x จำนวนคงเหลือ</div>
+        <div class="finance-value">${fmt(totalAvg)}</div>
+        <div class="finance-note">คำนวณจากราคาเฉลี่ย × จำนวนคงเหลือ</div>
       </div>
       <div class="finance-summary-card">
         <div class="finance-label">ช่วงมูลค่าสต็อก</div>
-        <div class="finance-value">${formatMoney(totalMinValue)} - ${formatMoney(totalMaxValue)}</div>
+        <div class="finance-value" style="font-size:1.2rem;">${fmt(totalMin)} – ${fmt(totalMax)}</div>
         <div class="finance-note">อิงจากราคาต่ำสุดถึงสูงสุด</div>
       </div>
       <div class="finance-summary-card">
         <div class="finance-label">สินค้าในสต็อกที่มีราคา</div>
-        <div class="finance-value">${stockedFish.filter(f => getAveragePrice(f) > 0).length}</div>
+        <div class="finance-value">${stockedFish.filter(f => avgPrice(f) > 0).length}</div>
         <div class="finance-note">ชนิดปลาที่นำมาคิดมูลค่าได้</div>
       </div>
     </div>
@@ -303,44 +416,29 @@ function renderFinancialInsights() {
   `;
 }
 
-function renderFishTable() {
-  const tbody = document.getElementById('fishTableBody');
-  if (!tbody) return;
-  tbody.innerHTML = fishData.length === 0
-    ? `<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:2rem">ยังไม่มีปลาครับ</td></tr>`
-    : fishData.map(f => `
-      <tr>
-        <td>${f.image ? `<img src="${f.image}" style="width:44px;height:44px;object-fit:cover;border-radius:8px">` : f.emoji || '🐟'}</td>
-        <td><strong>${f.name}</strong><br><small style="color:var(--gray)">${f.species}</small></td>
-        <td>฿${f.priceMin.toLocaleString()}${f.priceMax ? ' – ' + f.priceMax.toLocaleString() : ''}</td>
-        <td>
-          <span class="status-dot ${f.stock === 0 ? 'out' : f.stock <= 5 ? 'low' : 'ok'}"></span>
-          ${f.stock} ตัว
-        </td>
-        <td>${f.level}</td>
-        <td>
-          <button class="action-btn action-edit"   onclick="openEditModal('${f.id}')">แก้ไข</button>
-          <button class="action-btn action-delete" onclick="deleteFish('${f.id}')">ลบ</button>
-        </td>
-      </tr>
-    `).join('');
-}
-
-// ── EDIT MODAL ──
+// ════════════════════════════════════════════
+//   EDIT MODAL
+// ════════════════════════════════════════════
 function openEditModal(id) {
   const f = fishData.find(x => x.id === id);
   if (!f) return;
+
   document.getElementById('editFishId').value   = f.id;
   document.getElementById('editName').value     = f.name;
-  document.getElementById('editSpecies').value  = f.species;
+  document.getElementById('editSpecies').value  = f.species || '';
   document.getElementById('editPriceMin').value = f.priceMin;
   document.getElementById('editPriceMax').value = f.priceMax || '';
   document.getElementById('editStock').value    = f.stock;
   document.getElementById('editLevel').value    = f.level;
   document.getElementById('editDesc').value     = f.desc || '';
-  const preview = document.getElementById('editImagePreview');
-  preview.src = f.image || '';
+
+  const preview     = document.getElementById('editImagePreview');
+  preview.src       = f.image || '';
   preview.style.display = f.image ? 'block' : 'none';
+
+  // clear file input
+  document.getElementById('editImageFile').value = '';
+
   setSelectedTags('editTags', f.tags || []);
   document.getElementById('editModal').classList.add('open');
 }
@@ -349,17 +447,144 @@ function closeEditModal() {
   document.getElementById('editModal').classList.remove('open');
 }
 
-// ── CLEAR FORM ──
+// ════════════════════════════════════════════
+//   CLEAR FORM
+// ════════════════════════════════════════════
 function clearForm() {
-  ['newEmoji','newName','newSpecies','newPriceMin','newPriceMax','newStock','newDesc']
-    .forEach(id => document.getElementById(id).value = '');
+  ['newEmoji', 'newName', 'newSpecies', 'newPriceMin', 'newPriceMax', 'newStock', 'newDesc']
+    .forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
   document.getElementById('newEmoji').value = '🐡';
   document.getElementById('newImageFile').value = '';
-  document.getElementById('newImagePreview').style.display = 'none';
+
+  const preview = document.getElementById('newImagePreview');
+  if (preview) { preview.src = ''; preview.style.display = 'none'; }
+
   document.querySelectorAll('#newTags .tag-option').forEach(el => el.classList.remove('selected'));
+
+  const pp = document.getElementById('pricePreview');
+  if (pp) { pp.textContent = '—'; pp.className = 'price-preview'; }
 }
 
-// ── INIT ──
+// ════════════════════════════════════════════
+//   UI HELPERS
+// ════════════════════════════════════════════
+
+/** Tab switching */
+function switchTab(tab) {
+  document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.admin-nav-tab, .bnav-item').forEach(b => b.classList.remove('active'));
+
+  document.getElementById('page-' + tab).classList.add('active');
+  const topBtn = document.getElementById('nav-'  + tab);
+  const botBtn = document.getElementById('bnav-' + tab);
+  if (topBtn) topBtn.classList.add('active');
+  if (botBtn) botBtn.classList.add('active');
+
+  // render finance lazily when tab opens
+  if (tab === 'finance') renderFinancialInsights();
+}
+
+/** Collapsible add panel  — forceOpen: true = open, false = close, undefined = toggle */
+function toggleAddPanel(forceOpen) {
+  const body   = document.getElementById('addPanelBody');
+  const toggle = document.getElementById('addPanelToggle');
+  const open   = forceOpen !== undefined ? forceOpen : !body.classList.contains('open');
+  body.classList.toggle('open', open);
+  toggle.classList.toggle('open', open);
+}
+
+/** Price range preview */
+function calcPricePreview() {
+  const min = parseFloat(document.getElementById('newPriceMin').value) || 0;
+  const max = parseFloat(document.getElementById('newPriceMax').value) || 0;
+  const el  = document.getElementById('pricePreview');
+  if (!min) { el.textContent = '—'; el.className = 'price-preview'; return; }
+  if (max && max < min) {
+    el.textContent = '⚠️ ราคาสูงสุดน้อยกว่าต่ำสุด';
+    el.className = 'price-preview bad'; return;
+  }
+  if (max > min) {
+    const spread = ((max - min) / min * 100).toFixed(0);
+    el.innerHTML = `฿${min.toLocaleString('th-TH')} – ฿${max.toLocaleString('th-TH')} <span style="font-size:0.78rem;font-weight:400;">(+${spread}%)</span>`;
+    el.className = 'price-preview good';
+  } else {
+    el.textContent = `฿${min.toLocaleString('th-TH')} (ราคาเดียว)`;
+    el.className = 'price-preview warn';
+  }
+}
+
+/** Stock filter chips */
+function setStockFilter(f, el) {
+  _stockFilter = f;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderFishTable();
+}
+
+/** Date headers */
+function _setDateHeaders() {
+  const str = new Date().toLocaleDateString('th-TH', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  });
+  const hd = document.getElementById('headerDate');
+  const tl = document.getElementById('todayLabel');
+  if (hd) hd.textContent = str;
+  if (tl) tl.textContent = str;
+}
+
+/** Empty state HTML */
+function _empty(icon, text) {
+  return `<div class="admin-empty-state"><div class="admin-empty-icon">${icon}</div><div class="admin-empty-text">${text}</div></div>`;
+}
+
+// ════════════════════════════════════════════
+//   TODOS  (in-memory, วันนี้เท่านั้น)
+// ════════════════════════════════════════════
+function addTodo() {
+  const text = document.getElementById('todoText').value.trim();
+  if (!text) return;
+  const time = document.getElementById('todoTime').value || '';
+  _todos.push({ id: String(Date.now()), text, time, done: false });
+  document.getElementById('todoText').value = '';
+  document.getElementById('todoTime').value = '';
+  _renderTodos();
+}
+
+function toggleTodoItem(id) {
+  const t = _todos.find(t => t.id === id);
+  if (t) t.done = !t.done;
+  _renderTodos();
+}
+
+function deleteTodoItem(id) {
+  _todos = _todos.filter(t => t.id !== id);
+  _renderTodos();
+}
+
+function _renderTodos() {
+  const el = document.getElementById('todoList');
+  if (!_todos.length) {
+    el.innerHTML = _empty('🌊', 'ยังไม่มีงานวันนี้');
+    return;
+  }
+  const sorted = [..._todos].sort((a, b) => (a.time || '').localeCompare(b.time || ''));
+  el.innerHTML = sorted.map(t => `
+    <div class="todo-item ${t.done ? 'done' : ''}">
+      <div class="todo-checkbox ${t.done ? 'checked' : ''}" onclick="toggleTodoItem('${t.id}')">
+        ${t.done ? '✓' : ''}
+      </div>
+      <span class="todo-text">${t.text}</span>
+      ${t.time ? `<span class="todo-time-label">⏰ ${t.time}</span>` : ''}
+      <button class="todo-del-btn" onclick="deleteTodoItem('${t.id}')">🗑</button>
+    </div>`).join('');
+}
+
+// ════════════════════════════════════════════
+//   INIT
+// ════════════════════════════════════════════
 (async () => {
   const { data: { session } } = await supabase.auth.getSession();
   if (session) showDashboard();

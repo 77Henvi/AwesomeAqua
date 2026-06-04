@@ -1,0 +1,423 @@
+/* ============================================================
+   AWESOME AQUA — admin.css
+   paste ต่อจาก style.css หรือ link แยกก็ได้
+   ============================================================ */
+
+/* ── LOGIN SCREEN ── */
+.admin-login-screen {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #f0f4ff, #e8eeff);
+}
+.admin-login-box {
+  background: white; border-radius: 20px; padding: 2.5rem;
+  width: 100%; max-width: 380px;
+  box-shadow: 0 20px 60px rgba(26,58,143,0.12); text-align: center;
+}
+.admin-login-logo {
+  font-family: var(--font-display); font-size: 1.6rem; font-weight: 700;
+  color: var(--royal-blue); margin-bottom: 0.25rem;
+}
+.admin-login-logo span { color: var(--bright-blue); }
+.admin-login-sub { font-size: 0.82rem; color: var(--gray); margin-bottom: 2rem; }
+.admin-login-box input {
+  width: 100%; padding: 0.75rem 1rem;
+  border: 1.5px solid var(--border); border-radius: 10px;
+  font-size: 0.95rem; font-family: var(--font-body);
+  outline: none; margin-bottom: 1rem; transition: border-color 0.2s;
+  letter-spacing: normal;
+}
+.admin-login-box input:focus { border-color: var(--royal-blue); }
+.admin-login-btn {
+  width: 100%; padding: 0.8rem;
+  background: var(--royal-blue); color: white;
+  border: none; border-radius: 10px;
+  font-size: 0.95rem; font-weight: 500;
+  cursor: pointer; font-family: var(--font-body);
+  transition: background 0.2s;
+}
+.admin-login-btn:hover { background: var(--bright-blue); }
+.admin-error {
+  color: #dc2626; font-size: 0.82rem;
+  margin-top: 0.75rem; display: none;
+}
+
+/* ── DASHBOARD WRAPPER ── */
+.admin-dashboard { display: none; }
+
+/* ── TOPBAR ── */
+.admin-topbar {
+  background: var(--royal-blue); color: white;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 5%; height: 60px;
+  position: sticky; top: 0; z-index: 100;
+  gap: 1rem;
+}
+.admin-topbar-logo {
+  font-family: var(--font-display); font-size: 1.2rem; font-weight: 700;
+  white-space: nowrap; flex-shrink: 0;
+}
+.admin-topbar-logo span { color: #7eb3ff; }
+.admin-topbar-sub {
+  font-size: 0.72rem; opacity: 0.6;
+  font-family: var(--font-body); font-weight: 400; margin-left: 6px;
+}
+
+/* ── TAB NAV (topbar) ── */
+.admin-nav-tabs {
+  display: flex; gap: 2px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 8px; padding: 3px;
+}
+.admin-nav-tab {
+  padding: 5px 14px; border-radius: 6px;
+  font-size: 0.8rem; font-weight: 500;
+  color: rgba(255,255,255,0.65);
+  cursor: pointer; border: none;
+  background: transparent; font-family: var(--font-body);
+  transition: all 0.15s; white-space: nowrap;
+}
+.admin-nav-tab:hover { color: white; background: rgba(255,255,255,0.1); }
+.admin-nav-tab.active { background: white; color: var(--royal-blue); font-weight: 600; }
+
+.admin-topbar-right { display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
+.admin-topbar-right a {
+  color: rgba(255,255,255,0.75); text-decoration: none;
+  font-size: 0.82rem; transition: color 0.2s; white-space: nowrap;
+}
+.admin-topbar-right a:hover { color: white; }
+.admin-logout-btn {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: white; padding: 0.35rem 0.9rem;
+  border-radius: 8px; cursor: pointer;
+  font-size: 0.82rem; font-family: var(--font-body);
+  transition: background 0.2s; white-space: nowrap;
+}
+.admin-logout-btn:hover { background: rgba(255,255,255,0.25); }
+
+/* ── BODY & PAGES ── */
+.admin-body {
+  padding: 1.75rem 5%; background: #f8faff;
+  min-height: calc(100vh - 60px);
+}
+.admin-page {
+  display: none;
+  animation: adminPageIn 0.2s ease;
+}
+.admin-page.active { display: block; }
+@keyframes adminPageIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── CARD ── */
+/* .admin-card base is in style.css — only extend here */
+.admin-card { margin-bottom: 1.5rem; }
+.admin-card:last-child { margin-bottom: 0; }
+
+/* ── PANEL TITLE ── */
+.admin-panel-title {
+  font-family: var(--font-display); font-size: 1.3rem; font-weight: 700;
+  margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;
+}
+
+/* ── DATE BANNER ── */
+.date-banner {
+  background: white; border: 1px solid var(--border);
+  border-radius: 12px; padding: 0.75rem 1.25rem;
+  margin-bottom: 1.5rem;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 0.5rem;
+}
+.date-banner-text { font-size: 0.85rem; color: var(--gray); }
+.date-banner-text strong { color: var(--royal-blue); font-weight: 600; }
+.date-banner-badge {
+  font-size: 0.75rem; background: #eff4ff; color: var(--royal-blue);
+  padding: 3px 10px; border-radius: 20px; font-weight: 500;
+}
+
+/* ── STATS ── */
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem; margin-bottom: 1.5rem;
+}
+.admin-stat-card {
+  background: white; border: 1px solid var(--border);
+  border-radius: 12px; padding: 1.25rem 1.5rem;
+  display: flex; align-items: center; gap: 1rem;
+  transition: box-shadow 0.2s;
+}
+.admin-stat-card:hover { box-shadow: 0 4px 16px rgba(26,58,143,0.1); }
+.admin-stat-icon { font-size: 1.75rem; }
+.admin-stat-label { font-size: 0.78rem; color: var(--gray); margin-top: 0.2rem; }
+
+/* ── DASHBOARD 2-COL ── */
+.dash-two-col {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+}
+.dash-mini-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.6rem 0; border-bottom: 1px solid #f0f4ff; gap: 0.5rem;
+}
+.dash-mini-row:last-child { border-bottom: none; }
+.dash-mini-name { font-size: 0.88rem; font-weight: 500; }
+.dash-mini-sub  { font-size: 0.73rem; color: var(--gray); }
+
+/* ── COLLAPSIBLE ADD PANEL ── */
+.add-panel-toggle {
+  display: flex; align-items: center; justify-content: space-between;
+  cursor: pointer; user-select: none;
+}
+.add-panel-toggle .toggle-icon {
+  font-size: 1.1rem; transition: transform 0.2s; color: var(--gray);
+}
+.add-panel-toggle.open .toggle-icon { transform: rotate(180deg); }
+.add-panel-body { display: none; }
+.add-panel-body.open { display: block; }
+
+/* ── PRICE PREVIEW ── */
+.price-preview {
+  padding: 0.65rem 1rem; border-radius: 8px;
+  border: 1.5px solid var(--border); background: #f8faff;
+  font-size: 0.88rem; font-weight: 600; text-align: center; color: var(--gray);
+  transition: all 0.2s; font-family: var(--font-number);
+}
+.price-preview.good { background: #ecfdf5; border-color: #a7f3d0; color: #059669; }
+.price-preview.warn { background: #fffbeb; border-color: #fcd34d; color: #d97706; }
+.price-preview.bad  { background: #fef2f2; border-color: #fca5a5; color: #dc2626; }
+
+/* ── SEARCH + FILTER BAR ── */
+.search-filter-row {
+  display: flex; gap: 0.75rem; margin-bottom: 1rem;
+  flex-wrap: wrap; align-items: center;
+}
+.search-wrap { position: relative; flex: 1; min-width: 180px; }
+.search-wrap::before {
+  content: '🔍'; position: absolute; left: 11px; top: 50%;
+  transform: translateY(-50%); font-size: 13px; pointer-events: none;
+}
+.search-wrap input {
+  width: 100%; padding: 0.55rem 1rem 0.55rem 2.2rem;
+  border: 1.5px solid var(--border); border-radius: 20px;
+  font-size: 0.88rem; font-family: var(--font-body);
+  outline: none; transition: border-color 0.2s; background: white;
+}
+.search-wrap input:focus { border-color: var(--royal-blue); }
+.search-wrap input::placeholder { color: var(--gray); }
+
+.filter-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.filter-chip {
+  padding: 5px 13px; border-radius: 20px; font-size: 0.78rem; font-weight: 500;
+  border: 1.5px solid var(--border); background: white; color: var(--gray);
+  cursor: pointer; transition: all 0.15s; font-family: var(--font-body);
+}
+.filter-chip:hover { border-color: var(--royal-blue); color: var(--royal-blue); }
+.filter-chip.active { background: var(--royal-blue); border-color: var(--royal-blue); color: white; }
+
+/* ── TABLE HEADER ROW ── */
+.admin-table-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;
+}
+.admin-fish-count { font-size: 0.8rem; color: var(--gray); }
+
+/* ── STOCK / LEVEL BADGES ── */
+.admin-stock-badge {
+  display: inline-block; padding: 3px 10px; border-radius: 20px;
+  font-size: 0.75rem; font-weight: 600;
+}
+.admin-stock-badge.ok   { background: #ecfdf5; color: #059669; }
+.admin-stock-badge.low  { background: #fffbeb; color: #d97706; }
+.admin-stock-badge.out  { background: #fef2f2; color: #dc2626; }
+
+.admin-level-badge {
+  display: inline-block; padding: 3px 10px; border-radius: 20px;
+  font-size: 0.75rem; font-weight: 500;
+  border: 1px solid var(--border); color: var(--gray);
+}
+.admin-level-badge.easy   { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
+.admin-level-badge.medium { background: #fffbeb; color: #d97706; border-color: #fcd34d; }
+.admin-level-badge.hard   { background: #fef2f2; color: #dc2626; border-color: #fca5a5; }
+
+/* ── EMPTY STATE ── */
+.admin-empty-state {
+  padding: 2.5rem 1rem; text-align: center; color: var(--gray);
+}
+.admin-empty-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+.admin-empty-text { font-size: 0.88rem; }
+
+/* ── TODOS ── */
+.todo-input-row { display: flex; gap: 8px; margin-bottom: 1rem; }
+.todo-input-row input {
+  flex: 1; padding: 0.65rem 1rem;
+  border: 1.5px solid var(--border); border-radius: 10px;
+  font-size: 0.9rem; font-family: var(--font-body);
+  outline: none; transition: border-color 0.2s;
+}
+.todo-input-row input:focus { border-color: var(--royal-blue); }
+.todo-input-row input::placeholder { color: var(--gray); }
+.todo-time-input {
+  width: 115px; padding: 0.65rem 0.75rem;
+  border: 1.5px solid var(--border); border-radius: 10px;
+  font-size: 0.85rem; font-family: var(--font-body);
+  outline: none; transition: border-color 0.2s; color: var(--black);
+}
+.todo-time-input:focus { border-color: var(--royal-blue); }
+.todo-add-btn {
+  padding: 0.65rem 1.1rem;
+  background: var(--royal-blue); color: white;
+  border: none; border-radius: 10px;
+  font-size: 1.1rem; cursor: pointer; transition: background 0.15s;
+}
+.todo-add-btn:hover { background: var(--bright-blue); }
+.todo-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 0.65rem 0.9rem;
+  border: 1.5px solid var(--border); border-radius: 10px;
+  background: white; margin-bottom: 8px; transition: all 0.15s;
+}
+.todo-item.done { opacity: 0.5; }
+.todo-item.done .todo-text { text-decoration: line-through; color: var(--gray); }
+.todo-checkbox {
+  width: 20px; height: 20px; border-radius: 6px;
+  border: 1.5px solid var(--border); background: white;
+  cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s; font-size: 11px;
+}
+.todo-checkbox.checked { background: var(--royal-blue); border-color: var(--royal-blue); color: white; }
+.todo-text  { flex: 1; font-size: 0.9rem; }
+.todo-time-label {
+  font-size: 0.75rem; color: var(--royal-blue);
+  background: #eff4ff; padding: 2px 8px; border-radius: 20px; white-space: nowrap;
+}
+.todo-del-btn {
+  background: none; border: none; cursor: pointer;
+  font-size: 14px; color: var(--gray); padding: 3px;
+  border-radius: 5px; transition: all 0.15s; line-height: 1;
+}
+.todo-del-btn:hover { background: #fef2f2; color: #dc2626; }
+
+/* ── BOTTOM NAV (mobile) ── */
+.admin-bottom-nav {
+  display: none;
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: white; border-top: 1px solid var(--border);
+  z-index: 100; padding: 6px 0;
+  padding-bottom: calc(6px + env(safe-area-inset-bottom));
+  justify-content: space-around;
+}
+.bnav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 4px 14px; border-radius: 8px;
+  border: none; background: none;
+  font-family: var(--font-body); color: var(--gray);
+  cursor: pointer; transition: color 0.15s;
+}
+.bnav-item.active { color: var(--royal-blue); }
+.bnav-icon  { font-size: 1.3rem; }
+.bnav-label { font-size: 0.68rem; font-weight: 500; }
+
+/* ══════════════════════════════════════════
+   RESPONSIVE
+   Mobile  : ≤ 640px
+   Tablet  : 641px – 1024px
+   Desktop : ≥ 1025px  (base styles ด้านบน)
+
+   หมายเหตุ: style.css ครอบ .admin-body .admin-stats
+   .form-grid .form-actions ที่ 600px แล้ว —
+   ส่วนนี้จัดการเฉพาะ class ที่ admin.css เป็นเจ้าของ
+══════════════════════════════════════════ */
+
+/* ── DESKTOP (≥ 1025px) ── */
+@media (min-width: 1025px) {
+  .admin-body            { padding: 2rem 6%; }
+  .admin-stats           { grid-template-columns: repeat(4, 1fr); }
+  .dash-two-col          { grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .finance-summary-grid  { grid-template-columns: repeat(3, 1fr); }
+  .finance-lists         { grid-template-columns: 1fr 1fr; }
+  .admin-topbar          { padding: 0 6%; }
+  .admin-nav-tab         { padding: 5px 18px; font-size: 0.85rem; }
+}
+
+/* ── TABLET (641px – 1024px) ── */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .admin-body            { padding: 1.5rem 4%; }
+  .admin-topbar          { padding: 0 4%; }
+  .admin-stats           { grid-template-columns: repeat(2, 1fr); }
+  .dash-two-col          { grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .finance-summary-grid  { grid-template-columns: repeat(2, 1fr); }
+  .finance-lists         { grid-template-columns: 1fr 1fr; }
+  /* topbar แน่น — ซ่อน link "ดูหน้าลูกค้า" เหลือแค่ปุ่ม logout */
+  .admin-topbar-right a  { display: none; }
+  /* tab label สั้นลง */
+  .admin-nav-tab         { padding: 5px 10px; font-size: 0.75rem; }
+  /* form 2 col แทน auto */
+  .form-grid             { grid-template-columns: repeat(2, 1fr); }
+  /* table action buttons ไม่ต้องใหญ่ */
+  .action-btn            { padding: 0.25rem 0.6rem; font-size: 0.75rem; }
+}
+
+/* ── MOBILE (≤ 640px) ── */
+@media (max-width: 640px) {
+  /* topbar */
+  .admin-nav-tabs        { display: none; }
+  .admin-topbar-right a  { display: none; }
+  .admin-topbar          { padding: 0 4%; }
+
+  /* bottom nav */
+  .admin-bottom-nav      { display: flex; }
+  .admin-body            { padding: 1rem 4% 84px; } /* เว้น bottom-nav */
+
+  /* page title */
+  .admin-panel-title     { font-size: 1.1rem; }
+
+  /* stats 2 col */
+  .admin-stats           { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+  .admin-stat-card       { padding: 1rem; gap: 0.75rem; }
+  .admin-stat-icon       { font-size: 1.4rem; }
+
+  /* dashboard */
+  .dash-two-col          { grid-template-columns: 1fr; }
+  .date-banner           { padding: 0.6rem 1rem; }
+
+  /* finance */
+  .finance-summary-grid  { grid-template-columns: 1fr; }
+  .finance-lists         { grid-template-columns: 1fr; }
+
+  /* search + filter */
+  .search-filter-row     { flex-direction: column; align-items: stretch; }
+  .filter-chips          { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; }
+  .search-wrap           { min-width: 0; }
+
+  /* table: ซ่อน col species ย่อ padding */
+  .fish-table-wrap th,
+  .fish-table-wrap td    { padding: 0.6rem 0.6rem; }
+
+  /* form */
+  .form-grid             { grid-template-columns: 1fr; }
+
+  /* todos */
+  .todo-input-row        { flex-wrap: wrap; }
+  .todo-time-input       { width: calc(50% - 4px); }
+  .todo-add-btn          { flex: 1; }
+
+  /* card padding ลดลง */
+  .admin-card            { padding: 1.25rem; }
+
+  /* modal */
+  .modal                 { padding: 1.25rem; border-radius: 16px; }
+}
+
+/* ── MOBILE SMALL (≤ 400px) ── */
+@media (max-width: 400px) {
+  .admin-stats           { grid-template-columns: 1fr 1fr; }
+  .admin-stat-card       { padding: 0.85rem; }
+  .todo-time-input       { width: 100%; }
+  .todo-add-btn          { width: 100%; justify-content: center; }
+  .filter-chips          { gap: 4px; }
+  .filter-chip           { padding: 4px 9px; font-size: 0.72rem; }
+  .admin-nav-tab         { padding: 4px 8px; font-size: 0.72rem; }
+}
