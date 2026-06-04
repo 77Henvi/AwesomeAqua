@@ -4,7 +4,9 @@
 
 import { loadFishFromDB }                          from './modules/fishData.js';
 import { openFishDetail, closeFishModal,
-         closeFishModalOutside }                   from './modules/fishModal.js';
+         closeFishModalOutside,
+         openComingSoonDetail, closeCsModal,
+         closeCsModalOutside }                     from './modules/fishModal.js';
 import { openEditModal, closeEditModal,
          saveEdit, deleteFish }                    from './modules/indexAdmin.js';
 import { openModal, closeModal,
