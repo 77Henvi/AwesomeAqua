@@ -24,6 +24,8 @@ function _availableCard(f) {
       <div class="fish-info">
         <div class="fish-name">${f.name}</div>
         <div class="fish-species">${f.species}</div>
+        
+        ${f.sizeMin ? `<div style="font-size: 0.78rem; color: var(--gray); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.35rem;"><i class="ph ph-ruler"></i> ขนาด: ${f.sizeMin}${(f.sizeMax && f.sizeMax != f.sizeMin) ? ' – ' + f.sizeMax : ''} นิ้ว </div>` : ''}
         <div class="fish-meta">
           <div class="fish-price ${outOfStock ? 'fish-price--dim' : ''}">
             ฿${f.priceMin.toLocaleString()}${f.priceMax ? ' – ' + f.priceMax.toLocaleString() : ''}

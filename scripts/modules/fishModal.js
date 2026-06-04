@@ -92,13 +92,7 @@ export function openComingSoonDetail(id) {
         ${f.level ? `<span class="fd-tag fd-tag--level" style="--lc:${lc}">${f.level}</span>` : ''}
       </div>
 
-      <div class="cs-coming-banner">
-        <div class="cs-banner-icon">🔜</div>
-        <div>
-          <div class="cs-banner-title">กำลังจะมาเร็วๆ นี้</div>
-          <div class="cs-banner-sub">ปลาชนิดนี้อยู่ในแผนนำเข้า ติดต่อสอบถามล่วงหน้าได้เลย</div>
-        </div>
-      </div>
+
 
       ${f.desc ? `
         <div class="fd-desc-wrap">

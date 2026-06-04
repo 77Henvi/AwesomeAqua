@@ -14,6 +14,8 @@ export async function loadFishFromDB() {
     id:       f.id,
     name:     f.name,
     species:  f.species,
+    sizeMin:  f.size_min, 
+    sizeMax:  f.size_max,
     emoji:    f.emoji,
     image:    f.image,
     priceMin: f.price_min,
