@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // 🌟 ท่าไม้ตายกันเหนียว: ถ้าเว็บค้างเกิน 5 วินาที บังคับปิดจอโหลดไปเลย!
 setTimeout(() => {
   hideLoader();
-}, 5000);
+}, 3000);
 
 // ── Init ──
 injectFishBackgrounds();
