@@ -10,6 +10,10 @@ import { toggleTag, getSelectedTags,
          setSelectedTags }                from './shared/tags.js';
 
 // ── Expose ไว้บน window ──
+window.hideLoader = function() {
+  const loader = document.getElementById('global-loader');
+  if (loader) loader.classList.add('hidden');
+};
 window.adminLogin       = adminLogin;
 window.adminLogout      = adminLogout;
 window.addFish          = addFish;
@@ -103,6 +107,8 @@ async function loadFishFromDB() {
   }));
 
   renderAll();
+
+  setTimeout(() => { hideLoader(); }, 300);
 }
 
 // ════════════════════════════════════════════
@@ -745,5 +751,10 @@ async function saveFinanceModal() {
 // ════════════════════════════════════════════
 (async () => {
   const { data: { session } } = await supabase.auth.getSession();
-  if (session) showDashboard();
+  if (session) {
+    showDashboard(); 
+  } else {
+    hideLoader();
+    document.getElementById('loginScreen').style.display = 'flex';
+  }
 })();

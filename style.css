@@ -1174,6 +1174,80 @@ nav.scrolled .nav-contact { color: var(--gray); }
   transform: translateX(-50%) translateY(0);
 }
 
+/* ════════════════════════════════════════════
+   ANIMATED LOADING SCREEN
+   ════════════════════════════════════════════ */
+.global-loader {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(255, 255, 255, 0.85); /* พื้นหลังสีขาวโปร่งแสง */
+  backdrop-filter: blur(12px); /* เอฟเฟกต์กระจกฝ้า */
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 99999; /* ให้อยู่บนสุดเสมอ */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+
+/* คลาสสำหรับซ่อน Loading Screen แบบค่อยๆ จางหายไป */
+.global-loader.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.loader-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.loader-logo {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--royal-blue);
+  animation: pulseLogo 2s infinite ease-in-out; /* อนิเมชั่นโลโก้เต้น */
+}
+
+.loader-logo span {
+  color: var(--bright-blue);
+}
+
+.loader-spinner {
+  width: 45px;
+  height: 45px;
+  border: 3px solid rgba(26, 58, 143, 0.1);
+  border-top-color: var(--royal-blue);
+  border-radius: 50%;
+  animation: spinLoader 1s linear infinite; /* อนิเมชั่นวงแหวนหมุน */
+}
+
+.loader-text {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--gray);
+  letter-spacing: 0.05em;
+  animation: pulseText 2s infinite ease-in-out;
+}
+
+/* ── Keyframes (จังหวะอนิเมชั่น) ── */
+@keyframes spinLoader {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulseLogo {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.95); }
+}
+
+@keyframes pulseText {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 0.4; }
+}
+
 /* ── Responsive ── */
 @media (max-width: 600px) {
   .admin-body { padding: 1rem; }
