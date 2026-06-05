@@ -21,6 +21,7 @@ window.clearForm        = clearForm;
 window.toggleTag        = toggleTag;
 window.previewNewImage  = previewNewImage;
 window.previewEditImage = previewEditImage;
+window.handleComingSoon = handleComingSoon;
 
 // ── UI helpers (called from inline onclick in HTML) ──
 window.switchTab        = switchTab;
@@ -117,9 +118,10 @@ async function addFish() {
   const name     = document.getElementById('newName').value.trim();
   const emoji    = document.getElementById('newEmoji').value    || '🐟';
   const species  = document.getElementById('newSpecies').value;
-  const priceMin = parseInt(document.getElementById('newPriceMin').value) || 0;
-  const priceMax = parseInt(document.getElementById('newPriceMax').value) || 0;
-  const stock    = parseInt(document.getElementById('newStock').value)    || 0;
+  const isCS = document.getElementById('newIsComingSoon').checked;
+  const priceMin = isCS ? 0 : (parseInt(document.getElementById('newPriceMin').value) || 0);
+  const priceMax = isCS ? 0 : (parseInt(document.getElementById('newPriceMax').value) || 0);
+  const stock    = isCS ? 0 : (parseInt(document.getElementById('newStock').value)    || 0);
   const level    = document.getElementById('newLevel').value;
   const desc     = document.getElementById('newDesc').value;
   const sizeMin  = parseFloat(document.getElementById('newSizeMin').value) || null;
@@ -179,12 +181,18 @@ async function saveEdit() {
     if (!imageUrl) return;
   }
 
+
+  const isCS = document.getElementById('editIsComingSoon').checked;
+  const priceMin = isCS ? 0 : (parseInt(document.getElementById('editPriceMin').value) || 0);
+  const priceMax = isCS ? 0 : (parseInt(document.getElementById('editPriceMax').value) || 0);
+  const stock    = isCS ? 0 : (parseInt(document.getElementById('editStock').value)    || 0);
+
   const { error } = await supabase.from('fish').update({
     name:      document.getElementById('editName').value,
     species:   document.getElementById('editSpecies').value,
-    price_min: parseInt(document.getElementById('editPriceMin').value) || 0,
-    price_max: parseInt(document.getElementById('editPriceMax').value) || 0,
-    stock:     parseInt(document.getElementById('editStock').value)    || 0,
+    price_min: priceMin, 
+    price_max: priceMax, 
+    stock:     stock,    
     level:     document.getElementById('editLevel').value,
     desc:      document.getElementById('editDesc').value,
     tags:      getSelectedTags('editTags'),
@@ -452,6 +460,9 @@ function openEditModal(id) {
 
   setSelectedTags('editTags', f.tags || []);
   document.getElementById('editModal').classList.add('open');
+  const isCS = (f.priceMin === 0 && f.stock === 0);
+  document.getElementById('editIsComingSoon').checked = isCS;
+  handleComingSoon('edit');
 }
 
 function closeEditModal() {
@@ -477,6 +488,9 @@ function clearForm() {
 
   const pp = document.getElementById('pricePreview');
   if (pp) { pp.textContent = '—'; pp.className = 'price-preview'; }
+
+  document.getElementById('newIsComingSoon').checked = false;
+  handleComingSoon('new');
 }
 
 // ════════════════════════════════════════════
@@ -549,6 +563,28 @@ function _setDateHeaders() {
 /** Empty state HTML */
 function _empty(icon, text) {
   return `<div class="admin-empty-state"><div class="admin-empty-icon">${icon}</div><div class="admin-empty-text">${text}</div></div>`;
+}
+
+// ════════════════════════════════════════════
+//   COMING SOON HELPER
+// ════════════════════════════════════════════
+function handleComingSoon(prefix) {
+  const isCS  = document.getElementById(prefix + 'IsComingSoon').checked;
+  const pMin  = document.getElementById(prefix + 'PriceMin');
+  const pMax  = document.getElementById(prefix + 'PriceMax');
+  const stock = document.getElementById(prefix + 'Stock');
+
+  if (isCS) {
+    pMin.value = 0; pMin.disabled = true;
+    pMax.value = ''; pMax.disabled = true;
+    stock.value = 0; stock.disabled = true;
+  } else {
+    pMin.disabled = false;
+    pMax.disabled = false;
+    stock.disabled = false;
+  }
+  
+  if (prefix === 'new') calcPricePreview();
 }
 
 // ════════════════════════════════════════════
