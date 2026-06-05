@@ -209,18 +209,28 @@
       </div>
     </div>
 
-    <!-- ══ PAGE: TODOS ══ -->
+    <!-- ══ PAGE: FINANCE ══ -->
     <div class="admin-page" id="page-todos">
-      <div class="admin-card">
-        <div class="admin-panel-title">✅ งานวันนี้ — <span id="todayLabel" style="font-size:0.85rem;font-weight:400;font-family:var(--font-body);color:var(--gray);">—</span></div>
-        <div class="todo-input-row">
-          <input type="text" id="todoText" placeholder="เพิ่มงาน เช่น เปลี่ยนน้ำตู้เบอร์ 3, เช็คปั๊ม..."
-                 onkeydown="if(event.key==='Enter') addTodo()">
-          <input type="time" id="todoTime" class="todo-time-input">
-          <button class="todo-add-btn" onclick="addTodo()">+</button>
+      <div class="dash-two-col">
+        <!-- ฝั่งซ้าย: บันทึกด่วน -->
+        <div class="admin-card">
+          <div class="admin-panel-title">💸 บันทึกรายรับ-รายจ่าย</div>
+          <div class="todo-input-row" style="flex-wrap: wrap;">
+            <input type="text" id="finItemName" placeholder="เช่น ค่าอาหารปลา, ขายปลาเทวดา..." style="flex: 1; min-width: 200px;">
+            <input type="number" id="finItemAmount" placeholder="จำนวนเงิน (บาท)" style="width: 120px;">
+          </div>
+          <div style="display: flex; gap: 10px; margin-bottom: 1rem;">
+            <button class="btn" style="flex:1; background: #fef2f2; color: #dc2626; border: 1px solid #fecaca;" onclick="addFinance('expense')">- บันทึกรายจ่าย</button>
+            <button class="btn" style="flex:1; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;" onclick="addFinance('income')">+ บันทึกรายรับ</button>
+          </div>
         </div>
-        <div id="todoList">
-          <div class="admin-empty-state"><div class="admin-empty-icon">🌊</div><div class="admin-empty-text">ยังไม่มีงานวันนี้</div></div>
+
+        <!-- ฝั่งขวา: รายการของวันนี้ -->
+        <div class="admin-card">
+          <div class="admin-panel-title">📅 รายการวันนี้ — <span id="todayLabel" style="font-size:0.85rem;font-weight:400;color:var(--gray);">—</span></div>
+          <div id="financeTodayList">
+            <div class="admin-empty-state"><div class="admin-empty-icon">🌊</div><div class="admin-empty-text">กำลังโหลด...</div></div>
+          </div>
         </div>
       </div>
     </div>

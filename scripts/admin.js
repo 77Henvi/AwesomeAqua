@@ -28,13 +28,12 @@ window.switchTab        = switchTab;
 window.toggleAddPanel   = toggleAddPanel;
 window.calcPricePreview = calcPricePreview;
 window.setStockFilter   = setStockFilter;
-window.addTodo          = addTodo;
-window.toggleTodoItem   = toggleTodoItem;
-window.deleteTodoItem   = deleteTodoItem;
+window.addFinance = addFinance;
+window.deleteFinance = deleteFinance;
 
 // ── State ──
 let fishData     = [];
-let _todos       = [];
+let financeData = [];
 let _stockFilter = 'all';
 
 // ════════════════════════════════════════════
@@ -69,8 +68,8 @@ function showDashboard() {
   document.getElementById('adminDashboard').style.display = 'block';
   _setDateHeaders();
   loadFishFromDB();
+  loadFinanceFromDB(); 
 }
-
 // ════════════════════════════════════════════
 //   LOAD
 // ════════════════════════════════════════════
@@ -588,45 +587,88 @@ function handleComingSoon(prefix) {
 }
 
 // ════════════════════════════════════════════
-//   TODOS  (in-memory, วันนี้เท่านั้น)
+//   FINANCE SYSTEM (แปลงร่างจาก Todo)
 // ════════════════════════════════════════════
-function addTodo() {
-  const text = document.getElementById('todoText').value.trim();
-  if (!text) return;
-  const time = document.getElementById('todoTime').value || '';
-  _todos.push({ id: String(Date.now()), text, time, done: false });
-  document.getElementById('todoText').value = '';
-  document.getElementById('todoTime').value = '';
-  _renderTodos();
+async function loadFinanceFromDB() {
+  const { data, error } = await supabase
+    .from('finance')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (!error) {
+    financeData = data;
+    renderTodayFinance();
+  }
 }
 
-function toggleTodoItem(id) {
-  const t = _todos.find(t => t.id === id);
-  if (t) t.done = !t.done;
-  _renderTodos();
-}
+async function addFinance(type) {
+  const name = document.getElementById('finItemName').value.trim();
+  const amount = parseFloat(document.getElementById('finItemAmount').value);
 
-function deleteTodoItem(id) {
-  _todos = _todos.filter(t => t.id !== id);
-  _renderTodos();
-}
-
-function _renderTodos() {
-  const el = document.getElementById('todoList');
-  if (!_todos.length) {
-    el.innerHTML = _empty('🌊', 'ยังไม่มีงานวันนี้');
+  if (!name || !amount) {
+    showToast('⚠️ กรุณากรอกชื่อรายการและจำนวนเงิน');
     return;
   }
-  const sorted = [..._todos].sort((a, b) => (a.time || '').localeCompare(b.time || ''));
-  el.innerHTML = sorted.map(t => `
-    <div class="todo-item ${t.done ? 'done' : ''}">
-      <div class="todo-checkbox ${t.done ? 'checked' : ''}" onclick="toggleTodoItem('${t.id}')">
-        ${t.done ? '✓' : ''}
+
+  // ดึงวันที่ปัจจุบัน YYYY-MM-DD
+  const today = new Date().toLocaleDateString('en-CA'); 
+
+  const { error } = await supabase.from('finance').insert({
+    type: type,
+    name: name,
+    amount: amount,
+    date: today
+  });
+
+  if (error) {
+    showToast('❌ บันทึกไม่ได้: ' + error.message);
+    return;
+  }
+
+  showToast('✅ บันทึกยอดเรียบร้อย');
+  document.getElementById('finItemName').value = '';
+  document.getElementById('finItemAmount').value = '';
+  loadFinanceFromDB(); // โหลดข้อมูลใหม่มาแสดง
+}
+
+async function deleteFinance(id) {
+  if (!confirm('ลบรายการนี้?')) return;
+  const { error } = await supabase.from('finance').delete().eq('id', id);
+  
+  if (error) {
+    showToast('❌ ลบไม่ได้'); return;
+  }
+  
+  showToast('🗑️ ลบรายการแล้ว');
+  loadFinanceFromDB();
+}
+
+function renderTodayFinance() {
+  const el = document.getElementById('financeTodayList');
+  if (!el) return;
+
+  const today = new Date().toLocaleDateString('en-CA');
+  const list = financeData.filter(f => f.date === today);
+
+  if (!list.length) {
+    el.innerHTML = _empty('🍃', 'ยังไม่มีรายการเคลื่อนไหววันนี้');
+    return;
+  }
+
+  el.innerHTML = list.map(f => `
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: white; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px;">
+      <div>
+        <div style="font-weight: 500; font-size: 0.95rem;">${f.name}</div>
+        <div style="font-size: 0.75rem; color: var(--gray);">${f.type === 'income' ? '🟢 รายรับ' : '🔴 รายจ่าย'}</div>
       </div>
-      <span class="todo-text">${t.text}</span>
-      ${t.time ? `<span class="todo-time-label">⏰ ${t.time}</span>` : ''}
-      <button class="todo-del-btn" onclick="deleteTodoItem('${t.id}')">🗑</button>
-    </div>`).join('');
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-family: var(--font-number); font-weight: 700; color: ${f.type === 'income' ? '#059669' : '#dc2626'};">
+          ${f.type === 'income' ? '+' : '-'}฿${f.amount.toLocaleString()}
+        </span>
+        <button onclick="deleteFinance('${f.id}')" style="background:none; border:none; color:var(--gray); cursor:pointer; padding:4px;">🗑</button>
+      </div>
+    </div>
+  `).join('');
 }
 
 // ════════════════════════════════════════════
