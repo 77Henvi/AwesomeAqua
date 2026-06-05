@@ -13,13 +13,13 @@ import { toggleTag, getSelectedTags,
 window.hideLoader = function() {
   const loader = document.getElementById('global-loader');
   if (loader) loader.classList.add('hidden');
+};
 
-  setTimeout(() => {
+setTimeout(() => {
     hideLoader();
   }, 3000);
 
-};
-
+  
 window.adminLogin       = adminLogin;
 window.adminLogout      = adminLogout;
 window.addFish          = addFish;
