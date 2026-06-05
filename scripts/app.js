@@ -59,6 +59,28 @@ const observer = new IntersectionObserver(entries => {
 
 document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
+// ════════════════════════════════════════════
+//   LOADING SCREEN CONTROLLER
+// ════════════════════════════════════════════
+
+// 1. สร้างฟังก์ชันสำหรับซ่อนหน้าโหลด
+window.hideLoader = function() {
+  const loader = document.getElementById('global-loader');
+  if (loader) loader.classList.add('hidden');
+};
+
+// 2. สั่งให้ซ่อนหน้าโหลด ทันทีที่โครงสร้างเว็บ (HTML) โหลดเสร็จ
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => { 
+    hideLoader(); 
+  }, 300); // หน่วงเวลา 0.3 วินาทีให้ภาพสมูท
+});
+
+// 🌟 ท่าไม้ตายกันเหนียว: ถ้าเว็บค้างเกิน 5 วินาที บังคับปิดจอโหลดไปเลย!
+setTimeout(() => {
+  hideLoader();
+}, 5000);
+
 // ── Init ──
 injectFishBackgrounds();
 loadFishFromDB();
