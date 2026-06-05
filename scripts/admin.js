@@ -22,6 +22,11 @@ window.toggleTag        = toggleTag;
 window.previewNewImage  = previewNewImage;
 window.previewEditImage = previewEditImage;
 window.handleComingSoon = handleComingSoon;
+window.onFinMonthChange  = onFinMonthChange;
+window.setFinFilter      = setFinFilter;
+window.openFinanceModal  = openFinanceModal;
+window.closeFinanceModal = closeFinanceModal;
+window.saveFinanceModal  = saveFinanceModal;
 
 // ── UI helpers (called from inline onclick in HTML) ──
 window.switchTab        = switchTab;
@@ -106,7 +111,7 @@ async function loadFishFromDB() {
 function renderAll() {
   renderAdminStats();
   renderFishTable();
-  renderFinancialInsights();
+  renderFinancePage();
   renderDashboardCards();
 }
 
@@ -244,19 +249,19 @@ function renderAdminStats() {
 
   document.getElementById('adminStats').innerHTML = `
     <div class="admin-stat-card">
-      <div class="admin-stat-icon">🐠</div>
+      <div class="admin-stat-icon" style="color: var(--royal-blue);"><i class="ph ph-fish-simple"></i></div>
       <div><div class="admin-stat-num">${total}</div><div class="admin-stat-label">ชนิดปลาทั้งหมด</div></div>
     </div>
     <div class="admin-stat-card">
-      <div class="admin-stat-icon">✅</div>
+      <div class="admin-stat-icon" style="color: #059669;"><i class="ph ph-check-circle"></i></div>
       <div><div class="admin-stat-num">${inStock}</div><div class="admin-stat-label">มีในสต็อก</div></div>
     </div>
     <div class="admin-stat-card">
-      <div class="admin-stat-icon">⚠️</div>
+      <div class="admin-stat-icon" style="color: #d97706;"><i class="ph ph-warning-circle"></i></div>
       <div><div class="admin-stat-num">${lowStock}</div><div class="admin-stat-label">สต็อกเหลือน้อย</div></div>
     </div>
     <div class="admin-stat-card">
-      <div class="admin-stat-icon">❌</div>
+      <div class="admin-stat-icon" style="color: #dc2626;"><i class="ph ph-x-circle"></i></div>
       <div><div class="admin-stat-num">${outStock}</div><div class="admin-stat-label">หมดสต็อก</div></div>
     </div>
   `;
@@ -271,7 +276,7 @@ function renderDashboardCards() {
   const lowItems = fishData.filter(f => f.stock <= 5);
 
   if (!lowItems.length) {
-    lowEl.innerHTML = _empty('🎉', 'สต็อกครบทุกรายการ');
+    lowEl.innerHTML = _empty('<i class="ph ph-confetti"></i>', 'สต็อกครบทุกรายการ');
   } else {
     lowEl.innerHTML = lowItems.slice(0, 5).map(f => {
       const cls  = f.stock === 0 ? 'out' : 'low';
@@ -290,7 +295,7 @@ function renderDashboardCards() {
   // Recent
   const recEl = document.getElementById('dash-recent');
   if (!fishData.length) {
-    recEl.innerHTML = _empty('🐟', 'ยังไม่มีปลา');
+    recEl.innerHTML = _empty('<i class="ph ph-fish-simple"></i>', 'ยังไม่มีปลา');
   } else {
     recEl.innerHTML = [...fishData].slice(0, 5).map(f => `
       <div class="dash-mini-row">
@@ -352,85 +357,13 @@ function renderFishTable() {
         <td><span class="admin-stock-badge ${sc}">${st}</span></td>
         <td><span class="admin-level-badge ${lvCls}">${f.level}</span></td>
         <td>
-          <button class="action-btn action-edit"   onclick="openEditModal('${f.id}')">แก้ไข</button>
-          <button class="action-btn action-delete" onclick="deleteFish('${f.id}')">ลบ</button>
+          <button class="action-btn action-edit"   onclick="openEditModal('${f.id}')"><i class="ph ph-pencil-simple"></i> แก้ไข</button>
+          <button class="action-btn action-delete" onclick="deleteFish('${f.id}')"><i class="ph ph-trash"></i> ลบ</button>
         </td>
       </tr>`;
   }).join('');
 }
 
-// ════════════════════════════════════════════
-//   FINANCIAL INSIGHTS
-// ════════════════════════════════════════════
-function renderFinancialInsights() {
-  const panel = document.getElementById('financialInsights');
-  if (!panel) return;
-
-  const avgPrice  = f => (f.priceMin && f.priceMax) ? (f.priceMin + f.priceMax) / 2 : (f.priceMin || f.priceMax || 0);
-  const stockVal  = f => avgPrice(f) * (f.stock || 0);
-  const fmt       = v => '฿' + Math.round(v || 0).toLocaleString('th-TH');
-
-  const totalMin    = fishData.reduce((s, f) => s + (f.priceMin || 0) * (f.stock || 0), 0);
-  const totalMax    = fishData.reduce((s, f) => s + ((f.priceMax || f.priceMin) || 0) * (f.stock || 0), 0);
-  const totalAvg    = fishData.reduce((s, f) => s + stockVal(f), 0);
-  const stockedFish = fishData.filter(f => f.stock > 0);
-
-  const topValueFish = [...stockedFish]
-    .map(f => ({ ...f, value: stockVal(f), avgPrice: avgPrice(f) }))
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 5);
-
-  const urgentFish = [...stockedFish]
-    .map(f => ({ ...f, value: stockVal(f), avgPrice: avgPrice(f) }))
-    .filter(f => f.stock <= 5 && f.avgPrice > 0)
-    .sort((a, b) => b.avgPrice - a.avgPrice)
-    .slice(0, 5);
-
-  const renderRows = (list, emptyText) => {
-    if (!list.length) return `<div class="finance-empty">${emptyText}</div>`;
-    return list.map(f => `
-      <div class="finance-row">
-        <div class="finance-row-main">
-          <strong>${f.name}</strong>
-          <span>${f.species || '—'}</span>
-        </div>
-        <div class="finance-row-meta">
-          <span>${f.stock} ตัว</span>
-          <span>${fmt(f.value)}</span>
-        </div>
-      </div>`).join('');
-  };
-
-  panel.innerHTML = `
-    <div class="finance-summary-grid">
-      <div class="finance-summary-card">
-        <div class="finance-label">มูลค่าสต็อกประมาณการ</div>
-        <div class="finance-value">${fmt(totalAvg)}</div>
-        <div class="finance-note">คำนวณจากราคาเฉลี่ย × จำนวนคงเหลือ</div>
-      </div>
-      <div class="finance-summary-card">
-        <div class="finance-label">ช่วงมูลค่าสต็อก</div>
-        <div class="finance-value" style="font-size:1.2rem;">${fmt(totalMin)} – ${fmt(totalMax)}</div>
-        <div class="finance-note">อิงจากราคาต่ำสุดถึงสูงสุด</div>
-      </div>
-      <div class="finance-summary-card">
-        <div class="finance-label">สินค้าในสต็อกที่มีราคา</div>
-        <div class="finance-value">${stockedFish.filter(f => avgPrice(f) > 0).length}</div>
-        <div class="finance-note">ชนิดปลาที่นำมาคิดมูลค่าได้</div>
-      </div>
-    </div>
-    <div class="finance-lists">
-      <div>
-        <div class="finance-list-title">ปลามูลค่าสต็อกสูงสุด</div>
-        ${renderRows(topValueFish, 'ยังไม่มีปลาที่มีมูลค่าสต็อก')}
-      </div>
-      <div>
-        <div class="finance-list-title">ปลาราคาสูงที่ใกล้หมด</div>
-        ${renderRows(urgentFish, 'ตอนนี้ยังไม่มีปลาราคาสูงที่ใกล้หมด')}
-      </div>
-    </div>
-  `;
-}
 
 // ════════════════════════════════════════════
 //   EDIT MODAL
@@ -508,7 +441,7 @@ function switchTab(tab) {
   if (botBtn) botBtn.classList.add('active');
 
   // render finance lazily when tab opens
-  if (tab === 'finance') renderFinancialInsights();
+  if (tab === 'finance') renderFinancePage();
 }
 
 /** Collapsible add panel  — forceOpen: true = open, false = close, undefined = toggle */
@@ -598,6 +531,7 @@ async function loadFinanceFromDB() {
   if (!error) {
     financeData = data;
     renderTodayFinance();
+    renderFinancePage(); // 👈 เพิ่มบรรทัดนี้ลงไป
   }
 }
 
@@ -651,7 +585,7 @@ function renderTodayFinance() {
   const list = financeData.filter(f => f.date === today);
 
   if (!list.length) {
-    el.innerHTML = _empty('🍃', 'ยังไม่มีรายการเคลื่อนไหววันนี้');
+    el.innerHTML = _empty('<i class="ph ph-leaf"></i>', 'ยังไม่มีรายการเคลื่อนไหววันนี้');
     return;
   }
 
@@ -659,16 +593,151 @@ function renderTodayFinance() {
     <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: white; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px;">
       <div>
         <div style="font-weight: 500; font-size: 0.95rem;">${f.name}</div>
-        <div style="font-size: 0.75rem; color: var(--gray);">${f.type === 'income' ? '🟢 รายรับ' : '🔴 รายจ่าย'}</div>
+        <div style="font-size: 0.75rem; color: var(--gray); display: flex; align-items: center; gap: 4px;">
+          <i class="ph-fill ${f.type === 'income' ? 'ph-arrow-circle-up' : 'ph-arrow-circle-down'}" style="color: ${f.type === 'income' ? '#059669' : '#dc2626'};"></i>
+          ${f.type === 'income' ? 'รายรับ' : 'รายจ่าย'}
+        </div>
       </div>
       <div style="display: flex; align-items: center; gap: 10px;">
         <span style="font-family: var(--font-number); font-weight: 700; color: ${f.type === 'income' ? '#059669' : '#dc2626'};">
           ${f.type === 'income' ? '+' : '-'}฿${f.amount.toLocaleString()}
         </span>
-        <button onclick="deleteFinance('${f.id}')" style="background:none; border:none; color:var(--gray); cursor:pointer; padding:4px;">🗑</button>
+        <button onclick="deleteFinance('${f.id}')" style="background:none; border:none; color:var(--gray); cursor:pointer; padding:4px; font-size:1.1rem; display:flex;"><i class="ph ph-trash"></i></button>
       </div>
     </div>
   `).join('');
+}
+
+// ════════════════════════════════════════════
+//   FINANCE PAGE (Minimal Style)
+// ════════════════════════════════════════════
+let finFilter = 'all';
+let selectedFinMonth = new Date().toLocaleDateString('en-CA').slice(0, 7);
+
+function populateFinMonthSelect() {
+  const select = document.getElementById('fin-month-select');
+  if (!select) return;
+
+  const months = new Set(financeData.map(f => (f.date || '').slice(0, 7)).filter(Boolean));
+  months.add(new Date().toLocaleDateString('en-CA').slice(0, 7));
+
+  const sorted = [...months].sort((a, b) => b.localeCompare(a));
+  const monthNames = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+
+  select.innerHTML = sorted.map(m => {
+    const [y, mo] = m.split('-');
+    const yearTh = parseInt(y) + 543;
+    const label = `${monthNames[parseInt(mo) - 1]} ${yearTh}`;
+    const isNow = m === new Date().toLocaleDateString('en-CA').slice(0, 7) ? ' (เดือนนี้)' : '';
+    return `<option value="${m}" ${m === selectedFinMonth ? 'selected' : ''}>${label}${isNow}</option>`;
+  }).join('');
+}
+
+function onFinMonthChange() {
+  selectedFinMonth = document.getElementById('fin-month-select').value;
+  renderFinancePage();
+}
+
+function setFinFilter(f, el) {
+  finFilter = f;
+  document.querySelectorAll('.fin-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderFinancePage();
+}
+
+function renderFinancePage() {
+  populateFinMonthSelect();
+
+  const isCurrentMonth = selectedFinMonth === new Date().toLocaleDateString('en-CA').slice(0, 7);
+  const monthFin = financeData.filter(f => (f.date || '').startsWith(selectedFinMonth));
+
+  const income  = monthFin.filter(f => f.type === 'income').reduce((s,f) => s + f.amount, 0);
+  const expense = monthFin.filter(f => f.type === 'expense').reduce((s,f) => s + f.amount, 0);
+  const profit  = income - expense;
+
+  const suffix = isCurrentMonth ? 'เดือนนี้' : 'เดือนนั้น';
+  
+  if(document.getElementById('fin-label-income')) document.getElementById('fin-label-income').textContent  = `รายรับ${suffix}`;
+  if(document.getElementById('fin-label-expense')) document.getElementById('fin-label-expense').textContent  = `รายจ่าย${suffix}`;
+  if(document.getElementById('fin-label-profit')) document.getElementById('fin-label-profit').textContent  = `กำไร/ขาดทุน${suffix}`;
+
+  if(document.getElementById('fin-month-income')) document.getElementById('fin-month-income').textContent  = '฿' + income.toLocaleString('th-TH');
+  if(document.getElementById('fin-month-expense')) document.getElementById('fin-month-expense').textContent  = '฿' + expense.toLocaleString('th-TH');
+
+  const elProVal = document.getElementById('fin-profit');
+  if(elProVal) {
+    elProVal.textContent = (profit >= 0 ? '+' : '') + '฿' + profit.toLocaleString('th-TH');
+    elProVal.className   = 'fin-profit-val ' + (profit >= 0 ? 'good' : 'bad');
+  }
+
+  let list = [...monthFin].sort((a,b) => (b.date||'').localeCompare(a.date||''));
+  if (finFilter === 'income')  list = list.filter(f => f.type === 'income');
+  if (finFilter === 'expense') list = list.filter(f => f.type === 'expense');
+
+  const elList = document.getElementById('finance-list');
+  if (!elList) return;
+
+  if (!list.length) { 
+    elList.innerHTML = `<div class="admin-empty-state" style="background:white;border-radius:12px;border:1px solid var(--border);"><div class="admin-empty-icon">🍃</div><div class="admin-empty-text">ไม่มีรายการในเดือนนี้</div></div>`; 
+    return; 
+  }
+
+  elList.innerHTML = list.map(f => {
+    const [y, mo, d] = f.date.split('-');
+    const dateStr = `${parseInt(d)} ${['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'][parseInt(mo)-1]} ${(parseInt(y)+543).toString().slice(-2)}`;
+    
+    return `
+    <div class="fin-item">
+      <div class="fin-item-left">
+        <div class="fin-item-name">${f.name}</div>
+        <div class="fin-item-sub">${dateStr} · ${f.type === 'income' ? 'รายรับ' : 'รายจ่าย'}</div>
+      </div>
+      <div class="fin-item-right">
+        <div class="fin-item-amt ${f.type === 'income' ? 'inc' : 'exp'}">${f.type === 'income' ? '+' : '-'}฿${f.amount.toLocaleString('th-TH')}</div>
+        <button class="fin-item-del" onclick="deleteFinance('${f.id}')">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openFinanceModal() {
+  document.getElementById('finModalName').value = '';
+  document.getElementById('finModalAmount').value = '';
+  document.getElementById('finModalDate').value = new Date().toLocaleDateString('en-CA');
+  document.getElementById('finModalType').value = 'income';
+  document.getElementById('financeModal').classList.add('open');
+}
+
+function closeFinanceModal() {
+  document.getElementById('financeModal').classList.remove('open');
+}
+
+async function saveFinanceModal() {
+  const type = document.getElementById('finModalType').value;
+  const name = document.getElementById('finModalName').value.trim();
+  const amount = parseFloat(document.getElementById('finModalAmount').value);
+  const date = document.getElementById('finModalDate').value;
+
+  if (!name || !amount || !date) {
+    showToast('⚠️ กรุณากรอกข้อมูลให้ครบ');
+    return;
+  }
+
+  const { error } = await supabase.from('finance').insert({
+    type: type,
+    name: name,
+    amount: amount,
+    date: date
+  });
+
+  if (error) {
+    showToast('❌ บันทึกไม่ได้: ' + error.message);
+    return;
+  }
+
+  showToast('✅ บันทึกรายการเรียบร้อย');
+  closeFinanceModal();
+  loadFinanceFromDB();
 }
 
 // ════════════════════════════════════════════

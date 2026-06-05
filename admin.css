@@ -407,6 +407,88 @@
   font-size: 0.85rem;
 }
 
+/* ════════════════════════════════════════════
+   MINIMAL FINANCE PAGE (LadyVenice Style)
+   ════════════════════════════════════════════ */
+.fin-month-container {
+  background: white; border-radius: 12px; border: 1px solid var(--border);
+  padding: 0.25rem 1rem; margin-bottom: 1.5rem; position: relative;
+}
+.fin-month-container::after {
+  content: '▼'; position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);
+  font-size: 0.7rem; color: var(--gray); pointer-events: none;
+}
+.fin-month-select {
+  width: 100%; border: none; background: transparent; padding: 0.75rem 0;
+  font-size: 0.95rem; font-weight: 500; color: var(--black); font-family: var(--font-body);
+  appearance: none; outline: none; cursor: pointer;
+}
+
+.fin-summary-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;
+}
+.fin-card {
+  padding: 1.5rem; border-radius: 12px; display: flex; flex-direction: column; gap: 0.5rem;
+}
+.fin-income-card {
+  background: #fdf5f5; /* สีชมพูอมเบจ อ่อนๆ */
+  border: 1px solid #f2e1df;
+}
+.fin-expense-card {
+  background: white; border: 1px solid var(--border);
+}
+.fin-label { font-size: 0.8rem; color: #a37c76; font-weight: 500; }
+.fin-expense-card .fin-label { color: var(--gray); }
+
+.fin-val { font-size: 1.8rem; font-weight: 600; font-family: var(--font-number); color: #a37c76; }
+.fin-expense-card .fin-val { color: var(--black); }
+
+.fin-profit-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1.25rem 1.5rem; background: white; border-radius: 12px; border: 1px solid var(--border);
+  margin-bottom: 2rem;
+}
+.fin-profit-val { font-size: 1.4rem; font-weight: 700; font-family: var(--font-number); }
+.fin-profit-val.good { color: #81b29a; } /* เขียวละมุน */
+.fin-profit-val.bad { color: #e07a5f; }  /* แดงละมุน */
+
+.fin-list-header { display: flex; margin-bottom: 1.5rem; }
+.fin-chips {
+  display: flex; gap: 0.5rem; background: white; padding: 0.4rem; border-radius: 30px; border: 1px solid var(--border);
+}
+.fin-chip {
+  padding: 0.4rem 1.25rem; border-radius: 20px; border: none; background: transparent;
+  font-size: 0.85rem; font-weight: 500; color: var(--gray); cursor: pointer; transition: 0.2s;
+}
+.fin-chip.active { background: #d6a6a1; color: white; } /* ปุ่มกดแล้วเป็นสีพาสเทล */
+
+.fin-list-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.fin-list-title { font-weight: 600; font-size: 1.1rem; }
+.fin-add-btn {
+  background: #d6a6a1; color: white; border: none; padding: 0.4rem 1rem; border-radius: 20px;
+  font-size: 0.85rem; cursor: pointer; font-family: var(--font-body); transition: 0.2s;
+}
+.fin-add-btn:hover { background: #c68f85; }
+
+.fin-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1.1rem 1.25rem; background: white; border-radius: 12px; border: 1px solid var(--border);
+  margin-bottom: 0.5rem; transition: 0.2s;
+}
+.fin-item:hover { box-shadow: 0 4px 10px rgba(0,0,0,0.03); transform: translateY(-1px); }
+.fin-item-left { display: flex; flex-direction: column; gap: 0.3rem; }
+.fin-item-name { font-weight: 500; font-size: 0.95rem; color: var(--black); }
+.fin-item-sub { font-size: 0.75rem; color: var(--gray); }
+.fin-item-right { display: flex; align-items: center; gap: 1rem; }
+.fin-item-amt { font-family: var(--font-number); font-weight: 700; font-size: 1.1rem; }
+.fin-item-amt.inc { color: #81b29a; }
+.fin-item-amt.exp { color: #e07a5f; }
+.fin-item-del {
+  background: #f3f4f6; border: none; padding: 0.5rem; border-radius: 8px; cursor: pointer;
+  color: var(--gray); display: flex; align-items: center; justify-content: center; transition: 0.2s;
+}
+.fin-item-del:hover { background: #fee2e2; color: #dc2626; }
+
 /* ── TODOS ── */
 .todo-input-row { display: flex; gap: 8px; margin-bottom: 1rem; }
 .todo-input-row input {
