@@ -36,6 +36,7 @@
       <button class="admin-nav-tab active" id="nav-home"    onclick="switchTab('home')"><i class="ph ph-house"></i> หน้าหลัก</button>
       <button class="admin-nav-tab"        id="nav-fish"    onclick="switchTab('fish')"><i class="ph ph-fish-simple"></i> จัดการปลา</button>
       <button class="admin-nav-tab"        id="nav-finance" onclick="switchTab('finance')"><i class="ph ph-wallet"></i> การเงิน</button>
+      <button class="admin-nav-tab"        id="nav-stats"   onclick="switchTab('stats')"><i class="ph ph-chart-bar"></i> สถิติ</button>
     </div>
     <div class="admin-topbar-right">
       <a href="index.html" target="_blank">← ดูหน้าลูกค้า</a>
@@ -265,6 +266,48 @@
       </div>
     </div>
 
+    <!-- ══ PAGE: STATS ══ -->
+    <div class="admin-page" id="page-stats">
+
+      <!-- KPI strip -->
+      <div id="stats-kpi" class="stats-kpi-grid"></div>
+
+      <!-- Row 1: สต็อกปลา + กระจายราคา -->
+      <div class="stats-grid-2">
+        <div class="stats-section-card">
+          <div class="stats-section-title"><i class="ph ph-fish-simple"></i> สต็อกปลา (Top 10)</div>
+          <div id="stats-stock-chart"></div>
+        </div>
+        <div class="stats-section-card">
+          <div class="stats-section-title"><i class="ph ph-currency-circle-dollar"></i> กระจายราคา</div>
+          <div id="stats-price-dist"></div>
+        </div>
+      </div>
+
+      <!-- Row 2: Top ปลา + ระดับความยาก -->
+      <div class="stats-grid-2">
+        <div class="stats-section-card">
+          <div class="stats-section-title"><i class="ph ph-trophy"></i> ปลาตามราคา</div>
+          <div id="stats-top-fish" class="stats-top-wrap"></div>
+        </div>
+        <div class="stats-section-card">
+          <div class="stats-section-title"><i class="ph ph-chart-pie-slice"></i> ระดับความยาก</div>
+          <div id="stats-level-dist"></div>
+        </div>
+      </div>
+
+      <!-- Row 3: Monthly finance — full width -->
+      <div class="stats-section-card" style="margin-top:0;">
+        <div class="stats-section-title"><i class="ph ph-calendar-blank"></i> รายรับ-รายจ่ายรายเดือน (6 เดือนล่าสุด)</div>
+        <div style="display:flex;gap:1rem;font-size:0.75rem;margin-bottom:1rem;">
+          <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;background:#059669;border-radius:2px;display:inline-block;"></span> รายรับ</span>
+          <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;background:#dc2626;opacity:0.7;border-radius:2px;display:inline-block;"></span> รายจ่าย</span>
+        </div>
+        <div id="stats-monthly-finance"></div>
+      </div>
+
+    </div><!-- /page-stats -->
+
   </div><!-- /admin-body -->
 
   <!-- BOTTOM NAV (mobile) -->
@@ -277,6 +320,9 @@
     </button>
     <button class="bnav-item" id="bnav-finance" onclick="switchTab('finance')">
       <span class="bnav-icon"><i class="ph ph-wallet"></i></span><span class="bnav-label">การเงิน</span>
+    </button>
+    <button class="bnav-item" id="bnav-stats" onclick="switchTab('stats')">
+      <span class="bnav-icon"><i class="ph ph-chart-bar"></i></span><span class="bnav-label">สถิติ</span>
     </button>
   </nav>
 

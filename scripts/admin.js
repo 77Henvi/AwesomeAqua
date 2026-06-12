@@ -8,6 +8,7 @@ import { compressImage, previewNewImage,
          previewEditImage }               from './shared/image.js';
 import { toggleTag, getSelectedTags,
          setSelectedTags }                from './shared/tags.js';
+import { renderStats }                   from './modules/stats.js';
 
 // ── Expose ไว้บน window ──
 window.hideLoader = function() {
@@ -445,15 +446,11 @@ function clearForm() {
 function switchTab(tab) {
   document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.admin-nav-tab, .bnav-item').forEach(b => b.classList.remove('active'));
-
-  document.getElementById('page-' + tab).classList.add('active');
-  const topBtn = document.getElementById('nav-'  + tab);
-  const botBtn = document.getElementById('bnav-' + tab);
-  if (topBtn) topBtn.classList.add('active');
-  if (botBtn) botBtn.classList.add('active');
-
-  // render finance lazily when tab opens
+  document.getElementById('page-' + tab)?.classList.add('active');
+  document.getElementById('nav-'  + tab)?.classList.add('active');
+  document.getElementById('bnav-' + tab)?.classList.add('active');
   if (tab === 'finance') renderFinancePage();
+  if (tab === 'stats')   renderStats(fishData, financeData);
 }
 
 /** Collapsible add panel  — forceOpen: true = open, false = close, undefined = toggle */
