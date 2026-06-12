@@ -9,6 +9,7 @@ import { compressImage, previewNewImage,
 import { toggleTag, getSelectedTags,
          setSelectedTags }                from './shared/tags.js';
 import { renderStats }                   from './modules/stats.js';
+import { calcPricePreview, profitCell }  from './modules/profit.js';
 
 // ── Expose ไว้บน window ──
 window.hideLoader = function() {
@@ -105,6 +106,7 @@ async function loadFishFromDB() {
     image:    f.image,
     priceMin: f.price_min,
     priceMax: f.price_max,
+    cost:     f.cost || 0,
     stock:    f.stock,
     level:    f.level,
     desc:     f.desc,
@@ -143,6 +145,7 @@ async function addFish() {
   const desc     = document.getElementById('newDesc').value;
   const sizeMin  = parseFloat(document.getElementById('newSizeMin').value) || null;
   const sizeMax  = parseFloat(document.getElementById('newSizeMax').value) || null;
+  const cost     = parseFloat(document.getElementById('newCost').value) || 0;
   const file     = document.getElementById('newImageFile').files[0];
 
   if (!name) { showToast('⚠️ กรุณากรอกชื่อปลา'); return; }
@@ -160,9 +163,9 @@ async function addFish() {
     tags: getSelectedTags('newTags'),
     image: imageUrl,
     size_min: sizeMin,
-    size_max: sizeMax
+    size_max: sizeMax,
+    cost: cost
   });
-
   if (error) { showToast('❌ เพิ่มปลาไม่ได้: ' + error.message); return; }
 
   showToast('✅ เพิ่มปลา ' + name + ' เรียบร้อย!');
@@ -215,7 +218,8 @@ async function saveEdit() {
     tags:      getSelectedTags('editTags'),
     image:     imageUrl,
     size_min:  parseFloat(document.getElementById('editSizeMin').value) || null,
-    size_max:  parseFloat(document.getElementById('editSizeMax').value) || null
+    size_max:  parseFloat(document.getElementById('editSizeMax').value) || null,
+    cost:      parseFloat(document.getElementById('editCost').value) || 0
   }).eq('id', id);
 
   if (error) { showToast('❌ บันทึกไม่ได้'); return; }
@@ -341,7 +345,7 @@ function renderFishTable() {
 
   const tbody = document.getElementById('fishTableBody');
   if (!list.length) {
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:2rem">
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--gray);padding:2rem">
       ${q ? 'ไม่พบปลาที่ค้นหา' : 'ยังไม่มีปลาครับ'}
     </td></tr>`;
     return;
@@ -366,6 +370,9 @@ function renderFishTable() {
       </td>
         <td style="font-family:var(--font-number);font-weight:600;color:var(--royal-blue);">
           ฿${(f.priceMin || 0).toLocaleString('th-TH')}${f.priceMax ? ' – ฿' + f.priceMax.toLocaleString('th-TH') : ''}
+        </td>
+        <td style="font-family:var(--font-number);font-weight:600;">
+          ${profitCell(f)}
         </td>
         <td><span class="admin-stock-badge ${sc}">${st}</span></td>
         <td><span class="admin-level-badge ${lvCls}">${f.level}</span></td>
@@ -395,6 +402,7 @@ function openEditModal(id) {
   document.getElementById('editDesc').value     = f.desc || '';
   document.getElementById('editSizeMin').value  = f.sizeMin || '';
   document.getElementById('editSizeMax').value  = f.sizeMax || '';
+  document.getElementById('editCost').value     = f.cost || '';
 
   const preview     = document.getElementById('editImagePreview');
   preview.src       = f.image || '';
@@ -418,7 +426,7 @@ function closeEditModal() {
 //   CLEAR FORM
 // ════════════════════════════════════════════
 function clearForm() {
-  ['newEmoji', 'newName', 'newSpecies', 'newPriceMin', 'newPriceMax', 'newStock', 'newSizeMin', 'newSizeMax', 'newDesc']
+  ['newEmoji', 'newName', 'newSpecies', 'newPriceMin', 'newPriceMax', 'newStock', 'newSizeMin', 'newSizeMax', 'newDesc', 'newCost']
     .forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
@@ -462,25 +470,7 @@ function toggleAddPanel(forceOpen) {
   toggle.classList.toggle('open', open);
 }
 
-/** Price range preview */
-function calcPricePreview() {
-  const min = parseFloat(document.getElementById('newPriceMin').value) || 0;
-  const max = parseFloat(document.getElementById('newPriceMax').value) || 0;
-  const el  = document.getElementById('pricePreview');
-  if (!min) { el.textContent = '—'; el.className = 'price-preview'; return; }
-  if (max && max < min) {
-    el.textContent = '⚠️ ราคาสูงสุดน้อยกว่าต่ำสุด';
-    el.className = 'price-preview bad'; return;
-  }
-  if (max > min) {
-    const spread = ((max - min) / min * 100).toFixed(0);
-    el.innerHTML = `฿${min.toLocaleString('th-TH')} – ฿${max.toLocaleString('th-TH')} <span style="font-size:0.78rem;font-weight:400;">(+${spread}%)</span>`;
-    el.className = 'price-preview good';
-  } else {
-    el.textContent = `฿${min.toLocaleString('th-TH')} (ราคาเดียว)`;
-    el.className = 'price-preview warn';
-  }
-}
+/** Price range preview — see scripts/modules/profit.js */
 
 /** Stock filter chips */
 function setStockFilter(f, el) {
