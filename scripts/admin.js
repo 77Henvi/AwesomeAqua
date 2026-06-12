@@ -1,7 +1,3 @@
-// ============================================
-//   ENTRY POINT — admin.html
-// ============================================
-
 import { supabase }                       from '../supabase.js';
 import { showToast }                      from './shared/utils.js';
 import { compressImage, previewNewImage,
