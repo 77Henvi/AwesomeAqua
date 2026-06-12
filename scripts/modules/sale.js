@@ -181,26 +181,18 @@ export async function confirmSale() {
   if (fishErr) { showToast('❌ อัปเดตสต็อกไม่ได้: ' + fishErr.message); return; }
 
   // 2) บันทึกรายรับ (และรายจ่ายต้นทุน ถ้ามี) เข้าหน้ารายรับ-รายจ่าย
+  // บันทึกเฉพาะ "กำไร" เป็นรายรับ (ไม่แยกต้นทุนเป็นรายจ่าย)
+  const profit = totalIncome - totalCost;
   const rows = [{
     type: 'income',
     name: `ขาย ${fish.name} x${qty} ตัว`,
-    amount: totalIncome,
+    amount: profit,
     date: today
   }];
-
-  if (totalCost > 0) {
-    rows.push({
-      type: 'expense',
-      name: `ต้นทุน ${fish.name} x${qty} ตัว`,
-      amount: totalCost,
-      date: today
-    });
-  }
 
   const { error: finErr } = await supabase.from('finance').insert(rows);
   if (finErr) { showToast('⚠️ ลดสต็อกแล้ว แต่บันทึกรายรับไม่ได้: ' + finErr.message); }
 
-  const profit = totalIncome - totalCost;
   showToast(`✅ ขาย ${fish.name} x${qty} ตัว สำเร็จ (กำไร ฿${profit.toLocaleString('th-TH')})`);
 
   closeSaleModal();
