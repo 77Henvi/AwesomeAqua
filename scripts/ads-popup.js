@@ -1,4 +1,4 @@
-import { supabase } from './supabase.js';
+import { supabase } from '../supabase.js';
 
 (async () => {
   // ดึงเฉพาะ ad ที่ active อยู่ ตัวล่าสุด
