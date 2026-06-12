@@ -1,0 +1,107 @@
+/* ============================================
+   ADS — ใส่ต่อท้าย admin.css + style.css
+   ============================================ */
+
+/* ── ADMIN: ads list ── */
+.ads-item {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 1rem; background: white;
+  border: 1px solid var(--border); border-radius: 12px;
+  margin-bottom: 0.75rem; transition: box-shadow 0.2s;
+}
+.ads-item:hover { box-shadow: 0 4px 12px rgba(26,58,143,0.08); }
+.ads-item-img {
+  width: 80px; height: 56px; border-radius: 8px;
+  overflow: hidden; flex-shrink: 0;
+  background: #f0f4ff; display: flex; align-items: center; justify-content: center;
+}
+.ads-item-img img { width: 100%; height: 100%; object-fit: cover; }
+.ads-no-img { font-size: 1.5rem; }
+.ads-item-info { flex: 1; min-width: 0; }
+.ads-item-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.2rem; }
+.ads-item-sub { font-size: 0.75rem; color: var(--gray); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ads-item-actions { display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
+
+/* ── Toggle switch ── */
+.ads-toggle { position: relative; display: inline-block; width: 40px; height: 22px; cursor: pointer; }
+.ads-toggle input { opacity: 0; width: 0; height: 0; }
+.ads-toggle-slider {
+  position: absolute; inset: 0; background: #d1d5db; border-radius: 22px;
+  transition: background 0.2s;
+}
+.ads-toggle-slider::before {
+  content: ''; position: absolute;
+  width: 16px; height: 16px; border-radius: 50%; background: white;
+  left: 3px; top: 3px; transition: transform 0.2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+.ads-toggle input:checked + .ads-toggle-slider { background: #059669; }
+.ads-toggle input:checked + .ads-toggle-slider::before { transform: translateX(18px); }
+
+/* ── Ad image preview (admin form) ── */
+#adImgPreview {
+  display: none; width: 100%; max-height: 200px;
+  object-fit: contain; border-radius: 10px;
+  margin-top: 0.75rem; border: 1px solid var(--border);
+}
+
+/* ════════════════════════════════════════════
+   POPUP (หน้าลูกค้า)
+   ════════════════════════════════════════════ */
+#ad-popup-overlay {
+  position: fixed; inset: 0; z-index: 9000;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 1.5rem;
+  opacity: 0; transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+#ad-popup-overlay.ad-popup-show { opacity: 1; pointer-events: auto; }
+#ad-popup-overlay.ad-popup-hide { opacity: 0; pointer-events: none; }
+
+#ad-popup {
+  background: white; border-radius: 20px;
+  max-width: 420px; width: 100%;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.3);
+  position: relative; overflow: hidden;
+  transform: scale(0.88) translateY(20px);
+  transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+}
+.ad-popup-show #ad-popup { transform: scale(1) translateY(0); }
+.ad-popup-hide #ad-popup  { transform: scale(0.92) translateY(12px); }
+
+#ad-popup-close {
+  position: absolute; top: 0.75rem; right: 0.75rem; z-index: 2;
+  width: 30px; height: 30px; border-radius: 50%;
+  background: rgba(0,0,0,0.4); color: white;
+  border: none; cursor: pointer; font-size: 0.85rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+#ad-popup-close:hover { background: rgba(0,0,0,0.65); }
+
+#ad-popup-img {
+  width: 100%; display: block;
+  max-height: 400px; object-fit: cover;
+}
+
+#ad-popup-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem; font-weight: 700;
+  padding: 1rem 1.25rem 0.25rem; color: var(--black);
+}
+
+#ad-popup-cta {
+  display: block; margin: 0.75rem 1.25rem 1.25rem;
+  background: var(--royal-blue); color: white;
+  padding: 0.65rem 1rem; border-radius: 10px;
+  text-decoration: none; font-size: 0.875rem; font-weight: 500;
+  text-align: center; transition: background 0.2s;
+}
+#ad-popup-cta:hover { background: var(--bright-blue); }
+
+@media (max-width: 480px) {
+  #ad-popup { border-radius: 16px; }
+  #ad-popup-img { max-height: 300px; }
+}
