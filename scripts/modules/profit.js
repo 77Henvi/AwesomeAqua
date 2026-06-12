@@ -1,13 +1,3 @@
-// ============================================
-//   MODULE: PROFIT / COST CALCULATION
-//   path: scripts/modules/profit.js
-// ============================================
-
-/**
- * Preview ราคา + กำไร ในฟอร์มเพิ่มปลา
- * อ่านค่าจาก #newPriceMin, #newPriceMax, #newCost
- * แล้วเขียนผลลงที่ #pricePreview
- */
 export function calcPricePreview() {
   const min  = parseFloat(document.getElementById('newPriceMin').value) || 0;
   const max  = parseFloat(document.getElementById('newPriceMax').value) || 0;

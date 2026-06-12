@@ -1,8 +1,3 @@
-// ============================================
-//   scripts/ads-popup.js
-//   หน้าลูกค้า — โหลด active ad แล้วแสดง popup
-//   import ใน app.js หรือใส่ script tag แยก
-// ============================================
 import { supabase } from './supabase.js';
 
 (async () => {

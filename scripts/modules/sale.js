@@ -1,20 +1,3 @@
-// ============================================
-//   MODULE: SALE POPUP (ขายได้)
-//   path: scripts/modules/sale.js
-//
-//   - เปิด popup จากปุ่ม "ขายได้" ใน editModal
-//   - ครั้งแรก: กรอก จำนวน / ต้นทุนต่อตัว / ราคาขายต่อตัว
-//     -> บันทึก cost, sale_price ไว้ใน record ปลา (เป็นค่า default)
-//   - ครั้งต่อไป: ถ้ามี cost & sale_price อยู่แล้ว จะให้กรอกแค่ "จำนวนที่ขายได้"
-//   - เมื่อยืนยัน:
-//       - ลด stock ของปลาตามจำนวนที่ขาย
-//       - insert รายรับ (income) เข้าตาราง finance = จำนวน * ราคาขาย
-//       - insert รายจ่าย (expense) เข้าตาราง finance = จำนวน * ต้นทุน
-//         (ทำให้หน้า "รายรับ-รายจ่าย" คำนวณกำไรสุทธิถูกต้องอัตโนมัติ)
-//
-//   หมายเหตุ: ต้องมีคอลัมน์ "cost" และ "sale_price" (numeric) ในตาราง fish
-// ============================================
-
 import { supabase }   from '../../supabase.js';
 import { showToast }  from '../shared/utils.js';
 
@@ -142,12 +125,6 @@ export function closeSaleModal() {
   _currentFish = null;
 }
 
-/**
- * ยืนยันการขาย:
- *  - ลด stock
- *  - จำ cost / sale_price ไว้ในตาราง fish (เป็น default ครั้งถัดไป)
- *  - บันทึกรายรับ-รายจ่ายลงตาราง finance
- */
 export async function confirmSale() {
   const fish = _currentFish;
   if (!fish) return;
