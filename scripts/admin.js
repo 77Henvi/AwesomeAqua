@@ -40,6 +40,8 @@ window.setFinFilter      = setFinFilter;
 window.openFinanceModal  = openFinanceModal;
 window.closeFinanceModal = closeFinanceModal;
 window.saveFinanceModal  = saveFinanceModal;
+window.openSaleModal    = openSaleModal;
+window.openSale         = openSale;
 
 // ── UI helpers (called from inline onclick in HTML) ──
 window.switchTab        = switchTab;
@@ -333,6 +335,8 @@ function renderDashboardCards() {
 //   FISH TABLE
 // ════════════════════════════════════════════
 function renderFishTable() {
+  _ensureProfitHeader();
+
   const q    = (document.getElementById('fishSearch')?.value || '').toLowerCase();
   const list = fishData.filter(f => {
     const match = (f.name + ' ' + (f.species || '')).toLowerCase().includes(q);
@@ -379,6 +383,7 @@ function renderFishTable() {
         <td><span class="admin-stock-badge ${sc}">${st}</span></td>
         <td><span class="admin-level-badge ${lvCls}">${f.level}</span></td>
         <td>
+          <button class="action-btn" style="background:#059669;color:#fff;border:none;" onclick="openSale('${f.id}')"><i class="ph ph-shopping-cart-simple"></i> ขายได้</button>
           <button class="action-btn action-edit"   onclick="openEditModal('${f.id}')"><i class="ph ph-pencil-simple"></i> แก้ไข</button>
           <button class="action-btn action-delete" onclick="deleteFish('${f.id}')"><i class="ph ph-trash"></i> ลบ</button>
         </td>
@@ -387,9 +392,33 @@ function renderFishTable() {
 }
 
 
-// ════════════════════════════════════════════
-//   EDIT MODAL
-// ════════════════════════════════════════════
+/** เพิ่ม <th>กำไร</th> ให้ตรงกับคอลัมน์ใหม่ ถ้า header เดิมยังไม่มี (กันคอลัมน์เลื่อน) */
+function _ensureProfitHeader() {
+  const thead = document.querySelector('#fishTableBody')?.closest('table')?.querySelector('thead tr');
+  if (!thead) return;
+  if (thead.querySelector('.th-profit')) return;
+
+  const ths = thead.querySelectorAll('th');
+  // คอลัมน์ราคา คือ th ตัวที่ 3 (รูป, ชื่อ, ราคา, สต็อก, ระดับ, จัดการ)
+  const priceTh = ths[2];
+  const th = document.createElement('th');
+  th.className = 'th-profit';
+  th.textContent = 'กำไร';
+  if (priceTh && priceTh.nextSibling) {
+    thead.insertBefore(th, priceTh.nextSibling);
+  } else {
+    thead.appendChild(th);
+  }
+}
+
+/** เรียก popup ขายจากปุ่ม "ขายได้" ในตาราง */
+function openSale(id) {
+  const f = fishData.find(x => x.id === id);
+  if (!f) return;
+  openSaleModal(f, () => loadFishFromDB());
+}
+
+
 function openEditModal(id) {
   const f = fishData.find(x => x.id === id);
   if (!f) return;
@@ -418,28 +447,6 @@ function openEditModal(id) {
   const isCS = (f.priceMin === 0 && f.stock === 0);
   document.getElementById('editIsComingSoon').checked = isCS;
   handleComingSoon('edit');
-
-  _ensureSaleButton(f);
-}
-
-/** ปุ่ม "ขายได้" — สร้างแบบ dynamic แล้วแปะไว้บนสุดของ editModal */
-function _ensureSaleButton(f) {
-  const modal = document.getElementById('editModal');
-  if (!modal) return;
-  const box = modal.querySelector('.modal-content, .modal-box') || modal.firstElementChild || modal;
-
-  let btn = document.getElementById('editSaleBtn');
-  if (!btn) {
-    btn = document.createElement('button');
-    btn.id = 'editSaleBtn';
-    btn.type = 'button';
-    btn.className = 'action-btn action-edit';
-    btn.style.cssText = 'margin-bottom:12px;background:#059669;color:#fff;border:none;';
-    btn.innerHTML = '<i class="ph ph-shopping-cart-simple"></i> ขายได้';
-    box.insertBefore(btn, box.firstChild);
-  }
-
-  btn.onclick = () => openSaleModal(f, () => loadFishFromDB());
 }
 
 function closeEditModal() {
