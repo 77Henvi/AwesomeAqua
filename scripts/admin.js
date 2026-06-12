@@ -9,6 +9,7 @@ import { compressImage, previewNewImage,
 import { toggleTag, getSelectedTags,
          setSelectedTags }                from './shared/tags.js';
 import { renderStats }                   from './modules/stats.js';
+import { initAds }                       from './modules/ads.js';
 import { calcPricePreview, profitCell }  from './modules/profit.js';
 import { openSaleModal }                 from './modules/sale.js';
 
@@ -490,6 +491,7 @@ function switchTab(tab) {
   document.getElementById('bnav-' + tab)?.classList.add('active');
   if (tab === 'finance') renderFinancePage();
   if (tab === 'stats')   renderStats(fishData, financeData);
+  if (tab === 'ads')     initAds();
 }
 
 /** Collapsible add panel  — forceOpen: true = open, false = close, undefined = toggle */
