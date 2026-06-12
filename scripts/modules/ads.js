@@ -1,5 +1,5 @@
-import { supabase } from '../supabase.js';
-import { showToast } from './shared/utils.js';
+import { supabase }  from '../../supabase.js';
+import { showToast } from '../shared/utils.js';
 
 export function initAds() {
   loadAdsAdmin();
