@@ -59,6 +59,7 @@
 #ad-popup-overlay.ad-popup-hide { opacity: 0; pointer-events: none; }
 
 #ad-popup {
+  background: transparent; border-radius: 20px;
   max-width: 420px; width: 100%;
   box-shadow: 0 30px 80px rgba(0,0,0,0.3);
   position: relative; overflow: hidden;
