@@ -10,6 +10,7 @@ import { toggleTag, getSelectedTags,
          setSelectedTags }                from './shared/tags.js';
 import { renderStats }                   from './modules/stats.js';
 import { calcPricePreview, profitCell }  from './modules/profit.js';
+import { openSaleModal }                 from './modules/sale.js';
 
 // ── Expose ไว้บน window ──
 window.hideLoader = function() {
@@ -107,6 +108,7 @@ async function loadFishFromDB() {
     priceMin: f.price_min,
     priceMax: f.price_max,
     cost:     f.cost || 0,
+    sale_price: f.sale_price || 0,
     stock:    f.stock,
     level:    f.level,
     desc:     f.desc,
@@ -145,7 +147,7 @@ async function addFish() {
   const desc     = document.getElementById('newDesc').value;
   const sizeMin  = parseFloat(document.getElementById('newSizeMin').value) || null;
   const sizeMax  = parseFloat(document.getElementById('newSizeMax').value) || null;
-  const cost     = parseFloat(document.getElementById('newCost').value) || 0;
+  const cost     = parseFloat(document.getElementById('newCost')?.value) || 0;
   const file     = document.getElementById('newImageFile').files[0];
 
   if (!name) { showToast('⚠️ กรุณากรอกชื่อปลา'); return; }
@@ -219,7 +221,7 @@ async function saveEdit() {
     image:     imageUrl,
     size_min:  parseFloat(document.getElementById('editSizeMin').value) || null,
     size_max:  parseFloat(document.getElementById('editSizeMax').value) || null,
-    cost:      parseFloat(document.getElementById('editCost').value) || 0
+    cost:      parseFloat(document.getElementById('editCost')?.value) || 0
   }).eq('id', id);
 
   if (error) { showToast('❌ บันทึกไม่ได้'); return; }
@@ -402,7 +404,7 @@ function openEditModal(id) {
   document.getElementById('editDesc').value     = f.desc || '';
   document.getElementById('editSizeMin').value  = f.sizeMin || '';
   document.getElementById('editSizeMax').value  = f.sizeMax || '';
-  document.getElementById('editCost').value     = f.cost || '';
+  if (document.getElementById('editCost')) document.getElementById('editCost').value = f.cost || '';
 
   const preview     = document.getElementById('editImagePreview');
   preview.src       = f.image || '';
@@ -416,6 +418,28 @@ function openEditModal(id) {
   const isCS = (f.priceMin === 0 && f.stock === 0);
   document.getElementById('editIsComingSoon').checked = isCS;
   handleComingSoon('edit');
+
+  _ensureSaleButton(f);
+}
+
+/** ปุ่ม "ขายได้" — สร้างแบบ dynamic แล้วแปะไว้บนสุดของ editModal */
+function _ensureSaleButton(f) {
+  const modal = document.getElementById('editModal');
+  if (!modal) return;
+  const box = modal.querySelector('.modal-content, .modal-box') || modal.firstElementChild || modal;
+
+  let btn = document.getElementById('editSaleBtn');
+  if (!btn) {
+    btn = document.createElement('button');
+    btn.id = 'editSaleBtn';
+    btn.type = 'button';
+    btn.className = 'action-btn action-edit';
+    btn.style.cssText = 'margin-bottom:12px;background:#059669;color:#fff;border:none;';
+    btn.innerHTML = '<i class="ph ph-shopping-cart-simple"></i> ขายได้';
+    box.insertBefore(btn, box.firstChild);
+  }
+
+  btn.onclick = () => openSaleModal(f, () => loadFishFromDB());
 }
 
 function closeEditModal() {
