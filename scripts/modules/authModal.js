@@ -1,5 +1,5 @@
-import { supabase }   from '../supabase.js';
-import { showToast }  from './shared/utils.js';
+import { supabase }  from '../../supabase.js';
+import { showToast } from '../shared/utils.js';
 
 export function openModal(tab) {
   document.getElementById('authModal').classList.add('open');
