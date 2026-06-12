@@ -59,7 +59,6 @@
 #ad-popup-overlay.ad-popup-hide { opacity: 0; pointer-events: none; }
 
 #ad-popup {
-  background: white; border-radius: 20px;
   max-width: 420px; width: 100%;
   box-shadow: 0 30px 80px rgba(0,0,0,0.3);
   position: relative; overflow: hidden;
@@ -77,6 +76,7 @@
   display: flex; align-items: center; justify-content: center;
   transition: background 0.15s;
 }
+
 #ad-popup-close:hover { background: rgba(0,0,0,0.65); }
 
 #ad-popup-img {
