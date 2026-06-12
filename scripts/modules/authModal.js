@@ -21,6 +21,9 @@ export function switchAuthTab(tab) {
   document.getElementById('tabSignup').classList.toggle('active', tab === 'signup');
 }
 
+// alias เผื่อ app.js เรียกชื่อ switchTab
+export const switchTab = switchAuthTab;
+
 // ── Login ด้วย Supabase Auth ──
 export async function fakeLogin() {
   const email    = document.querySelector('#loginForm input[type="email"]').value.trim();
