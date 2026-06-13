@@ -3,7 +3,7 @@
 //   หน้าลูกค้า — โหลด active ad แล้วแสดง popup
 //   import ใน app.js หรือใส่ script tag แยก
 // ============================================
-import { supabase } from './supabase.js';
+import { supabase } from '/supabase.js';
 
 (async () => {
   // ดึงเฉพาะ ad ที่ active อยู่ ตัวล่าสุด
