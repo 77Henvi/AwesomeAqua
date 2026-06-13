@@ -24,25 +24,36 @@ function showAdPopup(ad) {
   const overlay = document.createElement('div');
   overlay.id = 'ad-popup-overlay';
   overlay.innerHTML = `
-    <div id="ad-popup">
-      <button id="ad-popup-close" onclick="closeAdPopup('${ad.id}')" aria-label="ปิด">✕</button>
-      ${ad.image_url
-        ? `<img src="${ad.image_url}" alt="${ad.title || 'โปรโมชั่น'}" id="ad-popup-img"
-             ${ad.link_url ? `onclick="window.open('${ad.link_url}','_blank')"` : ''}>`
-        : ''}
-    </div>`;
+    <button id="ad-popup-close" onclick="closeAdPopup('${ad.id}')" aria-label="ปิด">✕</button>
+    ${ad.image_url
+      ? `<img src="${ad.image_url}" alt="${ad.title || 'โปรโมชั่น'}" id="ad-popup-img"
+           ${ad.link_url ? `onclick="window.open('${ad.link_url}','_blank')"` : ''}>`
+      : ''}`;
 
   document.body.appendChild(overlay);
 
-  // animate in
+  // reposition ปุ่ม ✕ ให้ติดมุมบนขวาของรูปจริงๆ
   requestAnimationFrame(() => {
     overlay.classList.add('ad-popup-show');
+    const img = document.getElementById('ad-popup-img');
+    const btn = document.getElementById('ad-popup-close');
+    if (img && btn) {
+      img.onload = () => positionCloseBtn(img, btn);
+      if (img.complete) positionCloseBtn(img, btn);
+    }
   });
 
   // ปิดเมื่อคลิก overlay
   overlay.addEventListener('click', e => {
     if (e.target === overlay) closeAdPopup(ad.id);
   });
+}
+
+function positionCloseBtn(img, btn) {
+  const r = img.getBoundingClientRect();
+  btn.style.top  = (r.top  - 14) + 'px';
+  btn.style.left = (r.right - 18) + 'px';
+  btn.style.right = 'auto';
 }
 
 window.closeAdPopup = function(adId) {
