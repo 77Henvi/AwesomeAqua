@@ -67,9 +67,12 @@
 
 #ad-popup {
   position: relative;
-  width: 100%; max-width: 400px;
+  width: 100%; max-width: 85vw;
   transform: scale(0.9) translateY(20px);
   transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  background: none;
+  box-shadow: none;
+  border: none;
 }
 .ad-popup-show #ad-popup { transform: scale(1) translateY(0); }
 .ad-popup-hide #ad-popup  { transform: scale(0.93) translateY(10px); }
@@ -93,12 +96,11 @@
 /* ── รูปภาพล้วนๆ ── */
 #ad-popup-img {
   width: 100%; display: block;
-  border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  border-radius: 0;
+  box-shadow: none;
   cursor: pointer;
 }
 
 @media (max-width: 480px) {
-  #ad-popup { max-width: 85vw; }
-  #ad-popup-img { border-radius: 12px; }
+  #ad-popup { max-width: 92vw; }
 }
