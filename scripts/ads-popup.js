@@ -1,8 +1,3 @@
-// ============================================
-//   scripts/ads-popup.js
-//   หน้าลูกค้า — โหลด active ad แล้วแสดง popup
-//   import ใน app.js หรือใส่ script tag แยก
-// ============================================
 import { supabase } from '/supabase.js';
 
 (async () => {
@@ -32,14 +27,8 @@ function showAdPopup(ad) {
     <div id="ad-popup">
       <button id="ad-popup-close" onclick="closeAdPopup('${ad.id}')" aria-label="ปิด">✕</button>
       ${ad.image_url
-        ? `<div id="ad-popup-img-wrap"><img src="${ad.image_url}" alt="${ad.title || 'โปรโมชั่น'}" id="ad-popup-img"
-             ${ad.link_url ? `onclick="window.open('${ad.link_url}','_blank')" style="cursor:pointer"` : ''}></div>`
-        : ''}
-      ${ad.title
-        ? `<div id="ad-popup-title">${ad.title}</div>`
-        : ''}
-      ${ad.link_url
-        ? `<a href="${ad.link_url}" target="_blank" id="ad-popup-cta">ดูรายละเอียด →</a>`
+        ? `<img src="${ad.image_url}" alt="${ad.title || 'โปรโมชั่น'}" id="ad-popup-img"
+             ${ad.link_url ? `onclick="window.open('${ad.link_url}','_blank')"` : ''}>`
         : ''}
     </div>`;
 
