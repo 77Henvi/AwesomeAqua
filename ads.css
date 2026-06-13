@@ -108,4 +108,22 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
   transition: transform 0.15s;
 }
-#ad-popup-close:hover { transform: scale(1.12); }
+/* ── Responsive ── */
+/* iPad (768–1024px) */
+@media (max-width: 1024px) and (min-width: 768px) {
+  #ad-popup-img {
+    max-width: 70vw;
+    max-height: 80vh;
+  }
+}
+
+/* Mobile (< 768px) */
+@media (max-width: 767px) {
+  #ad-popup-img {
+    max-width: 92vw;
+    max-height: 82vh;
+  }
+  #ad-popup-close {
+    width: 28px; height: 28px; font-size: 0.75rem;
+  }
+}
