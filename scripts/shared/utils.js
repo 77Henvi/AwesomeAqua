@@ -28,7 +28,7 @@ export function showToast(msg) {
 }
 
 export function openLine(fishId) {
-  const lineId = 'ltz321';
+  const lineId = '@955ppjio';
   showToast('📱 กำลังเปิด LINE...');
   if (fishId) {
     const text = encodeURIComponent(`ดูปลา:${fishId}`);
