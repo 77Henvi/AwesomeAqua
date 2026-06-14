@@ -28,13 +28,13 @@ export function showToast(msg) {
 }
 
 export function openLine(fishId) {
-  const lineId = '@955ppjio';
   showToast('📱 กำลังเปิด LINE...');
   if (fishId) {
-    const text = encodeURIComponent(`ดูปลา:${fishId}`);
-    window.open(`https://line.me/R/ti/p/~${lineId}?text=${text}`, '_blank');
+    // เปิด LIFF พร้อมส่ง fish ID
+    window.open(`https://liff.line.me/2010391542-QzHeiSlX?fishId=${fishId}`, '_blank');
   } else {
-    window.open(`https://line.me/R/ti/p/~${lineId}`, '_blank');
+    // ปุ่ม LINE ทั่วไป navbar/footer/contact
+    window.open(`https://line.me/R/ti/p/@awesomeaqua`, '_blank');
   }
 }
 
