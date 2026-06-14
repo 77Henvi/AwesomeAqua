@@ -128,7 +128,12 @@ async function sendOrder(fishId, fishName, price) {
   } catch (e) {
     btn.disabled = false;
     btn.textContent = '🛒 สั่งซื้อเลย';
-    document.getElementById('status').textContent = '❌ เกิดข้อผิดพลาด: ' + e.message;
+    if (e.code === 'PERMISSION_DENIED' || e.message?.includes('permission')) {
+      // re-login เพื่อขอ permission ใหม่
+      liff.login({ redirectUri: location.href });
+    } else {
+      document.getElementById('status').textContent = '❌ ' + e.message;
+    }
   }
 }
 
@@ -139,6 +144,13 @@ async function sendOrder(fishId, fishName, price) {
 
     if (!liff.isLoggedIn()) {
       liff.login({ redirectUri: location.href });
+      return;
+    }
+
+    // เช็คว่ามี permission chat_message.write ไหม
+    if (!liff.isInClient()) {
+      document.getElementById('content').innerHTML =
+        '<p style="color:#dc2626">กรุณาเปิดหน้านี้ใน LINE app เท่านั้นครับ</p>';
       return;
     }
 
