@@ -28,15 +28,13 @@ export function showToast(msg) {
 }
 
 export function openLine(fishId) {
-  const lineId = '@ltz321';
+  const lineId = 'ltz321';
   showToast('📱 กำลังเปิด LINE...');
   if (fishId) {
-    // ส่ง "ดูปลา:ID" ให้ bot รู้ว่าสนใจปลาตัวไหน
     const text = encodeURIComponent(`ดูปลา:${fishId}`);
-    window.open(`https://line.me/R/oaMessage/${lineId}/?text=${text}`, '_blank');
+    window.open(`https://line.me/R/ti/p/~${lineId}?text=${text}`, '_blank');
   } else {
-    // ปุ่ม LINE ทั่วไป navbar/footer/contact
-    window.open(`https://line.me/R/ti/p/${lineId}`, '_blank');
+    window.open(`https://line.me/R/ti/p/~${lineId}`, '_blank');
   }
 }
 
