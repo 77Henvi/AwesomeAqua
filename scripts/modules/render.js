@@ -37,7 +37,7 @@ function _availableCard(f) {
         <div class="fish-tags">${(f.tags || []).map(t => `<span class="tag">${t}</span>`).join('')}</div>
         ${f.stock > 0
           ? `<button class="btn-line" style="width:100%;justify-content:center"
-               onclick="event.stopPropagation(); openLine('${f.name}')">
+               onclick="event.stopPropagation(); openLine('${f.id}')">
                ${LINE_ICON(16)} สั่งซื้อ
              </button>`
           : `<button class="btn" style="width:100%;background:#f3f4f6;color:#9ca3af;cursor:not-allowed" disabled>หมดสต็อก</button>`

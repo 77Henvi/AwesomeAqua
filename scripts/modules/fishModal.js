@@ -54,7 +54,7 @@ export function openFishDetail(id) {
         </div>` : ''}
       <div class="fd-cta">
         ${f.stock > 0
-          ? `<button class="btn-line fd-btn-line" onclick="openLine('${f.name}')">
+          ? `<button class="btn-line fd-btn-line" onclick="openLine('${f.id}')">
                ${LINE_ICON(20)} สั่งซื้อผ่านไลน์
              </button>`
           : `<button class="btn fd-btn-disabled" disabled>หมดสต็อก</button>`
@@ -101,7 +101,7 @@ export function openComingSoonDetail(id) {
         </div>` : ''}
 
       <div class="cs-cta-row">
-        <button class="btn-line fd-btn-line" onclick="openLine('สอบถามปลา ${f.name}')">
+        <button class="btn-line fd-btn-line" onclick="openLine('${f.id}')">
           ${LINE_ICON(18)} สอบถามผ่านไลน์
         </button>
         <button class="cs-notify-btn" onclick="closeCsModal()">
