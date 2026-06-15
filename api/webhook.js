@@ -81,6 +81,8 @@ async function handleEvent(event) {
   const text     = event.message.text.trim();
   const replyToken = event.replyToken;
 
+  console.log('userId:', userId, '| text:', text);
+
   // ── ลูกค้ากดปุ่มมาจากเว็บ — format: "ดูปลา:FISH_ID" ──
   if (text.startsWith('ดูปลา:')) {
     const fishId = text.split(':')[1];
