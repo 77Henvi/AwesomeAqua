@@ -1,3 +1,8 @@
+// ============================================
+//   api/webhook.js — Vercel Serverless Function
+//   LINE Messaging API Webhook
+// ============================================
+
 const CHANNEL_SECRET      = process.env.LINE_CHANNEL_SECRET;
 const CHANNEL_ACCESS_TOKEN = process.env.LINE_CHANNEL_ACCESS_TOKEN;
 const SUPABASE_URL        = process.env.SUPABASE_URL;
@@ -92,7 +97,6 @@ async function handleEvent(event) {
       return;
     }
 
-    // เก็บ session ว่าลูกค้าสนใจปลาตัวไหน
     await setUserSession(userId, fishId);
 
     const priceText = fish.price_min === fish.price_max
@@ -115,9 +119,34 @@ async function handleEvent(event) {
               `📦 ${stockText}\n\n` +
               `${fish.desc || ''}\n\n` +
               `──────────────\n` +
-              `พิมพ์ "สั่ง" เพื่อสั่งซื้อครับ 👇`
+              `พิมพ์ "สั่ง" เพื่อสั่งซื้อตัวนี้ 🛒\n` +
+              `พิมพ์ "ดูปลา" เพื่อดูปลาตัวอื่น 🐠\n` +
+              `พิมพ์ "ติดต่อ" เพื่อคุยกับแอดมิน 👨‍💼`
       }
     ]);
+    return;
+  }
+
+  // ── ดูปลาทั้งหมด ──
+  if (text === 'ดูปลา' || text === 'ปลา' || text === 'ดูปลาทั้งหมด') {
+    await replyMessage(replyToken, [{
+      type: 'text',
+      text: `🐟 ดูปลาทั้งหมดได้ที่:\nhttps://awesome-aqua.vercel.app\n\nกดปุ่ม LINE ที่ปลาที่สนใจได้เลยครับ 😊`
+    }]);
+    return;
+  }
+
+  // ── ติดต่อแอดมิน ──
+  if (text === 'ติดต่อ' || text === 'แอดมิน' || text === 'ติดต่อแอดมิน') {
+    await replyMessage(replyToken, [{
+      type: 'text',
+      text: `👨‍💼 ติดต่อแอดมินได้เลยครับ!\n\n` +
+            `📞 โทร: 082-237-2512\n` +
+            `💬 LINE: @955ppjio\n` +
+            `📘 Facebook: ฟีฟ่า คนชนตู้ปลา\n` +
+            `🎵 TikTok: @fifahaka\n\n` +
+            `ยินดีให้คำปรึกษาทุกเรื่องครับ 🙏`
+    }]);
     return;
   }
 
@@ -179,7 +208,13 @@ async function handleEvent(event) {
   // ── fallback ──
   await replyMessage(replyToken, [{
     type: 'text',
-    text: 'สวัสดีครับ! 🐟\nดูปลาทั้งหมดได้ที่:\nhttps://awesome-aqua.vercel.app\n\nหรือทักมาได้เลยครับ'
+    text: `สวัสดีครับ! 🐟 Awesome Aqua ยินดีให้บริการ\n\n` +
+          `พิมพ์คำสั่งได้เลยครับ:\n` +
+          `🐠 "ดูปลา" — ดูปลาทั้งหมด\n` +
+          `🛒 "สั่ง" — สั่งซื้อปลาที่เลือกไว้\n` +
+          `👨‍💼 "ติดต่อ" — คุยกับแอดมิน\n\n` +
+          `หรือกดปุ่ม LINE จากปลาที่สนใจในเว็บได้เลยครับ 😊\n` +
+          `https://awesome-aqua.vercel.app`
   }]);
 }
 
