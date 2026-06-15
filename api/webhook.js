@@ -93,27 +93,25 @@ async function handleEvent(event) {
     // เก็บ session ว่าลูกค้าสนใจปลาตัวไหน
     await setUserSession(userId, fishId);
 
-    const priceText = fish.priceMin === fish.priceMax
-      ? `฿${fish.priceMin}`
-      : `฿${fish.priceMin} – ฿${fish.priceMax}`;
+    const priceText = fish.price_min === fish.price_max
+      ? `฿${fish.price_min}`
+      : `฿${fish.price_min} – ฿${fish.price_max}`;
 
     const stockText = fish.stock === 0 ? '❌ หมดสต็อก' : `✅ มีในสต็อก ${fish.stock} ตัว`;
 
     await replyMessage(replyToken, [
-      // รูปปลา
-      ...(fish.imageUrl ? [{
+      ...(fish.image ? [{
         type: 'image',
-        originalContentUrl: fish.imageUrl,
-        previewImageUrl:    fish.imageUrl
+        originalContentUrl: fish.image,
+        previewImageUrl:    fish.image
       }] : []),
-      // ข้อมูลปลา
       {
         type: 'text',
         text: `🐟 ${fish.name}\n` +
               `📋 ${fish.species || ''}\n` +
               `💰 ราคา: ${priceText}\n` +
               `📦 ${stockText}\n\n` +
-              `${fish.description || ''}\n\n` +
+              `${fish.desc || ''}\n\n` +
               `──────────────\n` +
               `พิมพ์ "สั่ง" เพื่อสั่งซื้อครับ 👇`
       }
@@ -141,9 +139,9 @@ async function handleEvent(event) {
       return;
     }
 
-    const priceText = fish.priceMin === fish.priceMax
-      ? `฿${fish.priceMin}`
-      : `฿${fish.priceMin} – ฿${fish.priceMax}`;
+    const priceText = fish.price_min === fish.price_max
+      ? `฿${fish.price_min}`
+      : `฿${fish.price_min} – ฿${fish.price_max}`;
 
     // ส่งช่องทางชำระเงิน + QR Code
     await replyMessage(replyToken, [
@@ -153,7 +151,7 @@ async function handleEvent(event) {
               `💰 ราคา: ${priceText}\n\n` +
               `📲 ช่องทางชำระเงิน:\n` +
               `• พร้อมเพย์: 082-237-2512\n` +
-              `• ธนาคารกสิกร: 136-3-82691-8\n\n` +
+              `• ธนาคารกสิกร: 123-4-56789-0\n\n` +
               `โอนแล้วส่งสลิปมาในแชทนี้ได้เลยครับ 🙏`
       },
       {
