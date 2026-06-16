@@ -3,81 +3,168 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Awesome Aqua — สั่งซื้อ</title>
+  <title>Awesome Aqua</title>
   <script src="https://static.line-scdn.net/liff/edge/versions/2.22.3/sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f0f4ff;
+      font-family: 'Jost', sans-serif;
+      background: #0a0f28;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+    }
+
+    /* ── Hero image ── */
+    .hero {
+      position: relative; width: 100%;
+      height: 55vw; max-height: 320px; min-height: 220px;
+      overflow: hidden; flex-shrink: 0;
+      background: #0d1535;
+    }
+    .hero img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center;
+      display: block;
+    }
+    .hero-emoji {
+      width: 100%; height: 100%;
       display: flex; align-items: center; justify-content: center;
-      min-height: 100vh; padding: 1.5rem;
+      font-size: 6rem;
     }
-    .card {
-      background: white; border-radius: 20px;
-      padding: 2rem; max-width: 360px; width: 100%;
-      box-shadow: 0 8px 32px rgba(26,58,143,0.12);
-      text-align: center;
+    .hero-grad {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, #0a0f28 0%, transparent 55%);
     }
-    .logo {
-      font-size: 1.4rem; font-weight: 700;
-      color: #1a3a8f; margin-bottom: 0.25rem;
+    .hero-logo {
+      position: absolute; top: 1rem; left: 1.25rem;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem; font-weight: 700;
+      color: rgba(255,255,255,0.9); letter-spacing: 0.5px;
     }
-    .logo span { color: #2255cc; }
-    .fish-img {
-      width: 100%; max-height: 200px;
-      object-fit: cover; border-radius: 14px;
-      margin: 1.25rem 0;
+    .hero-logo span { color: #7eb3ff; }
+
+    /* ── Content ── */
+    .content {
+      flex: 1; padding: 1.5rem 1.25rem 2rem;
+      display: flex; flex-direction: column; gap: 0;
     }
-    .fish-emoji {
-      font-size: 5rem; display: block;
-      margin: 1.25rem 0;
-    }
+
     .fish-name {
-      font-size: 1.3rem; font-weight: 700;
-      color: #0d0d0d; margin-bottom: 0.25rem;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.75rem; font-weight: 700;
+      color: white; line-height: 1.2;
+      margin-bottom: 0.2rem;
     }
     .fish-species {
-      font-size: 0.82rem; color: #6b7280;
-      font-style: italic; margin-bottom: 0.75rem;
+      font-size: 0.78rem; color: rgba(255,255,255,0.4);
+      font-style: italic; margin-bottom: 1.25rem;
+      letter-spacing: 0.3px;
     }
-    .fish-price {
-      font-size: 1.2rem; font-weight: 700;
-      color: #1a3a8f; margin-bottom: 0.5rem;
+
+    /* info row */
+    .info-row {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 0.75rem; margin-bottom: 1.5rem;
     }
-    .fish-stock {
-      font-size: 0.85rem; margin-bottom: 1.25rem;
+    .info-block {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px; padding: 0.85rem 1rem;
     }
+    .info-label {
+      font-size: 0.65rem; color: rgba(255,255,255,0.35);
+      text-transform: uppercase; letter-spacing: 0.1em;
+      margin-bottom: 0.3rem;
+    }
+    .info-value {
+      font-size: 1rem; font-weight: 600; color: white;
+    }
+    .info-value.price { color: #7eb3ff; font-size: 1.1rem; }
+    .info-value.out   { color: #ef4444; }
+    .info-value.low   { color: #f59e0b; }
+    .info-value.ok    { color: #34d399; }
+
+    /* divider */
+    .divider {
+      height: 1px; background: rgba(255,255,255,0.07);
+      margin-bottom: 1.5rem;
+    }
+
+    /* buttons */
     .btn {
-      width: 100%; padding: 0.85rem;
+      width: 100%; padding: 0.9rem;
       border-radius: 12px; border: none;
-      font-size: 1rem; font-weight: 600;
-      cursor: pointer; transition: opacity 0.2s;
+      font-size: 0.95rem; font-weight: 500;
+      font-family: 'Jost', sans-serif;
+      cursor: pointer; transition: all 0.2s;
+      letter-spacing: 0.3px;
     }
-    .btn:hover { opacity: 0.88; }
     .btn-order {
       background: #06C755; color: white;
       margin-bottom: 0.75rem;
+      box-shadow: 0 4px 20px rgba(6,199,85,0.25);
     }
+    .btn-order:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-order:disabled { background: #374151; color: #6b7280; box-shadow: none; transform: none; cursor: not-allowed; }
     .btn-back {
-      background: #f0f4ff; color: #1a3a8f;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.55);
     }
-    .status { font-size: 0.82rem; color: #6b7280; margin-top: 1rem; }
-    .loading { color: #6b7280; font-size: 0.9rem; }
+    .btn-back:hover { background: rgba(255,255,255,0.1); }
+    .btn-disabled {
+      background: rgba(255,255,255,0.05);
+      color: #4b5563; cursor: not-allowed;
+      margin-bottom: 0.75rem;
+    }
+
+    .status {
+      font-size: 0.78rem; color: rgba(255,255,255,0.4);
+      text-align: center; margin-top: 0.75rem;
+      min-height: 1.2rem;
+    }
+
+    /* loading */
+    .loading-wrap {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 1rem;
+    }
+    .spinner {
+      width: 32px; height: 32px;
+      border: 2px solid rgba(255,255,255,0.1);
+      border-top-color: #7eb3ff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-size: 0.82rem; color: rgba(255,255,255,0.3); }
+
+    /* error */
+    .error-wrap {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 0.5rem; padding: 2rem;
+      text-align: center;
+    }
+    .error-icon { font-size: 2.5rem; }
+    .error-text { font-size: 0.85rem; color: rgba(255,255,255,0.4); line-height: 1.6; }
   </style>
 </head>
 <body>
-<div class="card">
-  <div class="logo">Awesome <span>Aqua</span></div>
-  <div id="content"><p class="loading">กำลังโหลด...</p></div>
+
+<div id="root">
+  <div class="loading-wrap">
+    <div class="spinner"></div>
+    <div class="loading-text">กำลังโหลด...</div>
+  </div>
 </div>
 
 <script>
-const LIFF_ID     = '2010391542-QzHeiSlX';
+const LIFF_ID      = '2010391542-QzHeiSlX';
 const SUPABASE_URL = 'https://vfihczafjrkcyncnosgj.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmaWhjemFmanJrY3luY25vc2dqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NjEzODIsImV4cCI6MjA5MTMzNzM4Mn0.x2XF1GzfAUu_o-l6acRQtl6k6DTY-GsG_JHnEOm-eLA';
-
-// ดึง fish ID จาก URL param
 const fishId = new URLSearchParams(location.search).get('fishId');
 
 async function getFish(id) {
@@ -88,89 +175,86 @@ async function getFish(id) {
   return data[0] || null;
 }
 
-function renderFish(f) {
-  const outOfStock = f.stock === 0;
-  const priceText  = `฿${f.price_min?.toLocaleString('th-TH') || 0}${f.price_max ? ' – ฿' + f.price_max.toLocaleString('th-TH') : ''}`;
-  const stockText  = outOfStock
-    ? '❌ หมดสต็อก'
-    : f.stock <= 5 ? `⚠️ เหลือ ${f.stock} ตัว` : `✅ มีในสต็อก ${f.stock} ตัว`;
-
-  document.getElementById('content').innerHTML = `
-    ${f.image
-      ? `<img src="${f.image}" class="fish-img" alt="${f.name}">`
-      : `<span class="fish-emoji">${f.emoji || '🐟'}</span>`}
-    <div class="fish-name">${f.name}</div>
-    <div class="fish-species">${f.species || ''}</div>
-    <div class="fish-price">${priceText}</div>
-    <div class="fish-stock">${stockText}</div>
-    ${!outOfStock
-      ? `<button class="btn btn-order" onclick="sendOrder('${f.id}', '${f.name}', '${priceText}')">
-           🛒 สั่งซื้อเลย
-         </button>`
-      : `<button class="btn" style="background:#f3f4f6;color:#9ca3af;cursor:not-allowed" disabled>หมดสต็อก</button>`}
-    <button class="btn btn-back" onclick="liff.closeWindow()">← กลับ</button>
-    <p class="status" id="status"></p>
-  `;
+function setRoot(html) {
+  document.getElementById('root').innerHTML = html;
 }
 
-async function sendOrder(fishId, fishName, price) {
-  const btn = document.querySelector('.btn-order');
+function renderFish(f) {
+  const outOfStock = f.stock === 0;
+  const priceText  = `฿${(f.price_min || 0).toLocaleString('th-TH')}${f.price_max && f.price_max !== f.price_min ? ' – ฿' + f.price_max.toLocaleString('th-TH') : ''}`;
+  const stockCls   = outOfStock ? 'out' : f.stock <= 5 ? 'low' : 'ok';
+  const stockText  = outOfStock ? 'หมดสต็อก' : f.stock <= 5 ? `เหลือ ${f.stock} ตัว` : `${f.stock} ตัว`;
+
+  setRoot(`
+    <div class="hero">
+      ${f.image
+        ? `<img src="${f.image}" alt="${f.name}">`
+        : `<div class="hero-emoji">${f.emoji || '🐟'}</div>`}
+      <div class="hero-grad"></div>
+      <div class="hero-logo">Awesome <span>Aqua</span></div>
+    </div>
+    <div class="content">
+      <div class="fish-name">${f.name}</div>
+      <div class="fish-species">${f.species || ''}</div>
+      <div class="info-row">
+        <div class="info-block">
+          <div class="info-label">ราคา</div>
+          <div class="info-value price">${priceText}</div>
+        </div>
+        <div class="info-block">
+          <div class="info-label">สต็อก</div>
+          <div class="info-value ${stockCls}">${stockText}</div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      ${!outOfStock
+        ? `<button class="btn btn-order" id="orderBtn" onclick="sendOrder('${f.id}')">สั่งซื้อเลย</button>`
+        : `<button class="btn btn-disabled" disabled>หมดสต็อก</button>`}
+      <button class="btn btn-back" onclick="liff.closeWindow()">← กลับ</button>
+      <div class="status" id="status"></div>
+    </div>
+  `);
+}
+
+async function sendOrder(id) {
+  const btn = document.getElementById('orderBtn');
   btn.disabled = true;
   btn.textContent = 'กำลังส่ง...';
-
   try {
-    await liff.sendMessages([{
-      type: 'text',
-      text: `ดูปลา:${fishId}`
-    }]);
-    document.getElementById('status').textContent = '✅ ส่งข้อมูลแล้ว bot จะตอบกลับทันที';
+    await liff.sendMessages([{ type: 'text', text: `ดูปลา:${id}` }]);
+    document.getElementById('status').textContent = '✓ ส่งแล้ว bot จะตอบกลับทันที';
     setTimeout(() => liff.closeWindow(), 1500);
   } catch (e) {
     btn.disabled = false;
-    btn.textContent = '🛒 สั่งซื้อเลย';
+    btn.textContent = 'สั่งซื้อเลย';
     if (e.code === 'PERMISSION_DENIED' || e.message?.includes('permission')) {
-      // re-login เพื่อขอ permission ใหม่
       liff.login({ redirectUri: location.href });
     } else {
-      document.getElementById('status').textContent = '❌ ' + e.message;
+      document.getElementById('status').textContent = '✕ ' + e.message;
     }
   }
 }
 
-// ── Init LIFF ──
 (async () => {
   try {
     await liff.init({ liffId: LIFF_ID });
-
-    if (!liff.isLoggedIn()) {
-      liff.login({ redirectUri: location.href });
-      return;
-    }
-
-    // เช็คว่ามี permission chat_message.write ไหม
+    if (!liff.isLoggedIn()) { liff.login({ redirectUri: location.href }); return; }
     if (!liff.isInClient()) {
-      document.getElementById('content').innerHTML =
-        '<p style="color:#dc2626">กรุณาเปิดหน้านี้ใน LINE app เท่านั้นครับ</p>';
+      setRoot(`<div class="error-wrap"><div class="error-icon">📱</div><div class="error-text">กรุณาเปิดหน้านี้<br>ใน LINE app เท่านั้นครับ</div></div>`);
       return;
     }
-
     if (!fishId) {
-      document.getElementById('content').innerHTML =
-        '<p style="color:#dc2626">ไม่พบข้อมูลปลา กรุณากลับไปเลือกใหม่</p>';
+      setRoot(`<div class="error-wrap"><div class="error-icon">🐟</div><div class="error-text">ไม่พบข้อมูลปลา<br>กรุณากลับไปเลือกใหม่</div></div>`);
       return;
     }
-
     const fish = await getFish(fishId);
     if (!fish) {
-      document.getElementById('content').innerHTML =
-        '<p style="color:#dc2626">ไม่พบปลาในระบบ</p>';
+      setRoot(`<div class="error-wrap"><div class="error-icon">🔍</div><div class="error-text">ไม่พบปลาในระบบ</div></div>`);
       return;
     }
-
     renderFish(fish);
   } catch (e) {
-    document.getElementById('content').innerHTML =
-      `<p style="color:#dc2626">Error: ${e.message}</p>`;
+    setRoot(`<div class="error-wrap"><div class="error-icon">⚠️</div><div class="error-text">${e.message}</div></div>`);
   }
 })();
 </script>
