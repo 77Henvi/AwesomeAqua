@@ -1,7 +1,3 @@
-// ============================================
-//   ENTRY POINT — index.html
-// ============================================
-
 import { loadFishFromDB }                          from './modules/fishData.js';
 import { openFishDetail, closeFishModal,
          closeFishModalOutside,
