@@ -90,17 +90,33 @@ nav.scrolled .nav-links a::after { background: var(--royal-blue); }
 .btn-outline:hover { background: var(--light-blue); }
 .btn-primary { background: var(--royal-blue); color: var(--white); }
 .btn-primary:hover { background: var(--bright-blue); transform: translateY(-1px); }
-.btn-line {
-  background: #06C755; color: white;
-  display: flex; align-items: center; gap: 0.5rem;
-  padding: 0.6rem 1.25rem; border-radius: 8px;
-  font-size: 0.875rem; font-weight: 500;
-  cursor: pointer; border: none;
-  font-family: var(--font-body);
-  transition: opacity 0.2s, transform 0.2s;
+
+.lang-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.3s;
 }
-.btn-line:hover { opacity: 0.88; transform: translateY(-1px); }
-.btn-line-nav { padding: 0.45rem 1rem; font-size: 0.82rem; }
+
+.lang-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+/* กรณีหน้าจอเลื่อน (scrolled) ให้สีปุ่มเปลี่ยนไปตามธีม */
+nav.scrolled .lang-btn {
+  background: var(--light-blue);
+  color: var(--royal-blue);
+  border-color: var(--border);
+}
 
 
 /* ── HAMBURGER ── */
