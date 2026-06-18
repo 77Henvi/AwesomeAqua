@@ -629,7 +629,19 @@ footer {
 
 
 /* ── FISH BACKGROUND (SVG outline) ── */
-.fish-bg { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+.fish-bg { 
+  position: absolute; 
+  inset: 0; 
+  overflow: hidden; 
+  pointer-events: none; 
+  z-index: 0; 
+  color: var(--royal-blue); 
+}
+
+.fish-bg.fish-bg--dark {
+  color: var(--white); 
+}
+
 #fish { position: relative; }
 .about-values { position: relative; }
 .stats { position: relative; }
@@ -638,12 +650,12 @@ footer {
 .fish-bg__fish { position: absolute; display: block; user-select: none; }
 @keyframes fishLTR { 0% { left: -8%; } 100% { left: 108%; } }
 @keyframes fishRTL { 0% { left: 108%; } 100% { left: -8%; } }
-.fish-bg__fish--1 { top: 10%; width: 2.2rem; opacity: 0.10; transform: scaleX(-1); animation: fishLTR 30s linear infinite -4s; }
-.fish-bg__fish--2 { top: 34%; width: 1.6rem; opacity: 0.08; animation: fishRTL 24s linear infinite -9s; }
-.fish-bg__fish--3 { top: 55%; width: 2.8rem; opacity: 0.09; transform: scaleX(-1); animation: fishLTR 38s linear infinite -16s; }
-.fish-bg__fish--4 { top: 75%; width: 1.8rem; opacity: 0.07; animation: fishRTL 20s linear infinite -2s; }
-.fish-bg__fish--5 { top: 20%; width: 1.3rem; opacity: 0.07; transform: scaleX(-1); animation: fishLTR 28s linear infinite -20s; }
-.fish-bg__fish--6 { top: 84%; width: 2.4rem; opacity: 0.08; animation: fishRTL 33s linear infinite -11s; }
+.fish-bg__fish--1 { top: 10%; width: 2.2rem; opacity: 0.10; animation: fishLTR 30s linear infinite -4s; }
+.fish-bg__fish--2 { top: 34%; width: 1.6rem; opacity: 0.08; transform: scaleX(-1); animation: fishRTL 24s linear infinite -9s; }
+.fish-bg__fish--3 { top: 55%; width: 2.8rem; opacity: 0.09; animation: fishLTR 38s linear infinite -16s; }
+.fish-bg__fish--4 { top: 75%; width: 1.8rem; opacity: 0.07; transform: scaleX(-1); animation: fishRTL 20s linear infinite -2s; }
+.fish-bg__fish--5 { top: 20%; width: 1.3rem; opacity: 0.07; animation: fishLTR 28s linear infinite -20s; }
+.fish-bg__fish--6 { top: 84%; width: 2.4rem; opacity: 0.08; transform: scaleX(-1); animation: fishRTL 33s linear infinite -11s; }
 .fish-bg--dark .fish-bg__fish--1 { opacity: 0.14; }
 .fish-bg--dark .fish-bg__fish--2 { opacity: 0.11; }
 .fish-bg--dark .fish-bg__fish--3 { opacity: 0.13; }
