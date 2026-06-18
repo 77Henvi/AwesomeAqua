@@ -15,7 +15,7 @@ import { openLine, toggleMobile,
 import { toggleTag }                               from './shared/tags.js';
 import { previewEditImage }                        from './shared/image.js';
 
-// ── Expose ไว้บน window เพื่อให้ HTML inline onclick ทำงานได้ ──
+
 window.openFishDetail        = openFishDetail;
 window.closeFishModal        = closeFishModal;
 window.closeFishModalOutside = closeFishModalOutside;
