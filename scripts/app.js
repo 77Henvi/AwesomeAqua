@@ -3,11 +3,6 @@ import { openFishDetail, closeFishModal,
          closeFishModalOutside,
          openComingSoonDetail, closeCsModal,
          closeCsModalOutside }                     from './modules/fishModal.js';
-import { openEditModal, closeEditModal,
-         saveEdit, deleteFish }                    from './modules/indexAdmin.js';
-import { openModal, closeModal,
-         closeModalOutside, switchTab,
-         fakeLogin }                               from './modules/authModal.js';
 import { goSlide }                                 from './modules/slideshow.js';
 import { injectFishBackgrounds }                   from './modules/fishBackground.js';
 import { openLine, toggleMobile,
@@ -19,21 +14,12 @@ import { previewEditImage }                        from './shared/image.js';
 window.openFishDetail        = openFishDetail;
 window.closeFishModal        = closeFishModal;
 window.closeFishModalOutside = closeFishModalOutside;
-window.openEditModal         = openEditModal;
-window.closeEditModal        = closeEditModal;
-window.saveEdit              = saveEdit;
-window.deleteFish            = deleteFish;
 window.openLine              = openLine;
 window.toggleTag             = toggleTag;
 window.toggleMobile          = toggleMobile;
 window.scrollToSection       = scrollToSection;
 window.goSlide               = goSlide;
 window.previewEditImage      = previewEditImage;
-window.openModal             = openModal;
-window.closeModal            = closeModal;
-window.closeModalOutside     = closeModalOutside;
-window.switchTab             = switchTab;
-window.fakeLogin             = fakeLogin;
 window.openComingSoonDetail = openComingSoonDetail;
 window.closeCsModal         = closeCsModal;
 window.closeCsModalOutside  = closeCsModalOutside;
