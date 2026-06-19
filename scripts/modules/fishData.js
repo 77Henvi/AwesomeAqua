@@ -4,7 +4,7 @@ export let fishData = [];
 
 export async function loadFishFromDB() {
   const { data, error } = await supabase
-    .from('fish')
+    .from('fish_public')
     .select('*')
     .order('created_at', { ascending: false });
 
@@ -14,7 +14,7 @@ export async function loadFishFromDB() {
     id:       f.id,
     name:     f.name,
     species:  f.species,
-    sizeMin:  f.size_min, 
+    sizeMin:  f.size_min,
     sizeMax:  f.size_max,
     emoji:    f.emoji,
     image:    f.image,
