@@ -71,6 +71,7 @@ function toggleLanguage() {
 
   console.log("Language changed to:", newLang);
 }
+window.toggleLanguage = toggleLanguage;
 
 // ── Init ──
 injectFishBackgrounds();

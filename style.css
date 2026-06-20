@@ -91,6 +91,24 @@ nav.scrolled .nav-links a::after { background: var(--royal-blue); }
 .btn-primary { background: var(--royal-blue); color: var(--white); }
 .btn-primary:hover { background: var(--bright-blue); transform: translateY(-1px); }
 
+.btn-line {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: #06c755; /* สี brand ของ LINE */
+  color: var(--white);
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 0.6rem 1.35rem;
+  transition: all 0.2s;
+}
+.btn-line:hover { background: #05a648; transform: translateY(-1px); }
+.btn-line svg { flex-shrink: 0; }
+
 .lang-btn {
   display: flex;
   align-items: center;
