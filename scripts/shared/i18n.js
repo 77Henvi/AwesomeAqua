@@ -93,8 +93,12 @@ export function initLanguage() {
   applyLanguage(saved);
 }
 
-// สลับภาษาไปอีกฝั่ง — ใช้กับปุ่ม TH/EN
+// สลับภาษาไปอีกฝั่ง — ใช้กับปุ่ม TH/EN แล้วสั่งรีเฟรชหน้า
 export function toggleLanguage() {
+
   const current = localStorage.getItem(STORAGE_KEY) || 'th';
-  applyLanguage(current === 'th' ? 'en' : 'th');
+  const newLang = current === 'th' ? 'en' : 'th';
+  
+  localStorage.setItem(STORAGE_KEY, newLang);
+  window.location.reload(); 
 }
