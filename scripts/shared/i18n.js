@@ -69,7 +69,7 @@ export const translations = {
 
 const STORAGE_KEY = 'aqua-lang';
 
-// เปลี่ยนข้อความทุก element ที่มี data-i18n ตาม lang ที่เลือก แล้วจำไว้ใน localStorage
+
 export function applyLanguage(lang) {
   const dict = translations[lang] || translations.th;
 
@@ -83,6 +83,8 @@ export function applyLanguage(lang) {
 
   document.documentElement.lang = lang;
   localStorage.setItem(STORAGE_KEY, lang);
+
+  window.dispatchEvent(new CustomEvent('languageChanged', { detail: lang }));
 }
 
 // เรียกตอนโหลดหน้า — อ่านภาษาที่เคยเลือกไว้จาก localStorage (ถ้ามี)

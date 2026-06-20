@@ -135,4 +135,8 @@ export function renderFishTable() {
       </tr>
     `;
   }).join('');
+
+    window.addEventListener('languageChanged', () => {
+    renderFishGrid();
+  });
 }
