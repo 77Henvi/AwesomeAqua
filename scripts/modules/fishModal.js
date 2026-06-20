@@ -4,7 +4,12 @@ import { LINE_ICON } from '../shared/utils.js';
 // ── Modal ปลาปกติ ──
 export function openFishDetail(id) {
   const f = fishData.find(x => x.id === id);
-  if (!f) return;
+  if (!f) return; 
+
+  const lang = localStorage.getItem('language') || 'th';
+  const displayName = lang === 'en' && f.name_en ? f.name_en : f.name_th;
+  const displayDesc = lang === 'en' && f.desc_en ? f.desc_en : f.desc_th;
+  const displayTags = lang === 'en' && f.tags_en?.length ? f.tags_en : f.tags_th;
 
   const outOfStock = f.stock === 0;
   const levelColor = { 'มือใหม่': '#22c55e', 'ปานกลาง': '#f59e0b', 'ผู้เชี่ยวชาญ': '#ef4444' };
@@ -13,19 +18,19 @@ export function openFishDetail(id) {
   document.getElementById('fishDetailContent').innerHTML = `
     <div class="fd-hero">
       ${f.image
-        ? `<img src="${f.image}" alt="${f.name}" class="fd-hero-img" onerror="this.outerHTML='<div class=fd-hero-emoji>${f.emoji||'🐟'}</div>'">`
+        ? `<img src="${f.image}" alt="${displayName}" class="fd-hero-img" onerror="this.outerHTML='<div class=fd-hero-emoji>${f.emoji||'🐟'}</div>'">`
         : `<div class="fd-hero-emoji">${f.emoji || '🐟'}</div>`
       }
       ${outOfStock ? `<div class="fd-out-ribbon">หมดสต็อก</div>` : ''}
       <div class="fd-hero-grad"></div>
       <div class="fd-hero-bottom">
-        <div class="fd-name">${f.name}</div>
+        <div class="fd-name">${displayName}</div>
         <div class="fd-species">${f.species}</div>
       </div>
     </div>
     <div class="fd-body">
       <div class="fd-tags">
-        ${(f.tags || []).map(t => `<span class="fd-tag">${t}</span>`).join('')}
+        ${(displayTags || []).map(t => `<span class="fd-tag">${t}</span>`).join('')}
         <span class="fd-tag fd-tag--level" style="--lc:${lc}">${f.level}</span>
       </div>
       <div class="fd-info-row">
@@ -47,10 +52,10 @@ export function openFishDetail(id) {
           </div>
         </div>
       </div>
-      ${f.desc ? `
+      ${displayDesc ? `
         <div class="fd-desc-wrap">
           <div class="fd-desc-title">📖 รายละเอียด</div>
-          <div class="fd-desc">${f.desc}</div>
+          <div class="fd-desc">${displayDesc}</div>
         </div>` : ''}
       <div class="fd-cta">
         ${f.stock > 0
@@ -68,7 +73,12 @@ export function openFishDetail(id) {
 // ── Modal Coming Soon ──
 export function openComingSoonDetail(id) {
   const f = fishData.find(x => x.id === id);
-  if (!f) return;
+  if (!f) return; // 👈 ย้ายมาเช็คตรงนี้เช่นกัน
+
+  const lang = localStorage.getItem('language') || 'th';
+  const displayName = lang === 'en' && f.name_en ? f.name_en : f.name_th;
+  const displayDesc = lang === 'en' && f.desc_en ? f.desc_en : f.desc_th;
+  const displayTags = lang === 'en' && f.tags_en?.length ? f.tags_en : f.tags_th;
 
   const levelColor = { 'มือใหม่': '#22c55e', 'ปานกลาง': '#f59e0b', 'ผู้เชี่ยวชาญ': '#ef4444' };
   const lc = levelColor[f.level] || '#6b7280';
@@ -76,28 +86,26 @@ export function openComingSoonDetail(id) {
   document.getElementById('csModalContent').innerHTML = `
     <div class="fd-hero cs-hero">
       ${f.image
-        ? `<img src="${f.image}" alt="${f.name}" class="fd-hero-img cs-hero-img" onerror="this.outerHTML='<div class=fd-hero-emoji>${f.emoji||'🐟'}</div>'">`
+        ? `<img src="${f.image}" alt="${displayName}" class="fd-hero-img cs-hero-img" onerror="this.outerHTML='<div class=fd-hero-emoji>${f.emoji||'🐟'}</div>'">`
         : `<div class="fd-hero-emoji">${f.emoji || '🐟'}</div>`
       }
       <div class="coming-badge-center">✨ เร็วๆ นี้</div>
       <div class="fd-hero-grad"></div>
       <div class="fd-hero-bottom">
-        <div class="fd-name">${f.name}</div>
+        <div class="fd-name">${displayName}</div>
         <div class="fd-species">${f.species || '—'}</div>
       </div>
     </div>
     <div class="fd-body">
       <div class="fd-tags">
-        ${(f.tags || []).map(t => `<span class="fd-tag">${t}</span>`).join('')}
+        ${(displayTags || []).map(t => `<span class="fd-tag">${t}</span>`).join('')}
         ${f.level ? `<span class="fd-tag fd-tag--level" style="--lc:${lc}">${f.level}</span>` : ''}
       </div>
 
-
-
-      ${f.desc ? `
+      ${displayDesc ? `
         <div class="fd-desc-wrap">
           <div class="fd-desc-title">📖 เกี่ยวกับปลาชนิดนี้</div>
-          <div class="fd-desc">${f.desc}</div>
+          <div class="fd-desc">${displayDesc}</div>
         </div>` : ''}
 
       <div class="cs-cta-row">

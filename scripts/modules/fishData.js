@@ -11,19 +11,22 @@ export async function loadFishFromDB() {
   if (error) { console.error(error); return; }
 
   fishData = data.map(f => ({
-    id:       f.id,
-    name:     f.name,
-    species:  f.species,
-    sizeMin:  f.size_min,
-    sizeMax:  f.size_max,
-    emoji:    f.emoji,
-    image:    f.image,
-    priceMin: f.price_min,
-    priceMax: f.price_max,
-    stock:    f.stock,
-    level:    f.level,
-    desc:     f.desc,
-    tags:     f.tags || []
+      id:       f.id,
+      name_th:  f.name_th,    
+      name_en:  f.name_en,    
+      species:  f.species,
+      sizeMin:  f.size_min,
+      sizeMax:  f.size_max,
+      emoji:    f.emoji,
+      image:    f.image,
+      priceMin: f.price_min,
+      priceMax: f.price_max,
+      stock:    f.stock,
+      level:    f.level,
+      desc_th:  f.desc_th,   
+      desc_en:  f.desc_en,    
+      tags_th:  f.tags_th || [], 
+      tags_en:  f.tags_en || []  
   }));
 
   const { renderFishGrid } = await import('./render.js');

@@ -8,11 +8,15 @@ export function isComingSoon(f) {
 // ── การ์ดปลาขายปกติ ──
 function _availableCard(f) {
   const outOfStock = f.stock === 0;
+  const lang = localStorage.getItem('language') || 'th'; 
+  const displayName = lang === 'en' && f.name_en ? f.name_en : f.name_th;
+  const displayTags = lang === 'en' && f.tags_en?.length ? f.tags_en : f.tags_th;
+  
   return `
     <div class="fish-card ${outOfStock ? 'fish-card--out' : ''}" onclick="openFishDetail('${f.id}')">
       <div class="fish-img">
         ${f.image
-          ? `<img src="${f.image}" alt="${f.name}" onerror="this.parentElement.innerHTML='<span>${f.emoji || '🐟'}</span>'">`
+          ? `<img src="${f.image}" alt="${displayName}" onerror="this.parentElement.innerHTML='<span>${f.emoji || '🐟'}</span>'">`
           : `<span>${f.emoji || '🐟'}</span>`
         }
         ${outOfStock ? `<div class="out-badge">หมดสต็อก</div>` : ''}
@@ -22,7 +26,7 @@ function _availableCard(f) {
         </div>
       </div>
       <div class="fish-info">
-        <div class="fish-name">${f.name}</div>
+        <div class="fish-name">${displayName}</div>
         <div class="fish-species">${f.species}</div>
         
         ${f.sizeMin ? `<div style="font-size: 0.78rem; color: var(--gray); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.35rem;"><i class="ph ph-ruler"></i> ขนาด: ${f.sizeMin}${(f.sizeMax && f.sizeMax != f.sizeMin) ? ' – ' + f.sizeMax : ''} นิ้ว </div>` : ''}
@@ -34,7 +38,7 @@ function _availableCard(f) {
             ${f.stock === 0 ? '❌ หมด' : f.stock <= 5 ? `⚠️ ${f.stock} ตัว` : `✅ ${f.stock} ตัว`}
           </div>
         </div>
-        <div class="fish-tags">${(f.tags || []).map(t => `<span class="tag">${t}</span>`).join('')}</div>
+        <div class="fish-tags">${(displayTags || []).map(t => `<span class="tag">${t}</span>`).join('')}</div>
         ${f.stock > 0
           ? `<button class="btn-line" style="width:100%;justify-content:center"
                onclick="event.stopPropagation(); openLine('${f.id}')">
@@ -48,11 +52,15 @@ function _availableCard(f) {
 
 // ── การ์ด Coming Soon ──
 function _comingSoonCard(f) {
+  const lang = localStorage.getItem('language') || 'th'; 
+  const displayName = lang === 'en' && f.name_en ? f.name_en : f.name_th;
+  const displayTags = lang === 'en' && f.tags_en?.length ? f.tags_en : f.tags_th;
+  
   return `
     <div class="fish-card fish-card--coming" tabindex="0" onclick="openComingSoonDetail('${f.id}')">
       <div class="fish-img fish-img--coming">
         ${f.image
-          ? `<img src="${f.image}" alt="${f.name}" onerror="this.parentElement.innerHTML='<span class=coming-emoji>${f.emoji || '🐟'}</span>'">`
+          ? `<img src="${f.image}" alt="${displayName}" onerror="this.parentElement.innerHTML='<span class=coming-emoji>${f.emoji || '🐟'}</span>'">`
           : `<span class="coming-emoji">${f.emoji || '🐟'}</span>`
         }
         
@@ -66,9 +74,9 @@ function _comingSoonCard(f) {
         <div class="coming-overlay"></div>
       </div>
       <div class="fish-info fish-info--coming">
-        <div class="fish-name">${f.name}</div>
+        <div class="fish-name">${displayName}</div>
         <div class="fish-species">${f.species || '—'}</div>
-        <div class="fish-tags">${(f.tags || []).map(t => `<span class="tag tag--dim">${t}</span>`).join('')}</div>
+        <div class="fish-tags">${(displayTags || []).map(t => `<span class="tag tag--dim">${t}</span>`).join('')}</div>
         <div class="coming-badge">🔔 กดดูรายละเอียด</div>
       </div>
     </div>`;
@@ -104,20 +112,27 @@ export function renderFishGrid() {
 export function renderFishTable() {
   const tbody = document.getElementById('fishTableBody');
   if (!tbody) return;
-  tbody.innerHTML = fishData.map(f => `
-    <tr>
-      <td>${f.image ? `<img src="${f.image}" style="width:40px;height:40px;object-fit:cover;border-radius:6px">` : f.emoji || '🐟'}</td>
-      <td><strong>${f.name}</strong><br><small style="color:var(--gray)">${f.species}</small></td>
-      <td>฿${f.priceMin.toLocaleString()}${f.priceMax ? ' – ' + f.priceMax.toLocaleString() : ''}</td>
-      <td>
-        <span class="status-dot ${f.stock === 0 ? 'out' : f.stock <= 5 ? 'low' : 'ok'}"></span>
-        ${f.stock} ตัว
-      </td>
-      <td>${f.level}</td>
-      <td>
-        <button class="action-btn action-edit"   onclick="openEditModal('${f.id}')">แก้ไข</button>
-        <button class="action-btn action-delete" onclick="deleteFish('${f.id}')">ลบ</button>
-      </td>
-    </tr>
-  `).join('');
+  
+  const lang = localStorage.getItem('language') || 'th'; 
+  
+  tbody.innerHTML = fishData.map(f => {
+    const displayName = lang === 'en' && f.name_en ? f.name_en : f.name_th;
+    
+    return `
+      <tr>
+        <td>${f.image ? `<img src="${f.image}" style="width:40px;height:40px;object-fit:cover;border-radius:6px">` : f.emoji || '🐟'}</td>
+        <td><strong>${displayName}</strong><br><small style="color:var(--gray)">${f.species}</small></td>
+        <td>฿${f.priceMin.toLocaleString()}${f.priceMax ? ' – ' + f.priceMax.toLocaleString() : ''}</td>
+        <td>
+          <span class="status-dot ${f.stock === 0 ? 'out' : f.stock <= 5 ? 'low' : 'ok'}"></span>
+          ${f.stock} ตัว
+        </td>
+        <td>${f.level}</td>
+        <td>
+          <button class="action-btn action-edit"   onclick="openEditModal('${f.id}')">แก้ไข</button>
+          <button class="action-btn action-delete" onclick="deleteFish('${f.id}')">ลบ</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
 }

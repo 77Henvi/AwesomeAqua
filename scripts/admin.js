@@ -135,21 +135,23 @@ function renderAll() {
 //   ADD
 // ════════════════════════════════════════════
 async function addFish() {
-  const name     = document.getElementById('newName').value.trim();
-  const emoji    = document.getElementById('newEmoji').value    || '🐟';
+  const name_th  = document.getElementById('newName_th').value.trim();
+  const name_en  = document.getElementById('newName_en').value.trim();
+  const emoji    = document.getElementById('newEmoji').value || '🐟';
   const species  = document.getElementById('newSpecies').value;
-  const isCS = document.getElementById('newIsComingSoon').checked;
+  const isCS     = document.getElementById('newIsComingSoon').checked;
   const priceMin = isCS ? 0 : (parseInt(document.getElementById('newPriceMin').value) || 0);
   const priceMax = isCS ? 0 : (parseInt(document.getElementById('newPriceMax').value) || 0);
   const stock    = isCS ? 0 : (parseInt(document.getElementById('newStock').value)    || 0);
   const level    = document.getElementById('newLevel').value;
-  const desc     = document.getElementById('newDesc').value;
+  const desc_th  = document.getElementById('newDesc_th').value;
+  const desc_en  = document.getElementById('newDesc_en').value;
   const sizeMin  = parseFloat(document.getElementById('newSizeMin').value) || null;
   const sizeMax  = parseFloat(document.getElementById('newSizeMax').value) || null;
   const cost     = parseFloat(document.getElementById('newCost')?.value) || 0;
   const file     = document.getElementById('newImageFile').files[0];
 
-  if (!name) { showToast('⚠️ กรุณากรอกชื่อปลา'); return; }
+  if (!name_th) { showToast('⚠️ กรุณากรอกชื่อปลา (TH)'); return; }
 
   let imageUrl = null;
   if (file) {
@@ -158,18 +160,27 @@ async function addFish() {
   }
 
   const { error } = await supabase.from('fish').insert({
-    name, emoji, species: species || '-',
-    price_min: priceMin, price_max: priceMax,
-    stock, level, desc,
-    tags: getSelectedTags('newTags'),
-    image: imageUrl,
-    size_min: sizeMin,
-    size_max: sizeMax,
-    cost: cost
+    name_th:   name_th, 
+    name_en:   name_en,
+    desc_th:   desc_th,
+    desc_en:   desc_en,
+    tags_th:   getSelectedTags('newTags_th'),
+    tags_en:   getSelectedTags('newTags_en'),
+    emoji, 
+    species:   species || '-',
+    price_min: priceMin, 
+    price_max: priceMax,
+    stock, 
+    level, 
+    image:     imageUrl,
+    size_min:  sizeMin,
+    size_max:  sizeMax,
+    cost:      cost
   });
+
   if (error) { showToast('❌ เพิ่มปลาไม่ได้: ' + error.message); return; }
 
-  showToast('✅ เพิ่มปลา ' + name + ' เรียบร้อย!');
+  showToast('✅ เพิ่มปลา ' + name_th + ' เรียบร้อย!');
   clearForm();
   toggleAddPanel(false); // ปิด panel
   loadFishFromDB();
@@ -454,7 +465,7 @@ function closeEditModal() {
 //   CLEAR FORM
 // ════════════════════════════════════════════
 function clearForm() {
-  ['newEmoji', 'newName', 'newSpecies', 'newPriceMin', 'newPriceMax', 'newStock', 'newSizeMin', 'newSizeMax', 'newDesc', 'newCost']
+  ['newEmoji', 'newName_th', 'newName_en', 'newSpecies', 'newPriceMin', 'newPriceMax', 'newStock', 'newSizeMin', 'newSizeMax', 'newDesc_th', 'newDesc_en', 'newCost']
     .forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
@@ -465,7 +476,8 @@ function clearForm() {
   const preview = document.getElementById('newImagePreview');
   if (preview) { preview.src = ''; preview.style.display = 'none'; }
 
-  document.querySelectorAll('#newTags .tag-option').forEach(el => el.classList.remove('selected'));
+  // เคลียร์ Tags ทั้งสองภาษา
+  document.querySelectorAll('#newTags_th .tag-option, #newTags_en .tag-option').forEach(el => el.classList.remove('selected'));
 
   const pp = document.getElementById('pricePreview');
   if (pp) { pp.textContent = '—'; pp.className = 'price-preview'; }

@@ -9,17 +9,24 @@ export function openEditModal(id) {
   const f = fishData.find(x => x.id === id);
   if (!f) return;
   document.getElementById('editFishId').value   = f.id;
-  document.getElementById('editName').value     = f.name;
+  document.getElementById('editName_th').value  = f.name_th || '';
+  document.getElementById('editName_en').value  = f.name_en || '';
   document.getElementById('editSpecies').value  = f.species;
   document.getElementById('editPriceMin').value = f.priceMin;
   document.getElementById('editPriceMax').value = f.priceMax || '';
   document.getElementById('editStock').value    = f.stock;
   document.getElementById('editLevel').value    = f.level;
-  document.getElementById('editDesc').value     = f.desc || '';
+  document.getElementById('editDesc_th').value  = f.desc_th || '';
+  document.getElementById('editDesc_en').value  = f.desc_en || '';
+  
   const preview = document.getElementById('editImagePreview');
   preview.src = f.image || '';
   preview.style.display = f.image ? 'block' : 'none';
-  setSelectedTags('editTags', f.tags || []);
+  
+  // โหลด Tags 2 ภาษา
+  setSelectedTags('editTags_th', f.tags_th || []);
+  setSelectedTags('editTags_en', f.tags_en || []);
+  
   document.getElementById('editModal').classList.add('open');
 }
 
@@ -32,35 +39,42 @@ export async function saveEdit() {
   const f  = fishData.find(x => x.id === id);
   if (!f) return;
 
-  // ปุ่ม submit ในโมดัล — ปรับ selector ตรงนี้ให้ตรงกับ HTML จริงถ้าไม่ตรง (ใส่ if (btn) ไว้แล้วเลยไม่พังถ้าหาไม่เจอ)
   const btn = document.querySelector('#editModal button[type="submit"], #editModal .btn-primary');
   if (btn) { btn.disabled = true; btn.textContent = 'กำลังบันทึก...'; }
 
   const priceMaxRaw = document.getElementById('editPriceMax').value.trim();
 
+  // ยุบรวมตัวแปร updated เป็นก้อนเดียวให้ครบทุกฟิลด์
   const updated = {
-    name:     document.getElementById('editName').value,
+    name_th:  document.getElementById('editName_th').value,
+    name_en:  document.getElementById('editName_en').value,
+    desc_th:  document.getElementById('editDesc_th').value,
+    desc_en:  document.getElementById('editDesc_en').value,
+    tags_th:  getSelectedTags('editTags_th'),
+    tags_en:  getSelectedTags('editTags_en'),
     species:  document.getElementById('editSpecies').value,
     priceMin: parseInt(document.getElementById('editPriceMin').value, 10) || 0,
-    // เว้นว่าง = ไม่มีราคาสูงสุด (null) ไม่ใช่ 0 เหมือนของเดิม
     priceMax: priceMaxRaw === '' ? null : (parseInt(priceMaxRaw, 10) || 0),
     stock:    parseInt(document.getElementById('editStock').value, 10) || 0,
     level:    document.getElementById('editLevel').value,
-    desc:     document.getElementById('editDesc').value,
-    tags:     getSelectedTags('editTags'),
   };
 
   const persist = async (imageValue) => {
+    // จัดเตรียมข้อมูลส่งไป Database
     const payload = {
-      name:      updated.name,
+      name_th:   updated.name_th,
+      name_en:   updated.name_en,
+      desc_th:   updated.desc_th,
+      desc_en:   updated.desc_en,
+      tags_th:   updated.tags_th,
+      tags_en:   updated.tags_en,
       species:   updated.species,
       price_min: updated.priceMin,
       price_max: updated.priceMax,
       stock:     updated.stock,
       level:     updated.level,
-      desc:      updated.desc,
-      tags:      updated.tags,
     };
+    
     if (imageValue !== undefined) payload.image = imageValue;
 
     const { error } = await supabase.from('fish').update(payload).eq('id', id);
@@ -72,13 +86,16 @@ export async function saveEdit() {
       return; 
     }
 
+    // อัปเดตข้อมูลบน Frontend 
     Object.assign(f, updated);
     if (imageValue !== undefined) f.image = imageValue;
 
     renderFishGrid();
     renderFishTable();
     closeEditModal();
-    showToast('✅ บันทึกข้อมูล ' + f.name + ' เรียบร้อย');
+    
+    // เปลี่ยนจาก f.name เป็น f.name_th เพื่อให้แสดงผล Toast ได้ถูกต้อง
+    showToast('✅ บันทึกข้อมูล ' + f.name_th + ' เรียบร้อย');
   };
 
   const fileInput = document.getElementById('editImageFile');
