@@ -87,6 +87,7 @@ function showDashboard() {
   loadFishFromDB();
   loadFinanceFromDB(); 
 }
+
 // ════════════════════════════════════════════
 //   LOAD
 // ════════════════════════════════════════════
@@ -100,7 +101,9 @@ async function loadFishFromDB() {
 
   fishData = data.map(f => ({
     id:       f.id,
-    name:     f.name,
+    name:     f.name_th,    
+    name_th:  f.name_th,
+    name_en:  f.name_en,
     species:  f.species,
     emoji:    f.emoji,
     image:    f.image,
@@ -110,8 +113,10 @@ async function loadFishFromDB() {
     sale_price: f.sale_price || 0,
     stock:    f.stock,
     level:    f.level,
-    desc:     f.desc,
-    tags:     f.tags || [],
+    desc_th:  f.desc_th,
+    desc_en:  f.desc_en,
+    tags_th:  f.tags_th || [],
+    tags_en:  f.tags_en || [],
     sizeMin:  f.size_min || null,
     sizeMax:  f.size_max || null
   }));
@@ -213,21 +218,23 @@ async function saveEdit() {
     if (!imageUrl) return;
   }
 
-
   const isCS = document.getElementById('editIsComingSoon').checked;
   const priceMin = isCS ? 0 : (parseInt(document.getElementById('editPriceMin').value) || 0);
   const priceMax = isCS ? 0 : (parseInt(document.getElementById('editPriceMax').value) || 0);
   const stock    = isCS ? 0 : (parseInt(document.getElementById('editStock').value)    || 0);
 
   const { error } = await supabase.from('fish').update({
-    name:      document.getElementById('editName').value,
+    name_th:   document.getElementById('editName_th').value,
+    name_en:   document.getElementById('editName_en').value,
+    desc_th:   document.getElementById('editDesc_th').value,
+    desc_en:   document.getElementById('editDesc_en').value,
+    tags_th:   getSelectedTags('editTags_th'),
+    tags_en:   getSelectedTags('editTags_en'),
     species:   document.getElementById('editSpecies').value,
     price_min: priceMin, 
     price_max: priceMax, 
     stock:     stock,    
     level:     document.getElementById('editLevel').value,
-    desc:      document.getElementById('editDesc').value,
-    tags:      getSelectedTags('editTags'),
     image:     imageUrl,
     size_min:  parseFloat(document.getElementById('editSizeMin').value) || null,
     size_max:  parseFloat(document.getElementById('editSizeMax').value) || null,
@@ -236,7 +243,7 @@ async function saveEdit() {
 
   if (error) { showToast('❌ บันทึกไม่ได้'); return; }
 
-  showToast('✅ บันทึกเรียบร้อย');
+  showToast('✅ บันทึกการแก้ไขเรียบร้อย');
   closeEditModal();
   loadFishFromDB();
 }
@@ -432,13 +439,15 @@ function openEditModal(id) {
   if (!f) return;
 
   document.getElementById('editFishId').value   = f.id;
-  document.getElementById('editName').value     = f.name;
+  document.getElementById('editName_th').value  = f.name_th || '';
+  document.getElementById('editName_en').value  = f.name_en || '';
   document.getElementById('editSpecies').value  = f.species || '';
   document.getElementById('editPriceMin').value = f.priceMin;
   document.getElementById('editPriceMax').value = f.priceMax || '';
   document.getElementById('editStock').value    = f.stock;
   document.getElementById('editLevel').value    = f.level;
-  document.getElementById('editDesc').value     = f.desc || '';
+  document.getElementById('editDesc_th').value  = f.desc_th || '';
+  document.getElementById('editDesc_en').value  = f.desc_en || '';
   document.getElementById('editSizeMin').value  = f.sizeMin || '';
   document.getElementById('editSizeMax').value  = f.sizeMax || '';
   if (document.getElementById('editCost')) document.getElementById('editCost').value = f.cost || '';
@@ -450,7 +459,10 @@ function openEditModal(id) {
   // clear file input
   document.getElementById('editImageFile').value = '';
 
-  setSelectedTags('editTags', f.tags || []);
+  // โหลด Tags 2 ภาษา
+  setSelectedTags('editTags_th', f.tags_th || []);
+  setSelectedTags('editTags_en', f.tags_en || []);
+  
   document.getElementById('editModal').classList.add('open');
   const isCS = (f.priceMin === 0 && f.stock === 0);
   document.getElementById('editIsComingSoon').checked = isCS;
