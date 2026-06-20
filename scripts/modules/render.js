@@ -8,10 +8,22 @@ export function isComingSoon(f) {
 // ── การ์ดปลาขายปกติ ──
 function _availableCard(f) {
   const outOfStock = f.stock === 0;
-  const lang = localStorage.getItem('language') || 'th'; 
-  const displayName = lang === 'en' && f.name_en ? f.name_en : f.name_th;
-  const displayTags = lang === 'en' && f.tags_en?.length ? f.tags_en : f.tags_th;
   
+  // 🚨 แก้ชื่อ Key เป็น 'aqua-lang' ให้ตรงกับระบบของคุณ
+  const lang = localStorage.getItem('aqua-lang') || 'th'; 
+  const isEn = lang === 'en';
+
+  const displayName = isEn && f.name_en ? f.name_en : f.name_th;
+  const displayTags = isEn && f.tags_en?.length ? f.tags_en : f.tags_th;
+  
+  // แปลคำศัพท์ UI
+  const txtSize = isEn ? 'Size:' : 'ขนาด:';
+  const txtInch = isEn ? 'inch' : 'นิ้ว';
+  const txtUnit = isEn ? 'pcs' : 'ตัว';
+  const txtOrder = isEn ? 'Order' : 'สั่งซื้อ';
+  const txtOut = isEn ? 'Out of stock' : 'หมดสต็อก';
+  const txtEmpty = isEn ? '❌ Out' : '❌ หมด';
+
   return `
     <div class="fish-card ${outOfStock ? 'fish-card--out' : ''}" onclick="openFishDetail('${f.id}')">
       <div class="fish-img">
@@ -19,7 +31,7 @@ function _availableCard(f) {
           ? `<img src="${f.image}" alt="${displayName}" onerror="this.parentElement.innerHTML='<span>${f.emoji || '🐟'}</span>'">`
           : `<span>${f.emoji || '🐟'}</span>`
         }
-        ${outOfStock ? `<div class="out-badge">หมดสต็อก</div>` : ''}
+        ${outOfStock ? `<div class="out-badge">${txtOut}</div>` : ''}
         <div class="card-admin-actions">
           <button onclick="event.stopPropagation(); openEditModal('${f.id}')" title="แก้ไข">✏️</button>
           <button onclick="event.stopPropagation(); deleteFish('${f.id}')" title="ลบ">🗑️</button>
@@ -29,22 +41,22 @@ function _availableCard(f) {
         <div class="fish-name">${displayName}</div>
         <div class="fish-species">${f.species}</div>
         
-        ${f.sizeMin ? `<div style="font-size: 0.78rem; color: var(--gray); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.35rem;"><i class="ph ph-ruler"></i> ขนาด: ${f.sizeMin}${(f.sizeMax && f.sizeMax != f.sizeMin) ? ' – ' + f.sizeMax : ''} นิ้ว </div>` : ''}
+        ${f.sizeMin ? `<div style="font-size: 0.78rem; color: var(--gray); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.35rem;"><i class="ph ph-ruler"></i> ${txtSize} ${f.sizeMin}${(f.sizeMax && f.sizeMax != f.sizeMin) ? ' – ' + f.sizeMax : ''} ${txtInch} </div>` : ''}
         <div class="fish-meta">
           <div class="fish-price ${outOfStock ? 'fish-price--dim' : ''}">
             ฿${f.priceMin.toLocaleString()}${f.priceMax ? ' – ' + f.priceMax.toLocaleString() : ''}
           </div>
           <div class="fish-stock ${f.stock > 0 && f.stock <= 5 ? 'low' : ''}">
-            ${f.stock === 0 ? '❌ หมด' : f.stock <= 5 ? `⚠️ ${f.stock} ตัว` : `✅ ${f.stock} ตัว`}
+            ${f.stock === 0 ? txtEmpty : f.stock <= 5 ? `⚠️ ${f.stock} ${txtUnit}` : `✅ ${f.stock} ${txtUnit}`}
           </div>
         </div>
         <div class="fish-tags">${(displayTags || []).map(t => `<span class="tag">${t}</span>`).join('')}</div>
         ${f.stock > 0
           ? `<button class="btn-line" style="width:100%;justify-content:center"
                onclick="event.stopPropagation(); openLine('${f.id}')">
-               ${LINE_ICON(16)} สั่งซื้อ
+               ${LINE_ICON(16)} ${txtOrder}
              </button>`
-          : `<button class="btn" style="width:100%;background:#f3f4f6;color:#9ca3af;cursor:not-allowed" disabled>หมดสต็อก</button>`
+          : `<button class="btn" style="width:100%;background:#f3f4f6;color:#9ca3af;cursor:not-allowed" disabled>${txtOut}</button>`
         }
       </div>
     </div>`;
@@ -52,10 +64,15 @@ function _availableCard(f) {
 
 // ── การ์ด Coming Soon ──
 function _comingSoonCard(f) {
-  const lang = localStorage.getItem('language') || 'th'; 
-  const displayName = lang === 'en' && f.name_en ? f.name_en : f.name_th;
-  const displayTags = lang === 'en' && f.tags_en?.length ? f.tags_en : f.tags_th;
+  const lang = localStorage.getItem('aqua-lang') || 'th'; 
+  const isEn = lang === 'en';
+
+  const displayName = isEn && f.name_en ? f.name_en : f.name_th;
+  const displayTags = isEn && f.tags_en?.length ? f.tags_en : f.tags_th;
   
+  const txtBadge = isEn ? '🔔 View Details' : '🔔 กดดูรายละเอียด';
+  const txtTape = isEn ? '✦ COMING SOON ✦ ' : '✦ COMING SOON ✦ เร็วๆ นี้ ✦ ';
+
   return `
     <div class="fish-card fish-card--coming" tabindex="0" onclick="openComingSoonDetail('${f.id}')">
       <div class="fish-img fish-img--coming">
@@ -66,8 +83,8 @@ function _comingSoonCard(f) {
         
         <div class="coming-tape-wrapper">
           <div class="coming-tape-content">
-            <span>✦ COMING SOON ✦ เร็วๆ นี้ ✦ COMING SOON ✦ เร็วๆ นี้ ✦ COMING SOON ✦ เร็วๆ นี้ ✦ </span>
-            <span>✦ COMING SOON ✦ เร็วๆ นี้ ✦ COMING SOON ✦ เร็วๆ นี้ ✦ COMING SOON ✦ เร็วๆ นี้ ✦ </span>
+            <span>${txtTape.repeat(4)}</span>
+            <span>${txtTape.repeat(4)}</span>
           </div>
         </div>
         
@@ -77,7 +94,7 @@ function _comingSoonCard(f) {
         <div class="fish-name">${displayName}</div>
         <div class="fish-species">${f.species || '—'}</div>
         <div class="fish-tags">${(displayTags || []).map(t => `<span class="tag tag--dim">${t}</span>`).join('')}</div>
-        <div class="coming-badge">🔔 กดดูรายละเอียด</div>
+        <div class="coming-badge">${txtBadge}</div>
       </div>
     </div>`;
 }
