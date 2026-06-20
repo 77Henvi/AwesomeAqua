@@ -9,6 +9,7 @@ import { openLine, toggleMobile,
          scrollToSection }                         from './shared/utils.js';
 import { toggleTag }                               from './shared/tags.js';
 import { previewEditImage }                        from './shared/image.js';
+import { toggleLanguage, initLanguage }            from './shared/i18n.js';
 
 
 window.openFishDetail        = openFishDetail;
@@ -62,17 +63,9 @@ setTimeout(() => {
   hideLoader();
 }, 3000);
 
-function toggleLanguage() {
-  const langText = document.querySelector('.lang-text');
-  const currentLang = langText.innerText;
-  const newLang = currentLang === 'TH' ? 'EN' : 'TH';
-  
-  langText.innerText = newLang;
-
-  console.log("Language changed to:", newLang);
-}
 window.toggleLanguage = toggleLanguage;
 
 // ── Init ──
+initLanguage();
 injectFishBackgrounds();
 loadFishFromDB();

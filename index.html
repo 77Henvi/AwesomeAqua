@@ -19,7 +19,7 @@
       <div class="sonar-wave delay"></div>
       <img src="images/logo.png" alt="Awesome Aqua Logo" class="loader-logo-img">
     </div>
-    <div class="loader-text">กำลังเตรียมน้ำเข้าตู้...</div>
+    <div class="loader-text" data-i18n="loaderText">กำลังเตรียมน้ำเข้าตู้...</div>
   </div>
 </div>
 
@@ -27,8 +27,8 @@
 <nav>
   <div class="logo">Awesome <span>Aqua</span></div>
   <ul class="nav-links">
-    <li><a href="#fish">ปลาทั้งหมด</a></li>
-    <li><a href="#about">เกี่ยวกับเรา</a></li>
+    <li><a href="#fish" data-i18n="navFish">ปลาทั้งหมด</a></li>
+    <li><a href="#about" data-i18n="navAbout">เกี่ยวกับเรา</a></li>
   </ul>
   <!-- ตัด nav-contact ออก เหลือแค่ปุ่ม LINE -->
   <div class="nav-actions">
@@ -44,8 +44,8 @@
 
 <!-- เมนูมือถือ — ลบ ℹ ออก -->
 <div class="nav-mobile-menu" id="mobileMenu">
-  <a href="#fish">ปลาทั้งหมด</a>
-  <a href="#about">เกี่ยวกับเรา</a>
+  <a href="#fish" data-i18n="navFish">ปลาทั้งหมด</a>
+  <a href="#about" data-i18n="navAbout">เกี่ยวกับเรา</a>
 </div>
 
 
@@ -59,11 +59,11 @@
     <div class="hero-overlay"></div>
   </div>
   <div class="hero-content">
-    <div class="hero-tag"><i class="ph ph-fish"></i> จำหน่ายปลาสวยงามและความรู้</div>
-    <h1>ปลาสวยงาม<br/><span>คัดสรรพิเศษ</span><br/>ส่งตรงถึงบ้าน</h1>
-    <p>คัดสรรปลาสวยงามคุณภาพดี พร้อมความรู้การดูแลรักษาปลาที่ถูกต้อง</p>
+    <div class="hero-tag"><i class="ph ph-fish"></i> <span data-i18n="heroTag">จำหน่ายปลาสวยงามและความรู้</span></div>
+    <h1 data-i18n="heroTitle">ปลาสวยงาม<br/><span>คัดสรรพิเศษ</span><br/>ส่งตรงถึงบ้าน</h1>
+    <p data-i18n="heroDesc">คัดสรรปลาสวยงามคุณภาพดี พร้อมความรู้การดูแลรักษาปลาที่ถูกต้อง</p>
     <div class="hero-btns">
-      <button class="btn btn-primary" onclick="scrollToSection('#fish')">ดูปลาทั้งหมด</button>
+      <button class="btn btn-primary" onclick="scrollToSection('#fish')" data-i18n="heroCta">ดูปลาทั้งหมด</button>
     </div>
     <!-- Dots ย้ายมาเป็น absolute ที่มุมล่างขวา hero -->
     <div class="slide-dots">
@@ -80,15 +80,15 @@
 <div class="stats fade-up">
   <div class="stat">
     <span class="stat-num">20+</span>
-    <span class="stat-label">ชนิดปลาในร้าน</span>
+    <span class="stat-label" data-i18n="statTypesLabel">ชนิดปลาในร้าน</span>
   </div>
   <div class="stat">
-    <span class="stat-num">3 ปี</span>
-    <span class="stat-label">ประสบการณ์</span>
+    <span class="stat-num" data-i18n="statExpNum">3 ปี</span>
+    <span class="stat-label" data-i18n="statExpLabel">ประสบการณ์</span>
   </div>
   <div class="stat">
     <span class="stat-num">100%</span>
-    <span class="stat-label">คัดสรรคุณภาพ</span>
+    <span class="stat-label" data-i18n="statQualityLabel">คัดสรรคุณภาพ</span>
   </div>
 </div>
 
@@ -96,8 +96,8 @@
 <section id="comingSoonSection" style="display:none; background: linear-gradient(180deg,#f8faff 0%,#eef2ff 100%); padding-top: 0;">
   <div class="section-header fade-up" style="padding-top: 3rem;">
     <div>
-      <h2 class="section-title" style="color:#1e1b4b;">กำลังจะมาในเร็วๆ นี้</h2>
-      <p class="section-sub">ปลาที่อยู่ในแผนนำเข้า สนใจตัวไหนทักมาจองล่วงหน้าได้เลยครับ</p>
+      <h2 class="section-title" style="color:#1e1b4b;" data-i18n="comingTitle">กำลังจะมาในเร็วๆ นี้</h2>
+      <p class="section-sub" data-i18n="comingDesc">ปลาที่อยู่ในแผนนำเข้า สนใจตัวไหนทักมาจองล่วงหน้าได้เลยครับ</p>
     </div>
   </div>
   <div class="fish-grid" id="comingSoonGrid"></div>
@@ -107,9 +107,9 @@
 <section id="fish">
   <div class="section-header fade-up">
     <div>
-      <div class="section-tag">คอลเลกชั่นปลา</div>
-      <h2 class="section-title">ปลาสวยงามของเรา</h2>
-      <p class="section-sub">คัดสรรปลาคุณภาพพร้อมข้อมูลครบ กดสั่งซื้อผ่านไลน์ได้เลย</p>
+      <div class="section-tag" data-i18n="fishTag">คอลเลกชั่นปลา</div>
+      <h2 class="section-title" data-i18n="fishTitle">ปลาสวยงามของเรา</h2>
+      <p class="section-sub" data-i18n="fishDesc">คัดสรรปลาคุณภาพพร้อมข้อมูลครบ กดสั่งซื้อผ่านไลน์ได้เลย</p>
     </div>
   </div>
   <div class="fish-grid" id="fishGrid"></div>
@@ -121,9 +121,9 @@
   <!-- ส่วนที่ 1 — เรื่องราวร้าน + วิดีโอ -->
   <div class="about-hero">
     <div class="about-hero-content">
-      <div class="section-tag">เกี่ยวกับเรา</div>
-      <h2 class="section-title" style="color:white">ความรักในปลาสวยงาม<br/>ที่ส่งต่อถึงคุณ</h2>
-      <p style="color:rgba(255,255,255,0.8);line-height:1.8;max-width:480px">
+      <div class="section-tag" data-i18n="aboutTag">เกี่ยวกับเรา</div>
+      <h2 class="section-title" style="color:white" data-i18n="aboutTitle">ความรักในปลาสวยงาม<br/>ที่ส่งต่อถึงคุณ</h2>
+      <p style="color:rgba(255,255,255,0.8);line-height:1.8;max-width:480px" data-i18n="aboutDesc">
         Awesome Aqua ตั้งขึ้นจากความหลงใหลในปลาสวยงาม เราคัดสรรปลาคุณภาพดี
         พร้อมแบ่งปันความรู้การเลี้ยงปลาที่ถูกต้อง เพื่อให้ทุกคนสามารถเลี้ยงปลาได้อย่างมีความสุข
       </p>
@@ -144,30 +144,30 @@
   <div class="about-values">
     <div class="about-value-card fade-up">
       <div class="about-value-icon"><i class="ph ph-seal-check"></i></div>
-      <h3>คัดสรรคุณภาพ</h3>
-      <p>เราคัดปลาและรับเลือกปลาที่ผ่านการตรวจสอบสุขภาพก่อนส่งถึงมือลูกค้า</p>
+      <h3 data-i18n="value1Title">คัดสรรคุณภาพ</h3>
+      <p data-i18n="value1Desc">เราคัดปลาและรับเลือกปลาที่ผ่านการตรวจสอบสุขภาพก่อนส่งถึงมือลูกค้า</p>
     </div>
     <div class="about-value-card fade-up">
       <div class="about-value-icon"><i class="ph ph-book-open"></i></div>
-      <h3>ความรู้คู่ปลา</h3>
-      <p>ไม่ใช่แค่ขายปลา แต่เราแบ่งปันความรู้การดูแลปลาให้ถูกต้องและมีความสุข</p>
+      <h3 data-i18n="value2Title">ความรู้คู่ปลา</h3>
+      <p data-i18n="value2Desc">ไม่ใช่แค่ขายปลา แต่เราแบ่งปันความรู้การดูแลปลาให้ถูกต้องและมีความสุข</p>
     </div>
     <div class="about-value-card fade-up">
       <div class="about-value-icon"><i class="ph ph-chat-circle-dots"></i></div>
-      <h3>บริการใส่ใจ</h3>
-      <p>พร้อมให้คำปรึกษาตลอด ไม่ว่าจะก่อนหรือหลังการซื้อ</p>
+      <h3 data-i18n="value3Title">บริการใส่ใจ</h3>
+      <p data-i18n="value3Desc">พร้อมให้คำปรึกษาตลอด ไม่ว่าจะก่อนหรือหลังการซื้อ</p>
     </div>
     <div class="about-value-card fade-up">
       <div class="about-value-icon"><i class="ph ph-package"></i></div>
-      <h3>ส่งถึงบ้าน</h3>
-      <p>บรรจุภัณฑ์ปลอดภัย ปลาถึงมือคุณอย่างสดใสพร้อมเลี้ยง</p>
+      <h3 data-i18n="value4Title">ส่งถึงบ้าน</h3>
+      <p data-i18n="value4Desc">บรรจุภัณฑ์ปลอดภัย ปลาถึงมือคุณอย่างสดใสพร้อมเลี้ยง</p>
     </div>
   </div>
 
   <!-- ส่วนที่ 3 — ติดต่อ -->
   <div class="about-contact-section fade-up">
-    <div class="section-tag">ติดต่อเรา</div>
-    <h2 class="section-title">ช่องทางติดต่อ</h2>
+    <div class="section-tag" data-i18n="contactTag">ติดต่อเรา</div>
+    <h2 class="section-title" data-i18n="contactTitle">ช่องทางติดต่อ</h2>
     <div class="contact-social-cards">
       <a href="#" onclick="openLine(); return false;" class="social-card social-card--line">
         <div class="social-card-icon">
@@ -188,7 +188,7 @@
       </a>
       <a href="tel:0822372512" class="social-card social-card--phone">
         <div class="social-card-icon"><i class="ph ph-phone"></i></div>
-        <div class="social-card-label">โทรศัพท์</div>
+        <div class="social-card-label" data-i18n="socialPhoneLabel">โทรศัพท์</div>
         <div class="social-card-value">082-237-2512</div>
       </a>
     </div>
@@ -201,8 +201,8 @@
   <div class="footer-inner">
     <div class="footer-logo">Awesome <span>Aqua</span></div>
     <div class="footer-links">
-      <a href="#fish">ปลาทั้งหมด</a>
-      <a href="#about">เกี่ยวกับเรา</a>
+      <a href="#fish" data-i18n="navFish">ปลาทั้งหมด</a>
+      <a href="#about" data-i18n="navAbout">เกี่ยวกับเรา</a>
     </div>
     <p class="footer-copy">© 2025 Awesome Aqua. All rights reserved.</p>
   </div>
