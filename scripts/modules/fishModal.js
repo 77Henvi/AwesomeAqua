@@ -58,7 +58,7 @@ export function openFishDetail(id) {
       <div class="fd-info-row">
         <div class="fd-info-block">
           <div class="fd-info-label">${txtPrice}</div>
-          <div class="fd-info-value fd-price ${outOfStock ? 'fd-price--dim' : ''}">
+          <div class="fd-info-value ${outOfStock ? 'fd-price--dim' : ''}">
             ฿${f.priceMin.toLocaleString()}${f.priceMax ? '<span class="fd-price-sep">–</span>฿' + f.priceMax.toLocaleString() : ''}
           </div>
         </div>
