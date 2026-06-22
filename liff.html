@@ -188,13 +188,13 @@ function renderFish(f) {
   setRoot(`
     <div class="hero">
       ${f.image
-        ? `<img src="${f.image}" alt="${f.name}">`
+        ? `<img src="${f.image}" alt="${f.name_th}">`
         : `<div class="hero-emoji">${f.emoji || '🐟'}</div>`}
       <div class="hero-grad"></div>
       <div class="hero-logo">Awesome <span>Aqua</span></div>
     </div>
     <div class="content">
-      <div class="fish-name">${f.name}</div>
+      <div class="fish-name">${f.name_th}</div>
       <div class="fish-species">${f.species || ''}</div>
       <div class="info-row">
         <div class="info-block">
