@@ -57,10 +57,10 @@ async function handleEvent({ type, message, source, replyToken }) {
     await reply(replyToken, [
       ...(fish.image ? [{ type: 'image', originalContentUrl: fish.image, previewImageUrl: fish.image }] : []),
       { type: 'text', text:
-        `🐟 ${fish.name}\n📋 ${fish.species || ''}\n` +
+        `🐟 ${fish.name_th}\n📋 ${fish.species || ''}\n` +
         `💰 ราคา: ${price(fish)}\n` +
         `📦 ${fish.stock === 0 ? '❌ หมดสต็อก' : `✅ ${fish.stock} ตัว`}\n\n` +
-        `${fish.desc || ''}\n\n──────────────\n` +
+        `${fish.desc_th || ''}\n\n──────────────\n` +
         `พิมพ์ "สั่ง" เพื่อสั่งซื้อตัวนี้ 🛒\n` +
         `พิมพ์ "ดูปลา" เพื่อดูปลาตัวอื่น 🐠\n` +
         `พิมพ์ "ติดต่อ" เพื่อคุยกับแอดมิน 👨‍💼`
@@ -79,7 +79,7 @@ async function handleEvent({ type, message, source, replyToken }) {
   if (['ติดต่อ', 'แอดมิน', 'ติดต่อแอดมิน'].includes(text)) {
     await reply(replyToken, [{ type: 'text', text:
       `👨‍💼 ติดต่อแอดมินได้เลยครับ!\n\n` +
-      `📞 โทร: 082-237-2512\n💬 LINE: @955ppjio\n` +
+      `📞 โทร: 082-237-2512\n💬 LINE: @ltz321\n` +
       `📘 Facebook: ฟีฟ่า คนชนตู้ปลา\n🎵 TikTok: @fifahaka\n\n` +
       `ยินดีให้คำปรึกษาทุกเรื่องครับ 🙏`
     }]);
@@ -89,19 +89,30 @@ async function handleEvent({ type, message, source, replyToken }) {
   // ── สั่งซื้อ ──
   if (['สั่ง', 'จอง', 'สั่งซื้อ'].includes(text)) {
     const session = await dbGet(`line_sessions?user_id=eq.${userId}&limit=1`);
-    if (!session) {
-      await reply(replyToken, [{ type: 'text', text: `กรุณาเลือกปลาที่สนใจจากเว็บก่อนนะครับ 🐟\n${SITE}` }]);
+    
+    // ดักจับ Session ที่หมดอายุ (เกิน 24 ชั่วโมง)
+    let isExpired = false;
+    if (session && session.updated_at) {
+      const hoursDiff = (new Date() - new Date(session.updated_at)) / (1000 * 60 * 60);
+      if (hoursDiff > 24) isExpired = true; 
+    }
+
+    // ตอบกลับแบบเป็นมิตรเมื่อ Session หาไม่เจอ หรือ หมดอายุ
+    if (!session || isExpired) {
+      await reply(replyToken, [{ type: 'text', text: `ขออภัยครับ เซสชันการทำรายการหมดอายุแล้ว ⏱️\nรบกวนคุณลูกค้ากดเลือกปลาที่สนใจจากหน้าเว็บใหม่อีกครั้งนะครับ 🐟\n${SITE}` }]);
       return;
     }
+
     const fish = await dbGet(`fish?id=eq.${session.fish_id}&limit=1`);
     if (!fish || fish.stock === 0) {
       await reply(replyToken, [{ type: 'text', text: '😢 ขออภัยครับ ปลาตัวนี้หมดสต็อกแล้ว\nลองเลือกตัวอื่นได้เลยครับ' }]);
       return;
     }
 
+    // ถ้าผ่านหมด ให้ส่งเลขบัญชีและรูป QR Code
     await reply(replyToken, [
       { type: 'text', text:
-        `✅ ยืนยันสั่งซื้อ "${fish.name}"\n💰 ราคา: ${price(fish)}\n\n` +
+        `✅ ยืนยันสั่งซื้อ "${fish.name_th}"\n💰 ราคา: ${price(fish)}\n\n` +
         `📲 ช่องทางชำระเงิน:\n• พร้อมเพย์: 082-237-2512\n• ธนาคารกสิกร: 123-4-56789-0\n\n` +
         `โอนแล้วส่งสลิปมาในแชทนี้ได้เลยครับ 🙏`
       },
@@ -111,8 +122,9 @@ async function handleEvent({ type, message, source, replyToken }) {
       }
     ]);
 
+    // แจ้งเตือนแอดมิน
     if (OWNER_ID) await push(OWNER_ID, [{ type: 'text', text:
-      `🔔 มีออเดอร์ใหม่!\n🐟 ${fish.name}\n💰 ${price(fish)}\n👤 LINE: ${userId}`
+      `🔔 มีออเดอร์ใหม่!\n🐟 ${fish.name_th}\n💰 ${price(fish)}\n👤 LINE: ${userId}`
     }]);
     return;
   }
