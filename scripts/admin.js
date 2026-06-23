@@ -19,7 +19,6 @@ setTimeout(() => {
     hideLoader();
   }, 3000);
 
-  
 window.adminLogin       = adminLogin;
 window.adminLogout      = adminLogout;
 window.addFish          = addFish;
@@ -137,26 +136,38 @@ function renderAll() {
 }
 
 // ════════════════════════════════════════════
-//   ADD
+//   ADD FISH + AUTO FINANCE LOG
 // ════════════════════════════════════════════
 async function addFish() {
-  const name_th  = document.getElementById('newName_th').value.trim();
-  const name_en  = document.getElementById('newName_en').value.trim();
-  const emoji    = document.getElementById('newEmoji').value || '🐟';
-  const species  = document.getElementById('newSpecies').value;
-  const isCS     = document.getElementById('newIsComingSoon').checked;
-  const priceMin = isCS ? 0 : (parseInt(document.getElementById('newPriceMin').value) || 0);
+  const name_th   = document.getElementById('newName_th').value.trim();
+  const name_en   = document.getElementById('newName_en').value.trim();
+  const emoji     = document.getElementById('newEmoji').value || '🐟';
+  const species   = document.getElementById('newSpecies').value;
+  const isCS      = document.getElementById('newIsComingSoon').checked;
+  
+  // ดึงค่าแบบ Raw string มาเช็คความว่างเปล่า
+  const priceMinRaw = document.getElementById('newPriceMin').value;
+  const stockRaw    = document.getElementById('newStock').value;
+  const costRaw     = document.getElementById('newCost')?.value;
+  const rDate       = document.getElementById('receiveDate')?.value;
+
+  // 1. Validation (ชื่อ TH, ราคาต่ำสุด, จำนวน, ต้นทุน, วันที่รับปลา ต้องไม่ว่าง)
+  // หมายเหตุ: ถ้ายกเว้น Coming Soon (isCS) อนุญาตให้ราคาและสต็อกว่างได้ (เพราะโดน disable อยู่)
+  if (!name_th || !rDate || costRaw === '' || (!isCS && (priceMinRaw === '' || stockRaw === ''))) {
+    showToast('⚠️ กรุณากรอกข้อมูลให้ครบถ้วน (ชื่อ TH, ราคาต่ำสุด, จำนวน, ต้นทุน, วันที่รับปลา)');
+    return;
+  }
+
+  const priceMin = isCS ? 0 : parseInt(priceMinRaw);
   const priceMax = isCS ? 0 : (parseInt(document.getElementById('newPriceMax').value) || 0);
-  const stock    = isCS ? 0 : (parseInt(document.getElementById('newStock').value)    || 0);
+  const stock    = isCS ? 0 : parseInt(stockRaw);
+  const cost     = parseFloat(costRaw);
   const level    = document.getElementById('newLevel').value;
   const desc_th  = document.getElementById('newDesc_th').value;
   const desc_en  = document.getElementById('newDesc_en').value;
   const sizeMin  = parseFloat(document.getElementById('newSizeMin').value) || null;
   const sizeMax  = parseFloat(document.getElementById('newSizeMax').value) || null;
-  const cost     = parseFloat(document.getElementById('newCost')?.value) || 0;
   const file     = document.getElementById('newImageFile').files[0];
-
-  if (!name_th) { showToast('⚠️ กรุณากรอกชื่อปลา (TH)'); return; }
 
   let imageUrl = null;
   if (file) {
@@ -164,7 +175,8 @@ async function addFish() {
     if (!imageUrl) return;
   }
 
-  const { error } = await supabase.from('fish').insert({
+  // 2. Insert ตาราง fish ก่อน (ถ้า Failed จะหยุดทำงาน)
+  const { error: fishError } = await supabase.from('fish').insert({
     name_th:   name_th, 
     name_en:   name_en,
     desc_th:   desc_th,
@@ -183,12 +195,55 @@ async function addFish() {
     cost:      cost
   });
 
-  if (error) { showToast('❌ เพิ่มปลาไม่ได้: ' + error.message); return; }
+  if (fishError) { 
+    showToast('❌ เพิ่มปลาไม่ได้: ' + fishError.message); 
+    return; 
+  }
 
-  showToast('✅ เพิ่มปลา ' + name_th + ' เรียบร้อย!');
+  // 3. ถ้า fish insert สำเร็จ -> Insert ตาราง finance
+  const totalAmount = cost * stock;
+  
+  const { error: financeError } = await supabase.from('finance').insert({
+    type: 'expense', // ในตาราง UI ใช้ 'expense' (ซึ่งแสดงผลเป็นรายจ่าย)
+    name: `ซื้อปลา: ${name_th} x${stock} ตัว`,
+    amount: totalAmount, // เก็บเป็นตัวเลขบวก
+    date: rDate // format YYYY-MM-DD จาก date input
+  });
+
+  if (financeError) {
+    showToast('⚠️ เพิ่มปลาสำเร็จ แต่บันทึกรายจ่ายไม่สำเร็จ กรุณาเพิ่มรายจ่ายด้วยตนเอง');
+  } else {
+    // 4. สำเร็จทั้งหมด
+    showToast(`✅ เพิ่มปลาและบันทึกรายจ่ายเรียบร้อย`);
+    loadFinanceFromDB(); // รีเฟรชตารางการเงิน
+  }
+
+  // 5. Reset ฟอร์ม
   clearForm();
-  toggleAddPanel(false); // ปิด panel
+  toggleAddPanel(false); 
   loadFishFromDB();
+}
+
+// ผูก Event Listener สำหรับแสดงยอดรวมรายจ่ายอัตโนมัติ
+document.addEventListener('DOMContentLoaded', () => {
+  const newCostInput = document.getElementById('newCost');
+  const newStockInput = document.getElementById('newStock');
+  const submitBtn = document.getElementById('submitAddFishBtn');
+
+  if (newCostInput) newCostInput.addEventListener('input', updateAddFishTotal);
+  if (newStockInput) newStockInput.addEventListener('input', updateAddFishTotal);
+  
+  // ป้องกันกรณีปุ่มเพิ่มปลาถูกลบ onclick ใน HTML
+  if (submitBtn) submitBtn.addEventListener('click', addFish);
+});
+
+function updateAddFishTotal() {
+  const c = parseFloat(document.getElementById('newCost')?.value) || 0;
+  const s = parseInt(document.getElementById('newStock')?.value) || 0;
+  const display = document.getElementById('totalFinanceDisplay');
+  if (display) {
+    display.value = (c * s).toLocaleString('th-TH') + ' บาท';
+  }
 }
 
 // ════════════════════════════════════════════
@@ -477,13 +532,16 @@ function closeEditModal() {
 //   CLEAR FORM
 // ════════════════════════════════════════════
 function clearForm() {
-  ['newEmoji', 'newName_th', 'newName_en', 'newSpecies', 'newPriceMin', 'newPriceMax', 'newStock', 'newSizeMin', 'newSizeMax', 'newDesc_th', 'newDesc_en', 'newCost']
+  ['newEmoji', 'newName_th', 'newName_en', 'newSpecies', 'newPriceMin', 'newPriceMax', 'newStock', 'newSizeMin', 'newSizeMax', 'newDesc_th', 'newDesc_en', 'newCost', 'receiveDate']
     .forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
   document.getElementById('newEmoji').value = '🐡';
   document.getElementById('newImageFile').value = '';
+
+  const display = document.getElementById('totalFinanceDisplay');
+  if (display) display.value = '';
 
   const preview = document.getElementById('newImagePreview');
   if (preview) { preview.src = ''; preview.style.display = 'none'; }
@@ -569,6 +627,7 @@ function handleComingSoon(prefix) {
   }
   
   if (prefix === 'new') calcPricePreview();
+  if (prefix === 'new') updateAddFishTotal(); // Update ยอดรายจ่าย
 }
 
 // ════════════════════════════════════════════
@@ -583,7 +642,7 @@ async function loadFinanceFromDB() {
   if (!error) {
     financeData = data;
     renderTodayFinance();
-    renderFinancePage(); // 👈 เพิ่มบรรทัดนี้ลงไป
+    renderFinancePage(); 
   }
 }
 

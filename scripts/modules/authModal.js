@@ -25,7 +25,7 @@ export function switchAuthTab(tab) {
 export const switchTab = switchAuthTab;
 
 // ── Login ด้วย Supabase Auth ──
-export async function fakeLogin() {
+export async function handleLogin() {
   const email    = document.querySelector('#loginForm input[type="email"]').value.trim();
   const password = document.querySelector('#loginForm input[type="password"]').value;
   const btn      = document.querySelector('#loginForm button[type="submit"], #loginForm .btn-primary');

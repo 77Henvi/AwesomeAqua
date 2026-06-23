@@ -111,6 +111,20 @@
               <label>จำนวนในสต็อก</label>
               <input type="number" id="newStock" placeholder="10">
             </div>
+
+            <div class="form-group">
+              <label>ราคาต้นทุน / ตัว (บาท) *</label>
+              <input type="number" id="newCost" placeholder="เช่น 80" min="0" required>
+            </div>
+            <div class="form-group">
+              <label>วันที่รับปลา *</label>
+              <input type="date" id="receiveDate" required>
+            </div>
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label>ยอดรวมรายจ่ายอัตโนมัติ</label>
+              <input type="text" id="totalFinanceDisplay" readonly placeholder="0 บาท" 
+                     style="background-color: rgba(255,255,255,0.05); color: #7eb3ff; font-weight: 600; cursor: not-allowed; border: 1px solid rgba(255,255,255,0.1);">
+            </div>
             <div class="form-group">
               <label>ขนาด (นิ้ว) </label>
               <div style="display:flex;gap:6px;align-items:center;">
@@ -178,12 +192,12 @@
           
           <div class="form-actions">
             <button class="btn btn-outline" onclick="clearForm()">ล้างข้อมูล</button>
-            <button class="btn btn-primary" onclick="addFish()">เพิ่มปลา</button>
+            <button class="btn btn-primary" id="submitAddFishBtn">เพิ่มปลา</button> 
           </div>
         </div>
       </div>
 
-      <div class="admin-card">
+<div class="admin-card">
         <div class="admin-table-header">
           <div class="admin-panel-title" style="margin-bottom:0;"><i class="ph ph-list-dashes"></i> รายการสต็อกทั้งหมด</div>
           <span id="fishCount" class="admin-fish-count"></span>
@@ -382,6 +396,7 @@
       <div class="form-group"><label>ราคาต่ำสุด</label><input type="number" id="editPriceMin"></div>
       <div class="form-group"><label>ราคาสูงสุด (ถ้ามี)</label><input type="number" id="editPriceMax"></div>
       <div class="form-group"><label>จำนวนสต็อก</label><input type="number" id="editStock"></div>
+      
       <div class="form-group">
         <label>ขนาดปลา (ซม.)</label>
         <div style="display:flex;gap:6px;align-items:center;">
@@ -403,86 +418,4 @@
         <input type="file" id="editImageFile" accept="image/*" onchange="previewEditImage(this)">
       </div>
       
-      <div class="form-group" style="grid-column:1/-1">
-        <label>ประเภท (TH)</label>
-        <div class="tag-selector" id="editTags_th">
-          <span class="tag-option" onclick="toggleTag(this)">ทะเล</span>
-          <span class="tag-option" onclick="toggleTag(this)">น้ำจืด</span>
-          <span class="tag-option" onclick="toggleTag(this)">น้ำกร่อย</span>
-          <span class="tag-option" onclick="toggleTag(this)">สีสวย</span>
-          <span class="tag-option" onclick="toggleTag(this)">เป็นมิตร</span>
-          <span class="tag-option" onclick="toggleTag(this)">ของแรร์</span>
-          <span class="tag-option" onclick="toggleTag(this)">ไทย</span>
-          <span class="tag-option" onclick="toggleTag(this)">ห่วงถิ่น</span>
-          <span class="tag-option" onclick="toggleTag(this)">เลี้ยงเดี่ยว</span>
-        </div>
       </div>
-      <div class="form-group" style="grid-column:1/-1">
-        <label>ประเภท (EN)</label>
-        <div class="tag-selector" id="editTags_en">
-          <span class="tag-option" onclick="toggleTag(this)">Marine</span>
-          <span class="tag-option" onclick="toggleTag(this)">Freshwater</span>
-          <span class="tag-option" onclick="toggleTag(this)">Brackish</span>
-          <span class="tag-option" onclick="toggleTag(this)">Colorful</span>
-          <span class="tag-option" onclick="toggleTag(this)">Friendly</span>
-          <span class="tag-option" onclick="toggleTag(this)">Rare</span>
-          <span class="tag-option" onclick="toggleTag(this)">Thai</span>
-          <span class="tag-option" onclick="toggleTag(this)">Territorial</span>
-          <span class="tag-option" onclick="toggleTag(this)">Solitary</span>
-        </div>
-      </div>
-    </div>
-    <img id="editImagePreview" style="display:none;width:100%;height:160px;object-fit:cover;border-radius:10px;margin-top:0.75rem">
-    
-    <div class="form-group" style="margin-top:1rem; grid-column:1/-1">
-      <label>รายละเอียด (TH)</label>
-      <textarea id="editDesc_th"></textarea>
-    </div>
-    <div class="form-group" style="margin-top:1rem; grid-column:1/-1">
-      <label>รายละเอียด (EN)</label>
-      <textarea id="editDesc_en"></textarea>
-    </div>
-    
-    <div class="form-actions">
-      <button class="btn btn-outline" onclick="closeEditModal()">ยกเลิก</button>
-      <button class="btn btn-primary" onclick="saveEdit()">บันทึก</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="financeModal" onclick="if(event.target===this)closeFinanceModal()">
-  <div class="modal" style="max-width:420px;">
-    <button class="modal-close" onclick="closeFinanceModal()">✕</button>
-    <div class="modal-logo" style="font-size:1.2rem; margin-bottom: 1.5rem;">💸 เพิ่มรายการ</div>
-    <div class="form-grid" style="grid-template-columns: 1fr;">
-      <div class="form-group">
-        <label>ประเภท</label>
-        <select id="finModalType">
-          <option value="income">รายรับ (+)</option>
-          <option value="expense">รายจ่าย (-)</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>ชื่อรายการ</label>
-        <input type="text" id="finModalName" placeholder="เช่น ขายปลา, ค่าอาหาร...">
-      </div>
-      <div class="form-group">
-        <label>จำนวนเงิน (บาท)</label>
-        <input type="number" id="finModalAmount" placeholder="0">
-      </div>
-      <div class="form-group">
-        <label>วันที่</label>
-        <input type="date" id="finModalDate">
-      </div>
-    </div>
-    <div class="form-actions" style="margin-top: 1.5rem;">
-      <button class="btn btn-outline" onclick="closeFinanceModal()">ยกเลิก</button>
-      <button class="btn btn-primary" onclick="saveFinanceModal()">บันทึก</button>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
-<script type="module" src="scripts/admin.js"></script>
-</body>
-</html>
