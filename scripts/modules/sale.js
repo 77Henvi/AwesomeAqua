@@ -14,32 +14,24 @@ export function initSaleModal() {
   wrap.innerHTML = `
     <div class="sale-modal-box">
       <h3 style="margin:0 0 4px;font-size:1.05rem;">🛒 บันทึกการขาย</h3>
-      <div id="saleFishName" style="font-size:0.85rem;color:var(--gray,#666);margin-bottom:14px;"></div>
-
-      <div id="saleDetailGroup">
-        <label class="sale-label">ต้นทุนต่อตัว (บาท)</label>
-        <input type="number" id="saleCost" class="sale-input" placeholder="0" min="0">
-
-        <label class="sale-label">ราคาที่ขายได้ต่อตัว (บาท)</label>
-        <input type="number" id="saleSellPrice" class="sale-input" placeholder="0" min="0">
-      </div>
+      <div id="saleFishName" style="font-size:0.9rem; color:#1e293b; margin-bottom:14px; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0;"></div>
 
       <div id="saleQtyGroup">
         <label class="sale-label">จำนวนที่ขายได้ (ตัว)</label>
-        <input type="number" id="saleQty" class="sale-input" placeholder="0" min="1">
+        <input type="number" id="saleQty" class="sale-input" placeholder="1" min="1">
       </div>
 
-      <div id="saleSummary" style="margin-top:10px;font-size:0.85rem;color:var(--gray,#666);"></div>
+      <div id="saleSummary" style="margin-top:10px;font-size:0.95rem;font-weight:600;color:var(--royal-blue,#2563eb);"></div>
 
       <div style="display:flex;gap:8px;margin-top:18px;">
         <button type="button" onclick="window.closeSaleModal()" class="sale-btn sale-btn-ghost">ยกเลิก</button>
-        <button type="button" onclick="window.confirmSale()" class="sale-btn sale-btn-primary">✅ บันทึกการขาย</button>
+        <button type="button" onclick="window.confirmSale()" id="confirmSaleBtn" class="sale-btn sale-btn-primary">✅ บันทึกการขาย</button>
       </div>
     </div>
   `;
   document.body.appendChild(wrap);
 
-  // ── style ขั้นต่ำ (กันกรณี admin.css ยังไม่มี class เหล่านี้) ──
+  // ── style ขั้นต่ำ ──
   if (!document.getElementById('saleModalStyle')) {
     const style = document.createElement('style');
     style.id = 'saleModalStyle';
@@ -54,23 +46,23 @@ export function initSaleModal() {
         background: #fff; border-radius: 14px; padding: 20px;
         width: 90%; max-width: 360px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
       }
-      .sale-label { display:block; font-size:0.8rem; color:#555; margin:10px 0 4px; }
+      .sale-label { display:block; font-size:0.85rem; color:#555; margin:10px 0 6px; font-weight:500;}
       .sale-input {
         width: 100%; padding: 10px 12px; border: 1px solid var(--border,#ddd);
-        border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;
+        border-radius: 8px; font-size: 1rem; box-sizing: border-box; font-family:var(--font-number);
       }
       .sale-btn { flex: 1; padding: 10px; border-radius: 10px; border: none;
-        font-weight: 600; cursor: pointer; font-size: 0.9rem; }
-      .sale-btn-primary { background: var(--royal-blue,#2563eb); color: #fff; }
-      .sale-btn-ghost { background: #f1f1f1; color: #333; }
+        font-weight: 600; cursor: pointer; font-size: 0.95rem; transition: 0.2s;}
+      .sale-btn-primary { background: #059669; color: #fff; }
+      .sale-btn-primary:hover { opacity: 0.9; }
+      .sale-btn-ghost { background: #f1f5f9; color: #475569; }
+      .sale-btn-ghost:hover { background: #e2e8f0; }
     `;
     document.head.appendChild(style);
   }
 
-  // ── live summary คำนวณกำไรเบื้องต้น ──
-  ['saleCost', 'saleSellPrice', 'saleQty'].forEach(id => {
-    document.getElementById(id).addEventListener('input', _updateSummary);
-  });
+  // ── live summary คำนวณยอดเงินรวม ──
+  document.getElementById('saleQty').addEventListener('input', _updateSummary);
 
   // expose สำหรับ inline onclick
   window.closeSaleModal = closeSaleModal;
@@ -78,43 +70,42 @@ export function initSaleModal() {
 }
 
 function _updateSummary() {
-  const cost = parseFloat(document.getElementById('saleCost').value) || (_currentFish?.cost || 0);
-  const sell = parseFloat(document.getElementById('saleSellPrice').value) || (_currentFish?.sale_price || 0);
+  const fish = _currentFish;
+  if (!fish) return;
+
   const qty  = parseInt(document.getElementById('saleQty').value) || 0;
+  const sellPrice = (fish.sale_price && fish.sale_price > 0) ? fish.sale_price : (fish.priceMin || 0);
 
   const el = document.getElementById('saleSummary');
-  if (!qty || !sell) { el.textContent = ''; return; }
+  if (!qty) { el.textContent = ''; return; }
 
-  const income = qty * sell;
-  const expense = qty * cost;
-  const profit  = income - expense;
-
-  el.innerHTML = `รายรับ ฿${income.toLocaleString('th-TH')}`
-    + (cost ? ` | ต้นทุน ฿${expense.toLocaleString('th-TH')} | กำไร ฿${profit.toLocaleString('th-TH')}` : '');
+  const income = qty * sellPrice;
+  el.innerHTML = `ยอดรวมรายรับ: ฿${income.toLocaleString('th-TH')}`;
 }
 
 /**
  * เปิด popup บันทึกการขาย
- * @param {object} fish - object ปลา (ต้องมี id, name, emoji, stock, cost, sale_price)
- * @param {function} onSaved - callback หลังบันทึกสำเร็จ (เช่น โหลดข้อมูลใหม่)
  */
 export function openSaleModal(fish, onSaved) {
   initSaleModal();
   _currentFish = fish;
   _onSaved     = onSaved;
 
-  const hasDefaults = !!(fish.cost && fish.sale_price);
+  const sellPrice = (fish.sale_price && fish.sale_price > 0) ? fish.sale_price : (fish.priceMin || 0);
 
-  document.getElementById('saleFishName').textContent =
-    `${fish.emoji || '🐟'} ${fish.name} — เหลือในสต็อก ${fish.stock} ตัว`;
+  // อัปเดตข้อมูลบนป๊อปอัป
+  document.getElementById('saleFishName').innerHTML = `
+    <div style="font-weight: 600; margin-bottom: 4px;">${fish.emoji || '🐟'} ${fish.name_th || fish.name}</div>
+    <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+      <span style="color: var(--gray);">เหลือในสต็อก: <strong>${fish.stock}</strong> ตัว</span>
+      <span style="color: var(--royal-blue); font-weight:600;">ตัวละ ฿${sellPrice.toLocaleString('th-TH')}</span>
+    </div>
+  `;
 
-  document.getElementById('saleDetailGroup').style.display = hasDefaults ? 'none' : 'block';
-  document.getElementById('saleCost').value      = fish.cost || '';
-  document.getElementById('saleSellPrice').value = fish.sale_price || fish.priceMin || '';
-
-  document.getElementById('saleQty').value = '';
+  document.getElementById('saleQty').value = '1'; // ตั้งค่าเริ่มต้นที่ 1 ตัว
   document.getElementById('saleQty').max   = fish.stock;
-  document.getElementById('saleSummary').textContent = '';
+  
+  _updateSummary(); // แสดงยอดรวมเริ่มต้นทันที
 
   document.getElementById('saleModal').classList.add('open');
   document.getElementById('saleQty').focus();
@@ -131,47 +122,45 @@ export async function confirmSale() {
 
   const qty = parseInt(document.getElementById('saleQty').value) || 0;
   if (qty <= 0) { showToast('⚠️ กรุณากรอกจำนวนที่ขาย'); return; }
-  if (qty > fish.stock) { showToast('⚠️ จำนวนเกินสต็อกที่มี (' + fish.stock + ' ตัว)'); return; }
+  if (qty > fish.stock) { showToast(`⚠️ จำนวนเกินสต็อกที่มี (${fish.stock} ตัว)`); return; }
 
-  const detailVisible = document.getElementById('saleDetailGroup').style.display !== 'none';
+  const btn = document.getElementById('confirmSaleBtn');
+  btn.disabled = true;
+  btn.textContent = 'กำลังบันทึก...';
 
-  let cost      = fish.cost || 0;
-  let sellPrice = fish.sale_price || fish.priceMin || 0;
-
-  if (detailVisible) {
-    cost      = parseFloat(document.getElementById('saleCost').value) || 0;
-    sellPrice = parseFloat(document.getElementById('saleSellPrice').value) || 0;
-  }
-
-  if (!sellPrice) { showToast('⚠️ กรุณากรอกราคาที่ขายได้'); return; }
-
-  const today      = new Date().toLocaleDateString('en-CA');
+  const sellPrice = (fish.sale_price && fish.sale_price > 0) ? fish.sale_price : (fish.priceMin || 0);
+  const today     = new Date().toLocaleDateString('en-CA');
   const totalIncome = qty * sellPrice;
-  const totalCost   = qty * cost;
-  const newStock    = fish.stock - qty;
+  const newStock  = fish.stock - qty;
 
-  // 1) อัปเดตสต็อก + จำค่า cost/sale_price เป็น default
-  const { error: fishErr } = await supabase.from('fish')
-    .update({ stock: newStock, cost, sale_price: sellPrice })
-    .eq('id', fish.id);
+  try {
+    // 1) อัปเดตสต็อกปลาให้ลดลง
+    const { error: fishErr } = await supabase.from('fish')
+      .update({ stock: newStock })
+      .eq('id', fish.id);
 
-  if (fishErr) { showToast('❌ อัปเดตสต็อกไม่ได้: ' + fishErr.message); return; }
+    if (fishErr) throw fishErr;
 
-  // 2) บันทึกรายรับ (และรายจ่ายต้นทุน ถ้ามี) เข้าหน้ารายรับ-รายจ่าย
-  // บันทึกเฉพาะ "กำไร" เป็นรายรับ (ไม่แยกต้นทุนเป็นรายจ่าย)
-  const profit = totalIncome - totalCost;
-  const rows = [{
-    type: 'income',
-    name: `ขาย ${fish.name} x${qty} ตัว`,
-    amount: profit,
-    date: today
-  }];
+    // 2) บันทึกยอดเต็มรายรับเข้าหน้าการเงิน
+    const { error: finErr } = await supabase.from('finance').insert([{
+      type: 'income',
+      name: `ขายปลา: ${fish.name_th || fish.name} x${qty} ตัว`,
+      amount: totalIncome,
+      date: today
+    }]);
 
-  const { error: finErr } = await supabase.from('finance').insert(rows);
-  if (finErr) { showToast('⚠️ ลดสต็อกแล้ว แต่บันทึกรายรับไม่ได้: ' + finErr.message); }
+    if (finErr) throw finErr;
 
-  showToast(`✅ ขาย ${fish.name} x${qty} ตัว สำเร็จ (กำไร ฿${profit.toLocaleString('th-TH')})`);
+    showToast(`✅ ขาย ${fish.name_th || fish.name} x${qty} ตัว สำเร็จ (รับเงิน ฿${totalIncome.toLocaleString('th-TH')})`);
 
-  closeSaleModal();
-  if (_onSaved) _onSaved();
+    closeSaleModal();
+    if (_onSaved) _onSaved();
+    
+  } catch (err) {
+    console.error(err);
+    showToast('❌ ผิดพลาด: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '✅ บันทึกการขาย';
+  }
 }
