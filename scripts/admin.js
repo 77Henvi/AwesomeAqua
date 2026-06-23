@@ -247,16 +247,32 @@ function updateAddFishTotal() {
 }
 
 // ════════════════════════════════════════════
-//   DELETE
+//   DELETE (ลบปลา + ลบรายจ่ายอัตโนมัติ)
 // ════════════════════════════════════════════
 async function deleteFish(id) {
-  if (!confirm('ยืนยันลบปลานี้?')) return;
+  if (!confirm('ยืนยันลบปลานี้? (ระบบจะลบรายจ่ายค่าตัวนี้ในหน้าการเงินออกด้วย)')) return;
 
+  const fishToDelete = fishData.find(f => f.id === id);
+
+  // 2. ลบปลาจากฐานข้อมูล
   const { error } = await supabase.from('fish').delete().eq('id', id);
 
-  if (error) { showToast('❌ ลบไม่ได้'); return; }
+  if (error) { 
+    showToast('❌ ลบไม่ได้'); 
+    return; 
+  }
 
-  showToast('🗑️ ลบปลาเรียบร้อย');
+  if (fishToDelete) {
+    const financeItemName = `ซื้อปลา: ${fishToDelete.name_th} x${fishToDelete.stock} ตัว`;
+    
+    await supabase.from('finance')
+      .delete()
+      .eq('name', financeItemName)
+      .eq('type', 'expense');      
+    loadFinanceFromDB(); 
+  }
+
+  showToast('🗑️ ลบปลาและรายจ่ายเรียบร้อย');
   loadFishFromDB();
 }
 
