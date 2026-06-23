@@ -524,9 +524,11 @@ function openEditModal(id) {
   if (document.getElementById('editCost')) document.getElementById('editCost').value = f.cost || '';
   if (document.getElementById('editSalePrice')) document.getElementById('editSalePrice').value = f.sale_price || '';
 
-  const preview     = document.getElementById('editImagePreview');
-  preview.src       = f.image || '';
-  preview.style.display = f.image ? 'block' : 'none';
+  const preview = document.getElementById('editImagePreview');
+  if (preview) {
+    preview.src = f.image || '';
+    preview.style.display = f.image ? 'block' : 'none';
+  }
 
   // clear file input
   document.getElementById('editImageFile').value = '';
