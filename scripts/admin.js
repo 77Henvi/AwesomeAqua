@@ -28,6 +28,7 @@ window.openEditModal    = openEditModal;
 window.closeEditModal   = closeEditModal;
 window.clearForm        = clearForm;
 window.toggleTag        = toggleTag;
+window.toggleSyncTag    = toggleSyncTag; // เพิ่มสำหรับ Sync Tag 2 ภาษา
 window.previewNewImage  = previewNewImage;
 window.previewEditImage = previewEditImage;
 window.handleComingSoon = handleComingSoon;
@@ -152,7 +153,6 @@ async function addFish() {
   const rDate       = document.getElementById('receiveDate')?.value;
 
   // 1. Validation (ชื่อ TH, ราคาต่ำสุด, จำนวน, ต้นทุน, วันที่รับปลา ต้องไม่ว่าง)
-  // หมายเหตุ: ถ้ายกเว้น Coming Soon (isCS) อนุญาตให้ราคาและสต็อกว่างได้ (เพราะโดน disable อยู่)
   if (!name_th || !rDate || costRaw === '' || (!isCS && (priceMinRaw === '' || stockRaw === ''))) {
     showToast('⚠️ กรุณากรอกข้อมูลให้ครบถ้วน (ชื่อ TH, ราคาต่ำสุด, จำนวน, ต้นทุน, วันที่รับปลา)');
     return;
@@ -162,6 +162,7 @@ async function addFish() {
   const priceMax = isCS ? 0 : (parseInt(document.getElementById('newPriceMax').value) || 0);
   const stock    = isCS ? 0 : parseInt(stockRaw);
   const cost     = parseFloat(costRaw);
+  const salePrice = parseFloat(document.getElementById('newSalePrice')?.value) || 0; // ดึงราคาขาย
   const level    = document.getElementById('newLevel').value;
   const desc_th  = document.getElementById('newDesc_th').value;
   const desc_en  = document.getElementById('newDesc_en').value;
@@ -175,7 +176,7 @@ async function addFish() {
     if (!imageUrl) return;
   }
 
-  // 2. Insert ตาราง fish ก่อน (ถ้า Failed จะหยุดทำงาน)
+  // 2. Insert ตาราง fish ก่อน
   const { error: fishError } = await supabase.from('fish').insert({
     name_th:   name_th, 
     name_en:   name_en,
@@ -192,7 +193,8 @@ async function addFish() {
     image:     imageUrl,
     size_min:  sizeMin,
     size_max:  sizeMax,
-    cost:      cost
+    cost:      cost,
+    sale_price: salePrice
   });
 
   if (fishError) { 
@@ -200,22 +202,21 @@ async function addFish() {
     return; 
   }
 
-  // 3. ถ้า fish insert สำเร็จ -> Insert ตาราง finance
+  // 3. ถ้า fish insert สำเร็จ -> Insert ตาราง finance อัตโนมัติ
   const totalAmount = cost * stock;
   
   const { error: financeError } = await supabase.from('finance').insert({
-    type: 'expense', // ในตาราง UI ใช้ 'expense' (ซึ่งแสดงผลเป็นรายจ่าย)
+    type: 'expense', 
     name: `ซื้อปลา: ${name_th} x${stock} ตัว`,
-    amount: totalAmount, // เก็บเป็นตัวเลขบวก
-    date: rDate // format YYYY-MM-DD จาก date input
+    amount: totalAmount, 
+    date: rDate 
   });
 
   if (financeError) {
     showToast('⚠️ เพิ่มปลาสำเร็จ แต่บันทึกรายจ่ายไม่สำเร็จ กรุณาเพิ่มรายจ่ายด้วยตนเอง');
   } else {
-    // 4. สำเร็จทั้งหมด
     showToast(`✅ เพิ่มปลาและบันทึกรายจ่ายเรียบร้อย`);
-    loadFinanceFromDB(); // รีเฟรชตารางการเงิน
+    loadFinanceFromDB(); 
   }
 
   // 5. Reset ฟอร์ม
@@ -233,7 +234,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (newCostInput) newCostInput.addEventListener('input', updateAddFishTotal);
   if (newStockInput) newStockInput.addEventListener('input', updateAddFishTotal);
   
-  // ป้องกันกรณีปุ่มเพิ่มปลาถูกลบ onclick ใน HTML
   if (submitBtn) submitBtn.addEventListener('click', addFish);
 });
 
@@ -293,7 +293,8 @@ async function saveEdit() {
     image:     imageUrl,
     size_min:  parseFloat(document.getElementById('editSizeMin').value) || null,
     size_max:  parseFloat(document.getElementById('editSizeMax').value) || null,
-    cost:      parseFloat(document.getElementById('editCost')?.value) || 0
+    cost:      parseFloat(document.getElementById('editCost')?.value) || 0,
+    sale_price: parseFloat(document.getElementById('editSalePrice')?.value) || 0
   }).eq('id', id);
 
   if (error) { showToast('❌ บันทึกไม่ได้'); return; }
@@ -462,14 +463,13 @@ function renderFishTable() {
 }
 
 
-/** เพิ่ม <th>กำไร</th> ให้ตรงกับคอลัมน์ใหม่ ถ้า header เดิมยังไม่มี (กันคอลัมน์เลื่อน) */
+/** เพิ่ม <th>กำไร</th> ให้ตรงกับคอลัมน์ใหม่ */
 function _ensureProfitHeader() {
   const thead = document.querySelector('#fishTableBody')?.closest('table')?.querySelector('thead tr');
   if (!thead) return;
   if (thead.querySelector('.th-profit')) return;
 
   const ths = thead.querySelectorAll('th');
-  // คอลัมน์ราคา คือ th ตัวที่ 3 (รูป, ชื่อ, ราคา, สต็อก, ระดับ, จัดการ)
   const priceTh = ths[2];
   const th = document.createElement('th');
   th.className = 'th-profit';
@@ -488,7 +488,6 @@ function openSale(id) {
   openSaleModal(f, () => loadFishFromDB());
 }
 
-
 function openEditModal(id) {
   const f = fishData.find(x => x.id === id);
   if (!f) return;
@@ -505,7 +504,9 @@ function openEditModal(id) {
   document.getElementById('editDesc_en').value  = f.desc_en || '';
   document.getElementById('editSizeMin').value  = f.sizeMin || '';
   document.getElementById('editSizeMax').value  = f.sizeMax || '';
+  
   if (document.getElementById('editCost')) document.getElementById('editCost').value = f.cost || '';
+  if (document.getElementById('editSalePrice')) document.getElementById('editSalePrice').value = f.sale_price || '';
 
   const preview     = document.getElementById('editImagePreview');
   preview.src       = f.image || '';
@@ -532,7 +533,7 @@ function closeEditModal() {
 //   CLEAR FORM
 // ════════════════════════════════════════════
 function clearForm() {
-  ['newEmoji', 'newName_th', 'newName_en', 'newSpecies', 'newPriceMin', 'newPriceMax', 'newStock', 'newSizeMin', 'newSizeMax', 'newDesc_th', 'newDesc_en', 'newCost', 'receiveDate']
+  ['newEmoji', 'newName_th', 'newName_en', 'newSpecies', 'newPriceMin', 'newPriceMax', 'newStock', 'newSizeMin', 'newSizeMax', 'newDesc_th', 'newDesc_en', 'newCost', 'receiveDate', 'newSalePrice']
     .forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
@@ -546,14 +547,42 @@ function clearForm() {
   const preview = document.getElementById('newImagePreview');
   if (preview) { preview.src = ''; preview.style.display = 'none'; }
 
-  // เคลียร์ Tags ทั้งสองภาษา
-  document.querySelectorAll('#newTags_th .tag-option, #newTags_en .tag-option').forEach(el => el.classList.remove('selected'));
+  // เคลียร์ Tags ทั้งสองภาษา (เผื่อติดทั้ง active และ selected)
+  document.querySelectorAll('#newTags_th .tag-option, #newTags_en .tag-option').forEach(el => {
+    el.classList.remove('active', 'selected');
+  });
 
   const pp = document.getElementById('pricePreview');
   if (pp) { pp.textContent = '—'; pp.className = 'price-preview'; }
 
   document.getElementById('newIsComingSoon').checked = false;
   handleComingSoon('new');
+}
+
+// ════════════════════════════════════════════
+//   TAG SYNC (เชื่อมปุ่ม Tag 2 ภาษา)
+// ════════════════════════════════════════════
+function toggleSyncTag(element, mode) {
+  // ตรวจสอบว่ากำลังเลือกหรือยกเลิก
+  const isSelecting = !element.classList.contains('active');
+  const idx = element.getAttribute('data-idx');
+  
+  // หา Tag Container ของทั้งสองภาษา
+  const thSelector = document.getElementById(mode + 'Tags_th');
+  const enSelector = document.getElementById(mode + 'Tags_en');
+  
+  // หาตัว Tag ที่ตรงกับ index ที่ถูกกด
+  const thTag = thSelector ? thSelector.querySelector(`[data-idx="${idx}"]`) : null;
+  const enTag = enSelector ? enSelector.querySelector(`[data-idx="${idx}"]`) : null;
+  
+  // ทำให้สถานะตรงกัน (Sync)
+  if (isSelecting) {
+    if (thTag) thTag.classList.add('active');
+    if (enTag) enTag.classList.add('active');
+  } else {
+    if (thTag) thTag.classList.remove('active');
+    if (enTag) enTag.classList.remove('active');
+  }
 }
 
 // ════════════════════════════════════════════
@@ -580,8 +609,6 @@ function toggleAddPanel(forceOpen) {
   body.classList.toggle('open', open);
   toggle.classList.toggle('open', open);
 }
-
-/** Price range preview — see scripts/modules/profit.js */
 
 /** Stock filter chips */
 function setStockFilter(f, el) {

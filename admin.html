@@ -46,14 +46,11 @@
   <div class="admin-body">
 
     <div class="admin-page active" id="page-home">
-
       <div class="date-banner">
         <div class="date-banner-text">วันนี้ <strong id="headerDate">—</strong></div>
         <div class="date-banner-badge">🐟 AwesomeAqua Admin</div>
       </div>
-
       <div class="admin-stats" id="adminStats"></div>
-
       <div class="dash-two-col">
         <div class="admin-card">
           <div class="admin-panel-title" style="font-size:1rem;margin-bottom:0.75rem;"><i class="ph ph-warning-circle"></i></div>
@@ -71,7 +68,6 @@
     </div>
 
     <div class="admin-page" id="page-fish">
-
       <div class="admin-card" style="margin-bottom:1.25rem;">
         <div class="add-panel-toggle" id="addPanelToggle" onclick="toggleAddPanel()">
           <div class="admin-panel-title" style="margin-bottom:0;"><i class="ph ph-plus-circle"></i> เพิ่มปลาใหม่</div>
@@ -125,6 +121,7 @@
               <input type="text" id="totalFinanceDisplay" readonly placeholder="0 บาท" 
                      style="background-color: rgba(255,255,255,0.05); color: #7eb3ff; font-weight: 600; cursor: not-allowed; border: 1px solid rgba(255,255,255,0.1);">
             </div>
+            
             <div class="form-group">
               <label>ขนาด (นิ้ว) </label>
               <div style="display:flex;gap:6px;align-items:center;">
@@ -154,32 +151,32 @@
             <div class="form-group" style="grid-column:1/-1">
               <label>ประเภท (TH)</label>
               <div class="tag-selector" id="newTags_th">
-                <span class="tag-option" onclick="toggleTag(this)">ทะเล</span>
-                <span class="tag-option" onclick="toggleTag(this)">น้ำจืด</span>
-                <span class="tag-option" onclick="toggleTag(this)">น้ำกร่อย</span>
-                <span class="tag-option" onclick="toggleTag(this)">สีสวย</span>
-                <span class="tag-option" onclick="toggleTag(this)">เป็นมิตร</span>
-                <span class="tag-option" onclick="toggleTag(this)">ของแรร์</span>
-                <span class="tag-option" onclick="toggleTag(this)">ไทย</span>
-                <span class="tag-option" onclick="toggleTag(this)">ห่วงถิ่น</span>
-                <span class="tag-option" onclick="toggleTag(this)">เลี้ยงเดี่ยว</span>
+                <span class="tag-option" data-idx="0" onclick="toggleSyncTag(this, 'new')">ทะเล</span>
+                <span class="tag-option" data-idx="1" onclick="toggleSyncTag(this, 'new')">น้ำจืด</span>
+                <span class="tag-option" data-idx="2" onclick="toggleSyncTag(this, 'new')">น้ำกร่อย</span>
+                <span class="tag-option" data-idx="3" onclick="toggleSyncTag(this, 'new')">สีสวย</span>
+                <span class="tag-option" data-idx="4" onclick="toggleSyncTag(this, 'new')">เป็นมิตร</span>
+                <span class="tag-option" data-idx="5" onclick="toggleSyncTag(this, 'new')">ของแรร์</span>
+                <span class="tag-option" data-idx="6" onclick="toggleSyncTag(this, 'new')">ไทย</span>
+                <span class="tag-option" data-idx="7" onclick="toggleSyncTag(this, 'new')">ห่วงถิ่น</span>
+                <span class="tag-option" data-idx="8" onclick="toggleSyncTag(this, 'new')">เลี้ยงเดี่ยว</span>
               </div>
             </div>
             <div class="form-group" style="grid-column:1/-1">
               <label>ประเภท (EN)</label>
               <div class="tag-selector" id="newTags_en">
-                <span class="tag-option" onclick="toggleTag(this)">Marine</span>
-                <span class="tag-option" onclick="toggleTag(this)">Freshwater</span>
-                <span class="tag-option" onclick="toggleTag(this)">Brackish</span>
-                <span class="tag-option" onclick="toggleTag(this)">Colorful</span>
-                <span class="tag-option" onclick="toggleTag(this)">Friendly</span>
-                <span class="tag-option" onclick="toggleTag(this)">Rare</span>
-                <span class="tag-option" onclick="toggleTag(this)">Thai</span>
-                <span class="tag-option" onclick="toggleTag(this)">Territorial</span>
-                <span class="tag-option" onclick="toggleTag(this)">Solitary</span>
+                <span class="tag-option" data-idx="0" onclick="toggleSyncTag(this, 'new')">Marine</span>
+                <span class="tag-option" data-idx="1" onclick="toggleSyncTag(this, 'new')">Freshwater</span>
+                <span class="tag-option" data-idx="2" onclick="toggleSyncTag(this, 'new')">Brackish</span>
+                <span class="tag-option" data-idx="3" onclick="toggleSyncTag(this, 'new')">Colorful</span>
+                <span class="tag-option" data-idx="4" onclick="toggleSyncTag(this, 'new')">Friendly</span>
+                <span class="tag-option" data-idx="5" onclick="toggleSyncTag(this, 'new')">Rare</span>
+                <span class="tag-option" data-idx="6" onclick="toggleSyncTag(this, 'new')">Thai</span>
+                <span class="tag-option" data-idx="7" onclick="toggleSyncTag(this, 'new')">Territorial</span>
+                <span class="tag-option" data-idx="8" onclick="toggleSyncTag(this, 'new')">Solitary</span>
               </div>
             </div>
-          </div>
+            </div>
           
           <div class="form-group" style="margin-top:1rem; grid-column:1/-1">
             <label>รายละเอียด (TH)</label>
@@ -197,7 +194,7 @@
         </div>
       </div>
 
-<div class="admin-card">
+      <div class="admin-card">
         <div class="admin-table-header">
           <div class="admin-panel-title" style="margin-bottom:0;"><i class="ph ph-list-dashes"></i> รายการสต็อกทั้งหมด</div>
           <span id="fishCount" class="admin-fish-count"></span>
@@ -231,8 +228,9 @@
           </table>
         </div>
       </div>
-
-    </div><div class="admin-page" id="page-finance">
+    </div>
+    
+    <div class="admin-page" id="page-finance">
       <div class="fin-month-container">
         <select id="fin-month-select" class="fin-month-select" onchange="onFinMonthChange()"></select>
       </div>
@@ -266,8 +264,7 @@
         <button class="fin-add-btn" onclick="openFinanceModal()">+ เพิ่ม</button>
       </div>
 
-      <div id="finance-list">
-        </div>
+      <div id="finance-list"></div>
     </div>
 
     <div class="admin-page" id="page-todos">
@@ -294,9 +291,7 @@
     </div>
 
     <div class="admin-page" id="page-stats">
-
       <div id="stats-kpi" class="stats-kpi-grid"></div>
-
       <div class="stats-grid-2">
         <div class="stats-section-card">
           <div class="stats-section-title"><i class="ph ph-fish-simple"></i> สต็อกปลา (Top 10)</div>
@@ -307,7 +302,6 @@
           <div id="stats-price-dist"></div>
         </div>
       </div>
-
       <div class="stats-grid-2">
         <div class="stats-section-card">
           <div class="stats-section-title"><i class="ph ph-trophy"></i> ปลาตามราคา</div>
@@ -318,7 +312,6 @@
           <div id="stats-level-dist"></div>
         </div>
       </div>
-
       <div class="stats-section-card" style="margin-top:0;">
         <div class="stats-section-title"><i class="ph ph-calendar-blank"></i> รายรับ-รายจ่ายรายเดือน (6 เดือนล่าสุด)</div>
         <div style="display:flex;gap:1rem;font-size:0.75rem;margin-bottom:1rem;">
@@ -327,9 +320,9 @@
         </div>
         <div id="stats-monthly-finance"></div>
       </div>
+    </div>
 
-    </div><div class="admin-page" id="page-ads">
-
+    <div class="admin-page" id="page-ads">
       <div class="admin-card" style="margin-bottom:1.25rem;">
         <div class="admin-panel-title"><i class="ph ph-plus-circle"></i> เพิ่มโฆษณาใหม่</div>
         <div class="form-grid">
@@ -361,8 +354,11 @@
         </p>
         <div id="ads-list"></div>
       </div>
+    </div>
 
-    </div></div><nav class="admin-bottom-nav">
+  </div>
+
+  <nav class="admin-bottom-nav">
     <button class="bnav-item active" id="bnav-home"    onclick="switchTab('home')">
       <span class="bnav-icon"><i class="ph ph-house"></i></span><span class="bnav-label">หน้าหลัก</span>
     </button>
@@ -380,7 +376,9 @@
     </button>
   </nav>
 
-</div><div class="modal-overlay" id="editModal" onclick="if(event.target===this)closeEditModal()">
+</div>
+
+<div class="modal-overlay" id="editModal" onclick="if(event.target===this)closeEditModal()">
   <div class="modal" style="max-width:480px;overflow-y:auto;max-height:90vh">
     <button class="modal-close" onclick="closeEditModal()">✕</button>
     <div class="modal-logo" style="font-size:1.2rem"><i class="ph ph-pencil-simple"></i> แก้ไขข้อมูลปลา</div>
@@ -417,5 +415,55 @@
         <label>เปลี่ยนรูป</label>
         <input type="file" id="editImageFile" accept="image/*" onchange="previewEditImage(this)">
       </div>
-      
+
+      <div class="form-group" style="grid-column:1/-1">
+        <label>ประเภท (TH)</label>
+        <div class="tag-selector" id="editTags_th">
+          <span class="tag-option" data-idx="0" onclick="toggleSyncTag(this, 'edit')">ทะเล</span>
+          <span class="tag-option" data-idx="1" onclick="toggleSyncTag(this, 'edit')">น้ำจืด</span>
+          <span class="tag-option" data-idx="2" onclick="toggleSyncTag(this, 'edit')">น้ำกร่อย</span>
+          <span class="tag-option" data-idx="3" onclick="toggleSyncTag(this, 'edit')">สีสวย</span>
+          <span class="tag-option" data-idx="4" onclick="toggleSyncTag(this, 'edit')">เป็นมิตร</span>
+          <span class="tag-option" data-idx="5" onclick="toggleSyncTag(this, 'edit')">ของแรร์</span>
+          <span class="tag-option" data-idx="6" onclick="toggleSyncTag(this, 'edit')">ไทย</span>
+          <span class="tag-option" data-idx="7" onclick="toggleSyncTag(this, 'edit')">ห่วงถิ่น</span>
+          <span class="tag-option" data-idx="8" onclick="toggleSyncTag(this, 'edit')">เลี้ยงเดี่ยว</span>
+        </div>
       </div>
+      <div class="form-group" style="grid-column:1/-1">
+        <label>ประเภท (EN)</label>
+        <div class="tag-selector" id="editTags_en">
+          <span class="tag-option" data-idx="0" onclick="toggleSyncTag(this, 'edit')">Marine</span>
+          <span class="tag-option" data-idx="1" onclick="toggleSyncTag(this, 'edit')">Freshwater</span>
+          <span class="tag-option" data-idx="2" onclick="toggleSyncTag(this, 'edit')">Brackish</span>
+          <span class="tag-option" data-idx="3" onclick="toggleSyncTag(this, 'edit')">Colorful</span>
+          <span class="tag-option" data-idx="4" onclick="toggleSyncTag(this, 'edit')">Friendly</span>
+          <span class="tag-option" data-idx="5" onclick="toggleSyncTag(this, 'edit')">Rare</span>
+          <span class="tag-option" data-idx="6" onclick="toggleSyncTag(this, 'edit')">Thai</span>
+          <span class="tag-option" data-idx="7" onclick="toggleSyncTag(this, 'edit')">Territorial</span>
+          <span class="tag-option" data-idx="8" onclick="toggleSyncTag(this, 'edit')">Solitary</span>
+        </div>
+      </div>
+      </div>
+
+    <div class="form-group" style="margin-top:1rem; grid-column:1/-1">
+      <label>รายละเอียด (TH)</label>
+      <textarea id="editDesc_th"></textarea>
+    </div>
+    <div class="form-group" style="margin-top:1rem; grid-column:1/-1">
+      <label>รายละเอียด (EN)</label>
+      <textarea id="editDesc_en"></textarea>
+    </div>
+    
+    <div class="form-actions" style="margin-top:1.5rem">
+      <button class="btn btn-outline" onclick="closeEditModal()">ยกเลิก</button>
+      <button class="btn btn-primary" id="submitEditFishBtn">บันทึกการแก้ไข</button> 
+    </div>
+
+  </div>
+</div>
+
+<script type="module" src="scripts/admin.js"></script>
+
+</body>
+</html>
