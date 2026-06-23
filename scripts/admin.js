@@ -563,25 +563,21 @@ function clearForm() {
 //   TAG SYNC (เชื่อมปุ่ม Tag 2 ภาษา)
 // ════════════════════════════════════════════
 function toggleSyncTag(element, mode) {
-  // ตรวจสอบว่ากำลังเลือกหรือยกเลิก
-  const isSelecting = !element.classList.contains('active');
+  const isSelecting = !element.classList.contains('selected');
   const idx = element.getAttribute('data-idx');
   
-  // หา Tag Container ของทั้งสองภาษา
   const thSelector = document.getElementById(mode + 'Tags_th');
   const enSelector = document.getElementById(mode + 'Tags_en');
   
-  // หาตัว Tag ที่ตรงกับ index ที่ถูกกด
   const thTag = thSelector ? thSelector.querySelector(`[data-idx="${idx}"]`) : null;
   const enTag = enSelector ? enSelector.querySelector(`[data-idx="${idx}"]`) : null;
   
-  // ทำให้สถานะตรงกัน (Sync)
   if (isSelecting) {
-    if (thTag) thTag.classList.add('active');
-    if (enTag) enTag.classList.add('active');
+    if (thTag) thTag.classList.add('selected');
+    if (enTag) enTag.classList.add('selected');
   } else {
-    if (thTag) thTag.classList.remove('active');
-    if (enTag) enTag.classList.remove('active');
+    if (thTag) thTag.classList.remove('selected');
+    if (enTag) enTag.classList.remove('selected');
   }
 }
 
