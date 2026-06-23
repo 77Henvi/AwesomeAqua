@@ -205,9 +205,9 @@
           </div>
           <div class="filter-chips">
             <button class="filter-chip active" onclick="setStockFilter('all',this)">ทั้งหมด</button>
-            <button class="filter-chip" onclick="setStockFilter('ok',this)">✅ มีสต็อก</button>
-            <button class="filter-chip" onclick="setStockFilter('low',this)">⚠️ ใกล้หมด</button>
-            <button class="filter-chip" onclick="setStockFilter('out',this)">❌ หมด</button>
+              <button class="filter-chip" onclick="setStockFilter('ok',this)"><i class="ph ph-check-circle"></i> มีสต็อก</button>
+              <button class="filter-chip" onclick="setStockFilter('low',this)"><i class="ph ph-warning-circle"></i> ใกล้หมด</button>
+              <button class="filter-chip" onclick="setStockFilter('out',this)"><i class="ph ph-x-circle"></i> หมด</button>
           </div>
         </div>
         <div class="fish-table-wrap">
@@ -386,7 +386,7 @@
     <div class="form-grid" style="margin-top:1.5rem">
       <div class="form-group" style="grid-column: 1 / -1; flex-direction: row; align-items: center; gap: 10px; background: #eef2ff; padding: 12px 15px; border-radius: 10px; border: 1px solid #c7d2fe;">
         <input type="checkbox" id="editIsComingSoon" onchange="handleComingSoon('edit')" style="width: 20px; height: 20px; cursor: pointer; margin: 0;">
-        <label for="editIsComingSoon" style="margin-bottom: 0; font-size: 0.95rem; font-weight: 600; color: var(--royal-blue); cursor: pointer; text-transform: none;">🔔 ตั้งเป็น Coming Soon (ปลาที่อยู่ในแผนนำเข้า)</label>
+        <label for="editIsComingSoon" style="margin-bottom: 0; font-size: 0.95rem; font-weight: 600; color: var(--royal-blue); cursor: pointer; text-transform: none;"><i class="ph ph-bell-ringing" style="font-size: 1.1em; vertical-align: middle;"></i> ตั้งเป็น Coming Soon</label>
       </div>
       <div class="form-group"><label>ชื่อปลา (TH)</label><input type="text" id="editName_th"></div>
       <div class="form-group"><label>ชื่อปลา (EN)</label><input type="text" id="editName_en"></div>
@@ -458,7 +458,7 @@
     
     <div class="form-actions" style="margin-top:1.5rem">
       <button class="btn btn-outline" onclick="closeEditModal()">ยกเลิก</button>
-      <button class="btn btn-primary" id="submitEditFishBtn">บันทึกการแก้ไข</button> 
+      <button class="btn btn-primary" id="submitEditFishBtn "onclick="saveEdit()">บันทึกการแก้ไข</button> 
     </div>
 
   </div>

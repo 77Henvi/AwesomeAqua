@@ -13,7 +13,7 @@ export function initSaleModal() {
   wrap.className = 'sale-modal-overlay';
   wrap.innerHTML = `
     <div class="sale-modal-box">
-      <h3 style="margin:0 0 4px;font-size:1.05rem;">🛒 บันทึกการขาย</h3>
+      <h3 style="margin:0 0 4px;font-size:1.05rem;"><i class="ph ph-shopping-cart"></i> บันทึกการขาย</h3>
       <div id="saleFishName" style="font-size:0.9rem; color:#1e293b; margin-bottom:14px; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0;"></div>
 
       <div id="saleQtyGroup">
@@ -24,8 +24,8 @@ export function initSaleModal() {
       <div id="saleSummary" style="margin-top:10px;font-size:0.95rem;font-weight:600;color:var(--royal-blue,#2563eb);"></div>
 
       <div style="display:flex;gap:8px;margin-top:18px;">
-        <button type="button" onclick="window.closeSaleModal()" class="sale-btn sale-btn-ghost">ยกเลิก</button>
-        <button type="button" onclick="window.confirmSale()" id="confirmSaleBtn" class="sale-btn sale-btn-primary">✅ บันทึกการขาย</button>
+        <button type="button" onclick="window.closeSaleModal()" class="sale-btn sale-btn-ghost"><i class="ph ph-x"></i> ยกเลิก</button>
+        <button type="button" onclick="window.confirmSale()" id="confirmSaleBtn" class="sale-btn sale-btn-primary"><i class="ph ph-check-circle"></i> บันทึกการขาย</button>
       </div>
     </div>
   `;

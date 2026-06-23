@@ -22,13 +22,14 @@ export function escapeHTML(str) {
 
 export function showToast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
+  if (!t) return; // ป้องกัน Error ถ้าหาแท็กไม่เจอ
+  t.innerHTML = msg; // <--- แก้จาก textContent เป็น innerHTML แล้ว
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
 export function openLine(fishId) {
-  showToast('📱 กำลังเปิด LINE...');
+  showToast('<i class="ph ph-device-mobile"></i> กำลังเปิด LINE...');
   if (fishId) {
     // เปิด LIFF พร้อมส่ง fish ID
     window.open(`https://liff.line.me/2010391542-QzHeiSlX?fishId=${fishId}`, '_blank');
