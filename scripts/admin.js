@@ -105,7 +105,6 @@ async function loadFishFromDB() {
     name_th:  f.name_th,
     name_en:  f.name_en,
     species:  f.species,
-    emoji:    f.emoji,
     image:    f.image,
     priceMin: f.price_min,
     priceMax: f.price_max,
@@ -136,13 +135,12 @@ function renderAll() {
   renderDashboardCards();
 }
 
-// ════════════════════════════════════════════
+/// ════════════════════════════════════════════
 //   ADD FISH + AUTO FINANCE LOG
 // ════════════════════════════════════════════
 async function addFish() {
   const name_th   = document.getElementById('newName_th').value.trim();
   const name_en   = document.getElementById('newName_en').value.trim();
-  const emoji     = document.getElementById('newEmoji').value || '🐟';
   const species   = document.getElementById('newSpecies').value;
   const isCS      = document.getElementById('newIsComingSoon').checked;
   
@@ -152,7 +150,7 @@ async function addFish() {
   const rDate       = document.getElementById('receiveDate')?.value;
 
   if (!name_th || !rDate || costRaw === '' || (!isCS && (priceMinRaw === '' || stockRaw === ''))) {
-    showToast('<i class="ph-fill ph-warning-circle" style="color:#f59e0b; font-size:1.1em; vertical-align:-2px;"></i> กรุณากรอกข้อมูลให้ครบถ้วน (ชื่อ TH, ราคาต่ำสุด, จำนวน, ต้นทุน, วันที่รับปลา)');
+    showToast('<i class="ph-fill ph-warning-circle" style="color:#f59e0b; font-size:1.1em; vertical-align:-2px;"></i> กรุณากรอกข้อมูลให้ครบถ้วน');
     return;
   }
 
@@ -181,7 +179,6 @@ async function addFish() {
     desc_en:   desc_en,
     tags_th:   getSelectedTags('newTags_th'),
     tags_en:   getSelectedTags('newTags_en'),
-    emoji, 
     species:   species || '-',
     price_min: priceMin, 
     price_max: priceMax,
@@ -200,16 +197,12 @@ async function addFish() {
   }
 
   const totalAmount = cost * stock;
-  
   const { error: financeError } = await supabase.from('finance').insert({
-    type: 'expense', 
-    name: `ซื้อปลา: ${name_th} x${stock} ตัว`,
-    amount: totalAmount, 
-    date: rDate 
+    type: 'expense', name: `ซื้อปลา: ${name_th} x${stock} ตัว`, amount: totalAmount, date: rDate 
   });
 
   if (financeError) {
-    showToast('<i class="ph-fill ph-warning-circle" style="color:#f59e0b; font-size:1.1em; vertical-align:-2px;"></i> เพิ่มปลาสำเร็จ แต่บันทึกรายจ่ายไม่สำเร็จ กรุณาเพิ่มรายจ่ายด้วยตนเอง');
+    showToast('<i class="ph-fill ph-warning-circle" style="color:#f59e0b; font-size:1.1em; vertical-align:-2px;"></i> เพิ่มปลาสำเร็จ แต่บันทึกรายจ่ายไม่สำเร็จ');
   } else {
     showToast('<i class="ph-fill ph-check-circle" style="color:#10b981; font-size:1.1em; vertical-align:-2px;"></i> เพิ่มปลาและบันทึกรายจ่ายเรียบร้อย');
     loadFinanceFromDB(); 
@@ -218,26 +211,6 @@ async function addFish() {
   clearForm();
   toggleAddPanel(false); 
   loadFishFromDB();
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  const newCostInput = document.getElementById('newCost');
-  const newStockInput = document.getElementById('newStock');
-  const submitBtn = document.getElementById('submitAddFishBtn');
-
-  if (newCostInput) newCostInput.addEventListener('input', updateAddFishTotal);
-  if (newStockInput) newStockInput.addEventListener('input', updateAddFishTotal);
-  
-  if (submitBtn) submitBtn.addEventListener('click', addFish);
-});
-
-function updateAddFishTotal() {
-  const c = parseFloat(document.getElementById('newCost')?.value) || 0;
-  const s = parseInt(document.getElementById('newStock')?.value) || 0;
-  const display = document.getElementById('totalFinanceDisplay');
-  if (display) {
-    display.value = (c * s).toLocaleString('th-TH') + ' บาท';
-  }
 }
 
 // ════════════════════════════════════════════
@@ -391,7 +364,7 @@ function renderDashboardCards() {
       return `
         <div class="dash-mini-row">
           <div>
-            <div class="dash-mini-name">${f.emoji || '🐟'} ${f.name}</div>
+            <div class="dash-mini-name"><i class="ph ph-fish-simple" style="color:var(--royal-blue);margin-right:4px;"></i>${f.name}</div>
             <div class="dash-mini-sub">${f.species || '—'}</div>
           </div>
           <span class="admin-stock-badge ${cls}">${text}</span>
@@ -406,7 +379,7 @@ function renderDashboardCards() {
     recEl.innerHTML = [...fishData].slice(0, 5).map(f => `
       <div class="dash-mini-row">
         <div>
-          <div class="dash-mini-name">${f.emoji || '🐟'} ${f.name}</div>
+          <div class="dash-mini-name"><i class="ph ph-fish-simple" style="color:var(--royal-blue);margin-right:4px;"></i>${f.name}</div>
           <div class="dash-mini-sub">${f.species || '—'}</div>
         </div>
         <span style="font-size:0.82rem;font-weight:600;color:var(--royal-blue);font-family:var(--font-number);">
@@ -447,9 +420,11 @@ function renderFishTable() {
     const st = f.stock === 0 ? '<i class="ph ph-x-circle"></i> หมด' : f.stock <= 5 ? `<i class="ph ph-warning-circle"></i> ${f.stock} ตัว` : `<i class="ph ph-check-circle"></i> ${f.stock} ตัว`;
     const lvMap = { 'มือใหม่': 'easy', 'ปานกลาง': 'medium', 'ผู้เชี่ยวชาญ': 'hard' };
     const lvCls = lvMap[f.level] || '';
+    
+    // ตรงนี้เปลี่ยนจากอีโมจิ เป็นไอคอนรูปภาพสีเทาๆ คลีนๆ แล้วครับ
     const imgCell = f.image
       ? `<img src="${f.image}" style="width:44px;height:44px;object-fit:cover;border-radius:8px;">`
-      : `<span style="font-size:1.8rem;">${f.emoji || '🐟'}</span>`;
+      : `<div style="width:44px;height:44px;background:#f1f5f9;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:1.5rem;"><i class="ph ph-image"></i></div>`;
 
     return `
       <tr>
@@ -545,12 +520,11 @@ function closeEditModal() {
 //   CLEAR FORM
 // ════════════════════════════════════════════
 function clearForm() {
-  ['newEmoji', 'newName_th', 'newName_en', 'newSpecies', 'newPriceMin', 'newPriceMax', 'newStock', 'newSizeMin', 'newSizeMax', 'newDesc_th', 'newDesc_en', 'newCost', 'receiveDate', 'newSalePrice']
+  ['newName_th', 'newName_en', 'newSpecies', 'newPriceMin', 'newPriceMax', 'newStock', 'newSizeMin', 'newSizeMax', 'newDesc_th', 'newDesc_en', 'newCost', 'receiveDate', 'newSalePrice']
     .forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
-  document.getElementById('newEmoji').value = '🐡';
   document.getElementById('newImageFile').value = '';
 
   const display = document.getElementById('totalFinanceDisplay');
