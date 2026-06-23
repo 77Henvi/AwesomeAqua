@@ -5,20 +5,15 @@ export function isComingSoon(f) {
   return f.stock === 0 && f.priceMin === 0;
 }
 
-// ── การ์ดปลาขายปกติ ──
+/// ── การ์ดปลาขายปกติ (เวอร์ชันคลีน) ──
 function _availableCard(f) {
   const outOfStock = f.stock === 0;
   
-  // 🚨 แก้ชื่อ Key เป็น 'aqua-lang' ให้ตรงกับระบบของคุณ
   const lang = localStorage.getItem('aqua-lang') || 'th'; 
   const isEn = lang === 'en';
 
   const displayName = isEn && f.name_en ? f.name_en : f.name_th;
-  const displayTags = isEn && f.tags_en?.length ? f.tags_en : f.tags_th;
   
-  // แปลคำศัพท์ UI
-  const txtSize = isEn ? 'Size:' : 'ขนาด:';
-  const txtInch = isEn ? 'inch' : 'นิ้ว';
   const txtUnit = isEn ? 'pcs' : 'ตัว';
   const txtOrder = isEn ? 'Order' : 'สั่งซื้อ';
   const txtOut = isEn ? 'Out of stock' : 'หมดสต็อก';
@@ -39,9 +34,8 @@ function _availableCard(f) {
       </div>
       <div class="fish-info">
         <div class="fish-name">${displayName}</div>
-        <div class="fish-species">${f.species}</div>
+        <div class="fish-species" style="margin-bottom: 1rem;">${f.species}</div>
         
-        ${f.sizeMin ? `<div style="font-size: 0.78rem; color: var(--gray); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.35rem;"><i class="ph ph-ruler"></i> ${txtSize} ${f.sizeMin}${(f.sizeMax && f.sizeMax != f.sizeMin) ? ' – ' + f.sizeMax : ''} ${txtInch} </div>` : ''}
         <div class="fish-meta">
           <div class="fish-price ${outOfStock ? 'fish-price--dim' : ''}">
             ฿${f.priceMin.toLocaleString()}${f.priceMax ? ' – ' + f.priceMax.toLocaleString() : ''}
@@ -50,7 +44,7 @@ function _availableCard(f) {
             ${f.stock === 0 ? txtEmpty : f.stock <= 5 ? `⚠️ ${f.stock} ${txtUnit}` : `✅ ${f.stock} ${txtUnit}`}
           </div>
         </div>
-        <div class="fish-tags">${(displayTags || []).map(t => `<span class="tag">${t}</span>`).join('')}</div>
+        
         ${f.stock > 0
           ? `<button class="btn-line" style="width:100%;justify-content:center"
                onclick="event.stopPropagation(); openLine('${f.id}')">
@@ -99,12 +93,11 @@ function _comingSoonCard(f) {
     </div>`;
 }
 
-// ── Render หลัก — แยก 2 grids ──
+// ── Render หลัก ──
 export function renderFishGrid() {
   const available  = fishData.filter(f => !isComingSoon(f));
   const comingSoon = fishData.filter(f =>  isComingSoon(f));
 
-  // Grid ปลาปกติ
   const grid = document.getElementById('fishGrid');
   if (grid) {
     grid.innerHTML = available.length
@@ -112,12 +105,12 @@ export function renderFishGrid() {
       : `<p style="color:var(--gray);grid-column:1/-1;text-align:center;padding:2rem">ยังไม่มีปลาในสต็อกครับ</p>`;
   }
 
-  // Section + Grid coming soon
   const csSection = document.getElementById('comingSoonSection');
   const csGrid    = document.getElementById('comingSoonGrid');
   if (!csSection || !csGrid) return;
 
-  if (comingSoon.length === 0) {
+  // ซ่อน Section ถ้าปลาน้อยกว่า 3 ตัว
+  if (comingSoon.length < 3) {
     csSection.style.display = 'none';
     return;
   }
