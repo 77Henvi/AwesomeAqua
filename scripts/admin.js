@@ -135,7 +135,7 @@ function renderAll() {
   renderDashboardCards();
 }
 
-/// ════════════════════════════════════════════
+// ════════════════════════════════════════════
 //   ADD FISH + AUTO FINANCE LOG
 // ════════════════════════════════════════════
 async function addFish() {
@@ -214,7 +214,7 @@ async function addFish() {
 }
 
 // ════════════════════════════════════════════
-//   AUTO FINANCE & EVENT LISTENER (ส่วนที่หายไป)
+//   AUTO FINANCE & EVENT LISTENER
 // ════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
   const newCostInput = document.getElementById('newCost');
