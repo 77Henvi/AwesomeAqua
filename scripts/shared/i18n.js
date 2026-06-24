@@ -69,7 +69,21 @@ export const translations = {
 
 const STORAGE_KEY = 'aqua-lang';
 
+// ── อัปเดต UI ของปุ่มสลับภาษา ─
+export function updateLangButtonUI(lang) {
+  const toggleBtns = document.querySelectorAll('.lang-toggle-btn');
+  
+  toggleBtns.forEach(btn => {
+    btn.querySelectorAll('.lang-opt').forEach(opt => opt.classList.remove('active'));
+    
+    const activeOpt = btn.querySelector(`.opt-${lang}`);
+    if (activeOpt) {
+      activeOpt.classList.add('active');
+    }
+  });
+}
 
+// ── ใช้แปลภาษาทั้งหน้าเว็บ ──
 export function applyLanguage(lang) {
   const dict = translations[lang] || translations.th;
 
@@ -84,21 +98,20 @@ export function applyLanguage(lang) {
   document.documentElement.lang = lang;
   localStorage.setItem(STORAGE_KEY, lang);
 
+  updateLangButtonUI(lang);
+
   window.dispatchEvent(new CustomEvent('languageChanged', { detail: lang }));
 }
 
-// เรียกตอนโหลดหน้า — อ่านภาษาที่เคยเลือกไว้จาก localStorage (ถ้ามี)
+// ── เรียกตอนโหลดหน้า ──
 export function initLanguage() {
   const saved = localStorage.getItem(STORAGE_KEY) || 'th';
   applyLanguage(saved);
 }
 
-// สลับภาษาไปอีกฝั่ง — ใช้กับปุ่ม TH/EN แล้วสั่งรีเฟรชหน้า
+// ── สลับภาษา ──
 export function toggleLanguage() {
-
-  const current = localStorage.getItem(STORAGE_KEY) || 'th';
-  const newLang = current === 'th' ? 'en' : 'th';
-  
-  localStorage.setItem(STORAGE_KEY, newLang);
-  window.location.reload(); 
+  const currentLang = localStorage.getItem(STORAGE_KEY) || 'th';
+  const newLang = currentLang === 'th' ? 'en' : 'th';
+  applyLanguage(newLang);
 }

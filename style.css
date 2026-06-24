@@ -112,31 +112,6 @@ nav.scrolled .nav-links a::after { background: var(--royal-blue); }
 .btn-line:hover { background: #05a648; transform: translateY(-1px); }
 .btn-line svg { flex-shrink: 0; }
 
-.lang-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  color: white;
-  cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 500;
-  transition: all 0.3s;
-}
-
-.lang-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
-  transform: translateY(-1px);
-}
-
-nav.scrolled .lang-btn {
-  background: var(--light-blue);
-  color: var(--royal-blue);
-  border-color: var(--border);
-}
 
 
 /* ── HAMBURGER ── */
@@ -811,6 +786,84 @@ footer {
   to   { width: 100%; }
 }
 
+/* ── LANGUAGE TOGGLE PILL ── */
+.lang-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px; /* ทรงแคปซูล */
+  color: white;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  height: 36px;
+  transition: all 0.3s ease;
+}
+
+.lang-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.lang-toggle-btn i {
+  font-size: 1.1rem;
+  margin: 0 4px;
+}
+
+.lang-opt {
+  padding: 3px 8px;
+  border-radius: 14px;
+  transition: all 0.3s ease;
+  color: rgba(255, 255, 255, 0.6); /* สีตัวหนังสือภาษาที่ไม่ได้เลือก */
+}
+
+/* สถานะที่ถูกเลือก (หน้า Navbar สีใส) */
+.lang-opt.active {
+  background: white;
+  color: var(--royal-blue);
+}
+
+/* ── สถานะตอน Scroll Navbar (พื้นหลังขาว) ── */
+nav.scrolled .lang-toggle-btn {
+  background: var(--light-blue);
+  border-color: var(--border);
+  color: var(--gray);
+}
+nav.scrolled .lang-toggle-btn:hover {
+  background: #dce4ff;
+}
+nav.scrolled .lang-opt {
+  color: var(--gray);
+}
+nav.scrolled .lang-opt.active {
+  background: var(--royal-blue);
+  color: white;
+}
+
+/* ── สถานะใน Mobile Dropdown Menu ── */
+.mobile-lang-wrap {
+  width: 100%;
+  margin-top: 0.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-start; /* ให้ปุ่มชิดซ้าย */
+}
+.nav-mobile-menu .lang-toggle-btn {
+  background: var(--light-blue);
+  border-color: var(--border);
+  color: var(--gray);
+}
+.nav-mobile-menu .lang-opt {
+  color: var(--gray);
+}
+.nav-mobile-menu .lang-opt.active {
+  background: var(--royal-blue);
+  color: white;
+}
 
 /* ── MOBILE MENU ── */
 .nav-mobile-menu {
