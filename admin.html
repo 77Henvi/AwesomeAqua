@@ -460,6 +460,45 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="financeModal" onclick="if(event.target===this)closeFinanceModal()">
+  <div class="modal" style="max-width:400px;">
+    <button class="modal-close" onclick="closeFinanceModal()">✕</button>
+    <div class="modal-logo" style="font-size:1.2rem; margin-bottom:1rem;">
+      <i class="ph ph-receipt"></i> บันทึกรายการใหม่
+    </div>
+    
+    <div class="form-group" style="margin-bottom:1rem;">
+      <label>ประเภทรายการ</label>
+      <select id="finModalType">
+        <option value="income">รายรับ (+)</option>
+        <option value="expense">รายจ่าย (-)</option>
+      </select>
+    </div>
+    
+    <div class="form-group" style="margin-bottom:1rem;">
+      <label>ชื่อรายการ</label>
+      <input type="text" id="finModalName" placeholder="เช่น ค่าไฟ, ค่าอาหารปลา...">
+    </div>
+    
+    <div class="form-group" style="margin-bottom:1rem;">
+      <label>จำนวนเงิน (บาท)</label>
+      <input type="number" id="finModalAmount" placeholder="0" min="0">
+    </div>
+    
+    <div class="form-group" style="margin-bottom:1.5rem;">
+      <label>วันที่</label>
+      <input type="date" id="finModalDate">
+    </div>
+    
+    <div class="form-actions">
+      <button class="btn btn-outline" style="background:#f1f5f9; border:none; color:#475569;" onclick="closeFinanceModal()">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="saveFinanceModal()">
+        <i class="ph ph-floppy-disk"></i> บันทึกรายการ
+      </button> 
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script type="module" src="scripts/admin.js"></script>
