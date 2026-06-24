@@ -214,6 +214,31 @@ async function addFish() {
 }
 
 // ════════════════════════════════════════════
+//   AUTO FINANCE & EVENT LISTENER (ส่วนที่หายไป)
+// ════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  const newCostInput = document.getElementById('newCost');
+  const newStockInput = document.getElementById('newStock');
+  const submitBtn = document.getElementById('submitAddFishBtn');
+
+  // คำนวณยอดเงินอัตโนมัติเวลาพิมพ์
+  if (newCostInput) newCostInput.addEventListener('input', updateAddFishTotal);
+  if (newStockInput) newStockInput.addEventListener('input', updateAddFishTotal);
+  
+  // ผูกปุ่มเพิ่มปลา
+  if (submitBtn) submitBtn.addEventListener('click', addFish);
+});
+
+function updateAddFishTotal() {
+  const c = parseFloat(document.getElementById('newCost')?.value) || 0;
+  const s = parseInt(document.getElementById('newStock')?.value) || 0;
+  const display = document.getElementById('totalFinanceDisplay');
+  if (display) {
+    display.value = (c * s).toLocaleString('th-TH') + ' บาท';
+  }
+}
+
+// ════════════════════════════════════════════
 //   DELETE
 // ════════════════════════════════════════════
 async function deleteFish(id) {
