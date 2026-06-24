@@ -134,14 +134,12 @@ export async function confirmSale() {
   const newStock  = fish.stock - qty;
 
   try {
-    // 1) อัปเดตสต็อกปลาให้ลดลง
     const { error: fishErr } = await supabase.from('fish')
       .update({ stock: newStock })
       .eq('id', fish.id);
 
     if (fishErr) throw fishErr;
 
-    // 2) บันทึกยอดเต็มรายรับเข้าหน้าการเงิน
     const { error: finErr } = await supabase.from('finance').insert([{
       type: 'income',
       name: `ขายปลา: ${fish.name_th || fish.name} x${qty} ตัว`,
@@ -152,6 +150,10 @@ export async function confirmSale() {
     if (finErr) throw finErr;
 
     showToast(`✅ ขาย ${fish.name_th || fish.name} x${qty} ตัว สำเร็จ (รับเงิน ฿${totalIncome.toLocaleString('th-TH')})`);
+    
+    if (typeof window.loadFinanceFromDB === 'function') {
+      window.loadFinanceFromDB();
+    }
 
     closeSaleModal();
     if (_onSaved) _onSaved();
@@ -161,6 +163,6 @@ export async function confirmSale() {
     showToast('❌ ผิดพลาด: ' + err.message);
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '✅ บันทึกการขาย';
+    btn.innerHTML = '<i class="ph ph-check-circle"></i> บันทึกการขาย';
   }
 }
