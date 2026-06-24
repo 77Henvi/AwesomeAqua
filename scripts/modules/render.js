@@ -150,3 +150,24 @@ export function renderFishTable() {
     renderFishGrid();
   });
 }
+
+// ════════════════════════════════════════════
+//   (Real-time Update)
+// ════════════════════════════════════════════
+window.addEventListener('languageChanged', () => {
+  // 1. สั่งให้วาดการ์ดปลาหน้าบ้านใหม่
+  if (document.getElementById('fishGrid')) {
+    renderFishGrid();
+  }
+  
+  // 2. สั่งให้วาดตารางหลังบ้านใหม่ (ถ้าเปิดหน้าแอดมินอยู่)
+  if (document.getElementById('fishTableBody')) {
+    renderFishTable();
+  }
+  
+  // 3. ปิด Modal รายละเอียดปลา (ถ้าเปิดค้างไว้) เพื่อให้ลูกค้ากดเปิดใหม่เป็นภาษาที่อัปเดตแล้ว
+  const fishModal = document.getElementById('fishModal');
+  if (fishModal && fishModal.classList.contains('open')) {
+    fishModal.classList.remove('open');
+  }
+});
