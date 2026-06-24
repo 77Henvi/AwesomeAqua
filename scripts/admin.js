@@ -354,20 +354,20 @@ function renderAdminStats() {
   const outStock = fishData.filter(f => f.stock === 0).length;
 
   document.getElementById('adminStats').innerHTML = `
-    <div class="admin-stat-card">
-      <div class="admin-stat-icon" style="color: var(--royal-blue);"><i class="ph ph-fish-simple"></i></div>
+    <div class="admin-stat-card stat-card-total">
+      <div class="admin-stat-icon"><i class="ph ph-fish-simple"></i></div>
       <div><div class="admin-stat-num">${total}</div><div class="admin-stat-label">ชนิดปลาทั้งหมด</div></div>
     </div>
-    <div class="admin-stat-card">
-      <div class="admin-stat-icon" style="color: #059669;"><i class="ph ph-check-circle"></i></div>
+    <div class="admin-stat-card stat-card-ok">
+      <div class="admin-stat-icon"><i class="ph ph-check-circle"></i></div>
       <div><div class="admin-stat-num">${inStock}</div><div class="admin-stat-label">มีในสต็อก</div></div>
     </div>
-    <div class="admin-stat-card">
-      <div class="admin-stat-icon" style="color: #d97706;"><i class="ph ph-warning-circle"></i></div>
+    <div class="admin-stat-card stat-card-low">
+      <div class="admin-stat-icon"><i class="ph ph-warning-circle"></i></div>
       <div><div class="admin-stat-num">${lowStock}</div><div class="admin-stat-label">สต็อกเหลือน้อย</div></div>
     </div>
-    <div class="admin-stat-card">
-      <div class="admin-stat-icon" style="color: #dc2626;"><i class="ph ph-x-circle"></i></div>
+    <div class="admin-stat-card stat-card-out">
+      <div class="admin-stat-icon"><i class="ph ph-x-circle"></i></div>
       <div><div class="admin-stat-num">${outStock}</div><div class="admin-stat-label">หมดสต็อก</div></div>
     </div>
   `;

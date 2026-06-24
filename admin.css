@@ -783,6 +783,34 @@
   width: 80px; text-align: right; flex-shrink: 0;
 }
 
+/* ── STAT CARDS COLOR CODING ── */
+.admin-stat-card {
+  border-left: 4px solid transparent;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.admin-stat-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  font-size: 1.5rem;
+}
+
+.stat-card-total { border-left-color: #3b82f6; }
+.stat-card-total .admin-stat-icon { background: rgba(59, 130, 246, 0.15); color: #3b82f6 !important; }
+
+.stat-card-ok { border-left-color: #22c55e; }
+.stat-card-ok .admin-stat-icon { background: rgba(34, 197, 94, 0.15); color: #22c55e !important; }
+
+.stat-card-low { border-left-color: #f59e0b; }
+.stat-card-low .admin-stat-icon { background: rgba(245, 158, 11, 0.15); color: #f59e0b !important; }
+
+.stat-card-out { border-left-color: #ef4444; }
+.stat-card-out .admin-stat-icon { background: rgba(239, 68, 68, 0.15); color: #ef4444 !important; }
+
 /* ── Responsive ── */
 @media (max-width: 640px) {
   .stats-kpi-grid  { grid-template-columns: repeat(2, 1fr); }
