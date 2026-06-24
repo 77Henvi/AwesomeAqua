@@ -206,7 +206,7 @@ nav.scrolled .hamburger span { background: var(--black); }
 }
 .stat:last-child { border-right: none; }
 .stat-num {
-  font-family: var(--font-display);
+  font-family: var(--font-body); 
   font-size: 1.75rem; font-weight: 700; display: block;
 }
 .stat-label { font-size: 0.78rem; opacity: 0.7; margin-top: 0.2rem; }
@@ -612,24 +612,57 @@ footer {
   display: grid; grid-template-columns: repeat(4, 1fr);
   gap: 1rem; width: 100%; max-width: 800px;
 }
+
+/* ── CONTACT SECTION CARDS (Upgraded UX/UI) ── */
 .social-card {
   display: flex; flex-direction: column; align-items: center;
   gap: 0.6rem; padding: 1.5rem 1rem; border-radius: 16px;
-  text-decoration: none; transition: transform 0.2s, background 0.2s;
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.18);
-  backdrop-filter: blur(8px); text-align: center;
+  text-decoration: none; 
+  transition: transform 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+  background: rgba(255, 255, 255, 0.08); /* 👈 คุมความสว่างให้เท่ากันทุกการ์ด */
+  border: 1px solid rgba(255, 255, 255, 0.12); /* 👈 คุมเส้นขอบให้เนียนสม่ำเสมอ */
+  backdrop-filter: blur(8px); 
+  text-align: center;
 }
-.social-card:hover { transform: translateY(-3px); background: rgba(255,255,255,0.18); }
-.social-card--line  { background: rgba(6,199,85,0.2); border-color: rgba(6,199,85,0.4); }
-.social-card--line:hover { background: rgba(6,199,85,0.35); }
-.social-card--fb    { background: rgba(24,119,242,0.2); border-color: rgba(24,119,242,0.4); }
-.social-card--fb:hover { background: rgba(24,119,242,0.35); }
-.social-card--tt    { background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.15); }
-.social-card--phone { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); }
-.social-card-icon { font-size: 1.75rem; line-height: 1; }
-.social-card-label { font-size: 0.68rem; color: rgba(255,255,255,0.6); margin-bottom: 0.1rem; }
-.social-card-value { font-size: 0.88rem; font-weight: 600; color: white; line-height: 1.3; }
+
+.social-card:hover { 
+  transform: translateY(-4px); 
+  background: rgba(255, 255, 255, 0.15); 
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.social-card-icon { 
+  font-size: 2rem; 
+  line-height: 1; 
+  margin-bottom: 0.25rem;
+  transition: transform 0.3s ease;
+}
+
+.social-card:hover .social-card-icon {
+  transform: scale(1.15);
+}
+
+.social-card--line .social-card-icon  { color: #00c300; } /* สว่างกว่าปกติเพื่อให้อ่านง่ายบนพื้นน้ำเงิน */
+.social-card--fb .social-card-icon    { color: #4285F4; } /* ฟ้าสว่างขึ้นนิดนึง */
+.social-card--tt .social-card-icon    { 
+  color: #ffffff; 
+  text-shadow: 1.5px 0px 0px #fe2c55, -1.5px 0px 0px #25f4ee; 
+}
+.social-card--phone .social-card-icon { color: #ffffff; }
+
+.social-card-label { 
+  font-size: 0.68rem; 
+  color: rgba(255,255,255,0.6); 
+  margin-bottom: 0.1rem; 
+  text-transform: uppercase; 
+  letter-spacing: 0.05em;
+}
+.social-card-value { 
+  font-size: 0.88rem; 
+  font-weight: 600; 
+  color: white; 
+  line-height: 1.3; 
+}
 
 .about-contact-info  { display: none; }
 .about-contact-visual { display: none; }
