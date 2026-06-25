@@ -254,6 +254,7 @@
           <button class="fin-chip active" onclick="setFinFilter('all', this)">ทั้งหมด</button>
           <button class="fin-chip" onclick="setFinFilter('income', this)">รายรับ</button>
           <button class="fin-chip" onclick="setFinFilter('expense', this)">รายจ่าย</button>
+          <button class="fin-chip" onclick="setFinFilter('calendar', this)">ปฏิทิน</button> </div>
         </div>
       </div>
 
@@ -496,6 +497,49 @@
       <button class="btn btn-outline" style="background:#f1f5f9; border:none; color:#475569;" onclick="closeFinanceModal()">ยกเลิก</button>
       <button class="btn btn-primary" onclick="saveFinanceModal()">
         <i class="ph ph-floppy-disk"></i> บันทึกรายการ
+      </button> 
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="restockModal" onclick="if(event.target===this)closeRestockModal()">
+  <div class="modal" style="max-width:380px;">
+    <button class="modal-close" onclick="closeRestockModal()">✕</button>
+    <div class="modal-logo" style="font-size:1.2rem; margin-bottom:1rem;">
+      <i class="ph ph-package"></i> เติมสต็อกปลา
+    </div>
+    
+    <div class="form-group" style="margin-bottom:1rem;">
+      <label>ชื่อปลา</label>
+      <input type="text" id="rsFishName" readonly style="background:#f1f5f9; color:#64748b;">
+      <input type="hidden" id="rsFishId">
+    </div>
+    
+    <div style="display:flex; gap:10px; margin-bottom:1rem;">
+      <div class="form-group" style="flex:1;">
+        <label>จำนวนที่เติม</label>
+        <input type="number" id="rsQty" min="1" placeholder="0" oninput="calcRestockTotal()">
+      </div>
+      <div class="form-group" style="flex:1;">
+        <label>ต้นทุน/ตัว (฿)</label>
+        <input type="number" id="rsCost" min="0" placeholder="0" oninput="calcRestockTotal()">
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-bottom:1rem;">
+      <label>ยอดรวมรายจ่าย (บาท)</label>
+      <input type="text" id="rsTotal" readonly style="background:rgba(239,68,68,0.05); color:#ef4444; font-weight:600;">
+    </div>
+    
+    <div class="form-group" style="margin-bottom:1.5rem;">
+      <label>วันที่รับปลา</label>
+      <input type="date" id="rsDate">
+    </div>
+    
+    <div class="form-actions">
+      <button class="btn btn-outline" style="border:none; background:#f1f5f9; color:#475569;" onclick="closeRestockModal()">ยกเลิก</button>
+      <button class="btn btn-primary" id="btnConfirmRestock" onclick="confirmRestock()">
+        <i class="ph ph-check-circle"></i> ยืนยันการเติม
       </button> 
     </div>
   </div>

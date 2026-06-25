@@ -144,7 +144,8 @@ export async function confirmSale() {
       type: 'income',
       name: `ขายปลา: ${fish.name_th || fish.name} x${qty} ตัว`,
       amount: totalIncome,
-      date: today
+      date: today,
+      fish_id: fish.id 
     }]);
 
     if (finErr) throw finErr;
