@@ -14,15 +14,14 @@
 <body>
 
 <div class="admin-login-screen" id="loginScreen">
-  <div class="admin-login-box">
-   <form class="admin-login-box" onsubmit="event.preventDefault(); adminLogin();">
-      <div class="admin-login-logo">Awesome <span>Aqua</span></div>
-        <div class="admin-login-sub">แผงควบคุมผู้ดูแลระบบ</div>
-        <input type="email" id="adminEmailInput" placeholder="อีเมล" style="letter-spacing:normal">
-        <input type="password" id="adminPassInput" placeholder="••••••••">
-        <button type="submit" class="admin-login-btn">เข้าสู่ระบบ</button>
-      <div class="admin-error" id="adminError"></div>
-    </form>
+  <form class="admin-login-box" onsubmit="event.preventDefault(); adminLogin();">
+    <div class="admin-login-logo">Awesome <span>Aqua</span></div>
+    <div class="admin-login-sub">แผงควบคุมผู้ดูแลระบบ</div>
+    <input type="email" id="adminEmailInput" placeholder="อีเมล" style="letter-spacing:normal">
+    <input type="password" id="adminPassInput" placeholder="••••••••">
+    <button type="submit" class="admin-login-btn">เข้าสู่ระบบ</button>
+    <div class="admin-error" id="adminError"></div>
+  </form>
 </div>
 
 <div class="admin-dashboard" id="adminDashboard">
