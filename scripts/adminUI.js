@@ -8,26 +8,6 @@ export function renderAll() {
   renderFinancePage();
   renderDashboardCards();
 }
-
-export function toggleSyncTag(element, mode) {
-  const isSelecting = !element.classList.contains('selected');
-  const idx = element.getAttribute('data-idx');
-  
-  const thSelector = document.getElementById(mode + 'Tags_th');
-  const enSelector = document.getElementById(mode + 'Tags_en');
-  
-  const thTag = thSelector ? thSelector.querySelector(`[data-idx="${idx}"]`) : null;
-  const enTag = enSelector ? enSelector.querySelector(`[data-idx="${idx}"]`) : null;
-  
-  if (isSelecting) {
-    if (thTag) thTag.classList.add('selected');
-    if (enTag) enTag.classList.add('selected');
-  } else {
-    if (thTag) thTag.classList.remove('selected');
-    if (enTag) enTag.classList.remove('selected');
-  }
-}
-
 export function switchTab(tab) {
   document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.admin-nav-tab, .bnav-item').forEach(b => b.classList.remove('active'));
@@ -174,8 +154,12 @@ export function clearForm() {
 export function toggleSyncTag(element, mode) {
   const isSelecting = !element.classList.contains('selected');
   const idx = element.getAttribute('data-idx');
-  const thTag = document.getElementById(mode + 'Tags_th')?.querySelector(`[data-idx="${idx}"]`);
-  const enTag = document.getElementById(mode + 'Tags_en')?.querySelector(`[data-idx="${idx}"]`);
+  
+  const thSelector = document.getElementById(mode + 'Tags_th');
+  const enSelector = document.getElementById(mode + 'Tags_en');
+  
+  const thTag = thSelector ? thSelector.querySelector(`[data-idx="${idx}"]`) : null;
+  const enTag = enSelector ? enSelector.querySelector(`[data-idx="${idx}"]`) : null;
   
   if (isSelecting) {
     if (thTag) thTag.classList.add('selected');
