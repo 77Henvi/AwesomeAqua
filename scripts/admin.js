@@ -51,5 +51,3 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('loginScreen').style.display = 'flex';
   }
 })();
-
-window.toggleSyncTag = UI.toggleSyncTag;
