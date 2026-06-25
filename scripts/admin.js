@@ -1,7 +1,7 @@
 import { supabase } from '../supabase.js';
 import * as UI from './adminUI.js';
 import * as Actions from './adminActions.js';
-import { toggleTag, toggleSyncTag } from './shared/tags.js';
+import { toggleTag } from './shared/tags.js'; 
 import { previewNewImage, previewEditImage } from './shared/image.js';
 import { calcPricePreview } from './modules/profit.js';
 
@@ -51,3 +51,5 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('loginScreen').style.display = 'flex';
   }
 })();
+
+window.toggleSyncTag = UI.toggleSyncTag;
