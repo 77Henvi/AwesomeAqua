@@ -222,7 +222,7 @@ export function renderFishTable() {
 }
 
 // ════════════════════════════════════════════
-//   (Real-time Update)
+//   (Real-time Update & Language Change)
 // ════════════════════════════════════════════
 window.addEventListener('languageChanged', () => {
   if (document.getElementById('fishGrid')) {
@@ -231,8 +231,30 @@ window.addEventListener('languageChanged', () => {
   if (document.getElementById('fishTableBody')) {
     renderFishTable();
   }
+  
   const fishModal = document.getElementById('fishModal');
   if (fishModal && fishModal.classList.contains('open')) {
     fishModal.classList.remove('open');
   }
+
+  const lang = localStorage.getItem('aqua-lang') || 'th'; 
+  const isEn = lang === 'en';
+  
+  const searchInput = document.querySelector('.search-bar input');
+  if (searchInput) {
+    searchInput.placeholder = isEn 
+      ? "Search for fish name or species..." 
+      : "ค้นหาชื่อปลา หรือสายพันธุ์...";
+  }
+
+  const chipTexts = isEn 
+    ? ['All', 'Freshwater', 'Marine', 'Beginner', 'Colorful', '❤️ Wishlist']
+    : ['ทั้งหมด', 'น้ำจืด', 'ทะเล', 'มือใหม่', 'สีสวย', '❤️ ถูกใจ'];
+
+  const chips = document.querySelectorAll('.filter-chips .chip');
+  chips.forEach((chip, index) => {
+    if (chipTexts[index]) {
+      chip.textContent = chipTexts[index];
+    }
+  });
 });
