@@ -1,5 +1,5 @@
 // scripts/modules/render.js
-import { fishData } from '../fishData.js';
+import { fishData } from './fishData.js';
 import { LINE_ICON } from '../shared/utils.js';
 import { isWishlisted } from '../shared/wishlist.js'; // นำเข้าฟังก์ชัน wishlist
 
