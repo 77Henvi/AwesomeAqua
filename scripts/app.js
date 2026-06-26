@@ -5,12 +5,36 @@ import { openFishDetail, closeFishModal,
          closeCsModalOutside }                     from './modules/fishModal.js';
 import { goSlide }                                 from './modules/slideshow.js';
 import { injectFishBackgrounds }                   from './modules/fishBackground.js';
+import { setFishChip, filterFish,  
+        renderFishGrid, getCurrentFilter }         from './modules/render.js';
 import { openLine, toggleMobile,
          scrollToSection }                         from './shared/utils.js';
 import { toggleTag }                               from './shared/tags.js';
 import { previewEditImage }                        from './shared/image.js';
 import { toggleLanguage, initLanguage }            from './shared/i18n.js';
+import { toggleWishlist }                          from './shared/wishlist.js';
 
+window.setFishChip = setFishChip;
+window.filterFish = filterFish;
+
+window.onWishToggle = function(id, btnElement, event) {
+  if (event) event.stopPropagation();
+
+  const isLiked = toggleWishlist(id);
+
+  if (isLiked) {
+    btnElement.classList.add('active');
+    btnElement.innerHTML = `<i class="ph-fill ph-heart"></i>`;
+  } else {
+    btnElement.classList.remove('active');
+    btnElement.innerHTML = `<i class="ph ph-heart"></i>`;
+  }
+
+  // หากอยู่ในหน้า "ถูกใจ" ให้ re-render เพื่อรีเฟรชรายการที่ถูกลบออกไป
+  if (getCurrentFilter() === 'ถูกใจ') {
+    renderFishGrid();
+  }
+};
 
 window.openFishDetail        = openFishDetail;
 window.closeFishModal        = closeFishModal;

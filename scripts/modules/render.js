@@ -1,5 +1,34 @@
-import { fishData } from './fishData.js';
+// scripts/modules/render.js
+import { fishData } from '../fishData.js';
 import { LINE_ICON } from '../shared/utils.js';
+import { isWishlisted } from '../shared/wishlist.js'; // นำเข้าฟังก์ชัน wishlist
+
+// --- State Management ---
+let currentFilter = 'ทั้งหมด';
+let searchQuery = '';
+
+export function getCurrentFilter() {
+    return currentFilter;
+}
+
+export function setFishChip(filterValue, btnElement) {
+    currentFilter = filterValue;
+    
+    // จัดการ UI ของ Chip
+    const chips = document.querySelectorAll('.filter-chips .chip');
+    chips.forEach(c => c.classList.remove('active'));
+    if (btnElement) {
+        btnElement.classList.add('active');
+    }
+    
+    renderFishGrid();
+}
+
+export function filterFish(query) {
+    searchQuery = query.toLowerCase().trim();
+    renderFishGrid();
+}
+// ------------------------
 
 export function isComingSoon(f) {
   return f.stock === 0 && f.priceMin === 0;
@@ -19,9 +48,15 @@ function _availableCard(f) {
   const txtOut = isEn ? 'Out of stock' : 'หมดสต็อก';
   const txtEmpty = isEn ? '❌ Out' : '❌ หมด';
 
+  const liked = isWishlisted(f.id);
+  const heartIcon = liked ? `<i class="ph-fill ph-heart"></i>` : `<i class="ph ph-heart"></i>`;
+
   return `
     <div class="fish-card ${outOfStock ? 'fish-card--out' : ''}" onclick="openFishDetail('${f.id}')">
-      <div class="fish-img">
+      <div class="fish-card-img-wrap">
+          <button class="wishlist-btn ${liked ? 'active' : ''}" onclick="onWishToggle('${f.id}', this, event)">
+            ${heartIcon}
+          </button>
         ${f.image
           ? `<img src="${f.image}" alt="${displayName}" onerror="this.parentElement.innerHTML='<span>${f.emoji || '🐟'}</span>'">`
           : `<span>${f.emoji || '🐟'}</span>`
@@ -66,10 +101,16 @@ function _comingSoonCard(f) {
   
   const txtBadge = isEn ? '🔔 View Details' : '🔔 กดดูรายละเอียด';
   const txtTape = isEn ? '✦ COMING SOON ✦ ' : '✦ COMING SOON ✦ เร็วๆ นี้ ✦ ';
+  
+  const liked = isWishlisted(f.id);
+  const heartIcon = liked ? `<i class="ph-fill ph-heart"></i>` : `<i class="ph ph-heart"></i>`;
 
   return `
     <div class="fish-card fish-card--coming" tabindex="0" onclick="openComingSoonDetail('${f.id}')">
-      <div class="fish-img fish-img--coming">
+      <div class="fish-card-img-wrap fish-img--coming">
+         <button class="wishlist-btn ${liked ? 'active' : ''}" onclick="onWishToggle('${f.id}', this, event)">
+            ${heartIcon}
+          </button>
         ${f.image
           ? `<img src="${f.image}" alt="${displayName}" onerror="this.parentElement.innerHTML='<span class=coming-emoji>${f.emoji || '🐟'}</span>'">`
           : `<span class="coming-emoji">${f.emoji || '🐟'}</span>`
@@ -95,26 +136,59 @@ function _comingSoonCard(f) {
 
 // ── Render หลัก ──
 export function renderFishGrid() {
-  const available  = fishData.filter(f => !isComingSoon(f));
-  const comingSoon = fishData.filter(f =>  isComingSoon(f));
-
   const grid = document.getElementById('fishGrid');
-  if (grid) {
-    grid.innerHTML = available.length
-      ? available.map(_availableCard).join('')
-      : `<p style="color:var(--gray);grid-column:1/-1;text-align:center;padding:2rem">ยังไม่มีปลาในสต็อกครับ</p>`;
-  }
-
   const csSection = document.getElementById('comingSoonSection');
   const csGrid    = document.getElementById('comingSoonGrid');
-  if (!csSection || !csGrid) return;
 
-  // ซ่อน Section ถ้าปลาน้อยกว่า 3 ตัว
+  // 1. กรองข้อมูล (Apply Filter + Search)
+  const filteredData = fishData.filter(f => {
+      // เช็ค Search
+      const nameTh = (f.name_th || '').toLowerCase();
+      const nameEn = (f.name_en || '').toLowerCase();
+      const species = (f.species || '').toLowerCase();
+      const matchSearch = nameTh.includes(searchQuery) || nameEn.includes(searchQuery) || species.includes(searchQuery);
+
+      // เช็ค Chip
+      let matchChip = false;
+      if (currentFilter === 'ทั้งหมด') {
+          matchChip = true;
+      } else if (currentFilter === 'ถูกใจ') {
+          matchChip = isWishlisted(f.id);
+      } else if (currentFilter === 'มือใหม่') {
+          matchChip = f.level === 'มือใหม่';
+      } else {
+          // หาใน tags array
+          matchChip = (Array.isArray(f.tags_th) && f.tags_th.includes(currentFilter)) || 
+                      (Array.isArray(f.tags_en) && f.tags_en.includes(currentFilter));
+      }
+
+      return matchSearch && matchChip;
+  });
+
+  // แยก Available และ Coming Soon จากข้อมูลที่ถูกกรองแล้ว
+  const available  = filteredData.filter(f => !isComingSoon(f));
+  const comingSoon = filteredData.filter(f =>  isComingSoon(f));
+
+  // Render Available
+  if (grid) {
+      if (available.length > 0) {
+          grid.innerHTML = available.map(_availableCard).join('');
+      } else {
+          // Empty State Logic
+          if (currentFilter === 'ถูกใจ' && searchQuery === '') {
+             grid.innerHTML = `<div class="store-empty-state"><i class="ph ph-heart-break"></i><p>ยังไม่มีปลาถูกใจ</p></div>`;
+          } else {
+             grid.innerHTML = `<div class="store-empty-state"><i class="ph ph-magnifying-glass-minus"></i><p>ไม่พบผลลัพธ์ที่ค้นหา</p></div>`;
+          }
+      }
+  }
+
+  // Render Coming Soon
+  if (!csSection || !csGrid) return;
   if (comingSoon.length < 3) {
     csSection.style.display = 'none';
     return;
   }
-
   csSection.style.display = '';
   csGrid.innerHTML = comingSoon.map(_comingSoonCard).join('');
 }
@@ -123,7 +197,7 @@ export function renderFishTable() {
   const tbody = document.getElementById('fishTableBody');
   if (!tbody) return;
   
-  const lang = localStorage.getItem('language') || 'th'; 
+  const lang = localStorage.getItem('aqua-lang') || 'th'; 
   
   tbody.innerHTML = fishData.map(f => {
     const displayName = lang === 'en' && f.name_en ? f.name_en : f.name_th;
@@ -145,27 +219,18 @@ export function renderFishTable() {
       </tr>
     `;
   }).join('');
-
-    window.addEventListener('languageChanged', () => {
-    renderFishGrid();
-  });
 }
 
 // ════════════════════════════════════════════
 //   (Real-time Update)
 // ════════════════════════════════════════════
 window.addEventListener('languageChanged', () => {
-  // 1. สั่งให้วาดการ์ดปลาหน้าบ้านใหม่
   if (document.getElementById('fishGrid')) {
     renderFishGrid();
   }
-  
-  // 2. สั่งให้วาดตารางหลังบ้านใหม่ (ถ้าเปิดหน้าแอดมินอยู่)
   if (document.getElementById('fishTableBody')) {
     renderFishTable();
   }
-  
-  // 3. ปิด Modal รายละเอียดปลา (ถ้าเปิดค้างไว้) เพื่อให้ลูกค้ากดเปิดใหม่เป็นภาษาที่อัปเดตแล้ว
   const fishModal = document.getElementById('fishModal');
   if (fishModal && fishModal.classList.contains('open')) {
     fishModal.classList.remove('open');

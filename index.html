@@ -121,6 +121,22 @@
       <p class="section-sub" data-i18n="fishDesc">คัดสรรปลาคุณภาพพร้อมข้อมูลครบ กดสั่งซื้อผ่านไลน์ได้เลย</p>
     </div>
   </div>
+
+  <div class="store-filter-section fade-up">
+    <div class="search-bar">
+      <i class="ph ph-magnifying-glass"></i>
+      <input type="text" placeholder="ค้นหาชื่อปลา หรือสายพันธุ์..." oninput="filterFish(this.value)">
+    </div>
+    
+    <div class="filter-chips">
+      <button class="chip active" onclick="setFishChip('ทั้งหมด', this)">ทั้งหมด</button>
+      <button class="chip" onclick="setFishChip('น้ำจืด', this)">น้ำจืด</button>
+      <button class="chip" onclick="setFishChip('ทะเล', this)">ทะเล</button>
+      <button class="chip" onclick="setFishChip('มือใหม่', this)">มือใหม่</button>
+      <button class="chip" onclick="setFishChip('สีสวย', this)">สีสวย</button>
+      <button class="chip" onclick="setFishChip('ถูกใจ', this)">❤️ ถูกใจ</button>
+    </div>
+  </div>
   <div class="fish-grid" id="fishGrid"></div>
 </section>
 
