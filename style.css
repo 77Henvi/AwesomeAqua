@@ -1086,6 +1086,29 @@ nav.scrolled .lang-opt.active {
   margin-bottom: 0.5rem;
 }
 
+/* --- แก้ไขสัดส่วนรูปภาพในการ์ดปลา --- */
+.fish-card-img-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3; /* ล็อคสัดส่วนรูปภาพให้เท่ากันทุกการ์ด (สามารถเปลี่ยนเป็น 1 / 1 ถ้าอยากได้รูปจัตุรัส) */
+  overflow: hidden;
+  border-radius: 12px 12px 0 0; /* ทำให้ขอบมนรับกับตัวการ์ด */
+}
+
+.fish-card-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* บังคับให้รูปเต็มกรอบโดยสัดส่วนไม่เพี้ยน */
+  object-position: center; /* จัดให้อยู่กึ่งกลางเสมอ */
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+/* แถมลูกเล่น: เวลาเอาเมาส์ชี้ให้รูปซูมนิดๆ (ถ้าไม่ชอบลบออกได้ครับ) */
+.fish-card:hover .fish-card-img-wrap img {
+  transform: scale(1.05);
+}
+
 
 /* ── RESPONSIVE ── */
 @media (max-width: 768px) {
