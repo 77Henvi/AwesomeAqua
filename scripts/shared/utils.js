@@ -18,7 +18,7 @@ export function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-const MESSENGER_USERNAME = 'rapeepat.nitakorn';
+const MESSENGER_USERNAME = '778588831999884'; // Page ID จริงของ Awesome Aqua (จาก Messenger API settings)
 
 export function openMessenger(fishId) {
   showToast('<i class="ph ph-facebook-logo"></i> กำลังเปิด Messenger...');
