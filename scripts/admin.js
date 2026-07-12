@@ -182,7 +182,7 @@ async function addFish() {
   }
 
   const priceMin = isCS ? 0 : parseInt(priceMinRaw);
-  const priceMax = isCS ? 0 : (parseInt(document.getElementById('newPriceMax').value) || 0);
+  const priceMax = isCS ? 0 : (parseInt(document.getElementById('newPriceMax').value) || null);
   const stock    = isCS ? 0 : parseInt(stockRaw);
   const cost     = parseFloat(costRaw);
   const salePrice = parseFloat(document.getElementById('newSalePrice')?.value) || 0; 
@@ -379,7 +379,7 @@ async function saveEdit() {
 
   const isCS = document.getElementById('editIsComingSoon').checked;
   const priceMin = isCS ? 0 : (parseInt(document.getElementById('editPriceMin').value) || 0);
-  const priceMax = isCS ? 0 : (parseInt(document.getElementById('editPriceMax').value) || 0);
+  const priceMax = isCS ? 0 : (parseInt(document.getElementById('editPriceMax').value) || null);
   const stock    = isCS ? 0 : (parseInt(document.getElementById('editStock').value)    || 0);
 
   const elCost = document.getElementById('editCost');

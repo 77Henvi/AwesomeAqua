@@ -40,7 +40,7 @@ const dbUpsert = (path, body) =>
     body: JSON.stringify(body)
   });
 
-const price = (f) => f.price_min === f.price_max
+const price = (f) => (!f.price_max || f.price_max === f.price_min)
   ? `฿${f.price_min}`
   : `฿${f.price_min} – ฿${f.price_max}`;
 
