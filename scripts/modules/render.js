@@ -1,6 +1,6 @@
 // scripts/modules/render.js
 import { fishData } from './fishData.js';
-import { LINE_ICON } from '../shared/utils.js';
+import { MESSENGER_ICON } from '../shared/utils.js';
 import { isWishlisted } from '../shared/wishlist.js'; // นำเข้าฟังก์ชัน wishlist
 
 // --- State Management ---
@@ -81,9 +81,9 @@ function _availableCard(f) {
         </div>
         
         ${f.stock > 0
-          ? `<button class="btn-line" style="width:100%;justify-content:center"
-               onclick="event.stopPropagation(); openLine('${f.id}')">
-               ${LINE_ICON(16)} ${txtOrder}
+          ? `<button class="btn-messenger" style="width:100%;justify-content:center"
+               onclick="event.stopPropagation(); openMessenger('${f.id}')">
+               ${MESSENGER_ICON(16)} ${txtOrder}
              </button>`
           : `<button class="btn" style="width:100%;background:#f3f4f6;color:#9ca3af;cursor:not-allowed" disabled>${txtOut}</button>`
         }

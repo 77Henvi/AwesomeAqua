@@ -7,7 +7,7 @@ import { goSlide }                                 from './modules/slideshow.js'
 import { injectFishBackgrounds }                   from './modules/fishBackground.js';
 import { setFishChip, filterFish,  
         renderFishGrid, getCurrentFilter }         from './modules/render.js';
-import { openLine, toggleMobile,
+import { openMessenger, toggleMobile,
          scrollToSection }                         from './shared/utils.js';
 import { toggleTag }                               from './shared/tags.js';
 import { previewEditImage }                        from './shared/image.js';
@@ -39,7 +39,7 @@ window.onWishToggle = function(id, btnElement, event) {
 window.openFishDetail        = openFishDetail;
 window.closeFishModal        = closeFishModal;
 window.closeFishModalOutside = closeFishModalOutside;
-window.openLine              = openLine;
+window.openMessenger          = openMessenger;
 window.toggleTag             = toggleTag;
 window.toggleMobile          = toggleMobile;
 window.scrollToSection       = scrollToSection;

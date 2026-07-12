@@ -94,12 +94,12 @@ nav.scrolled .nav-links a::after { background: var(--royal-blue); }
 .btn-primary { background: var(--royal-blue); color: var(--white); }
 .btn-primary:hover { background: var(--bright-blue); transform: translateY(-1px); }
 
-.btn-line {
+.btn-messenger {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background: #06c755; 
+  background: linear-gradient(135deg, #00B2FF 0%, #006AFF 50%, #A033FF 100%);
   color: var(--white);
   border: none;
   cursor: pointer;
@@ -109,8 +109,8 @@ nav.scrolled .nav-links a::after { background: var(--royal-blue); }
   padding: 0.6rem 1.35rem;
   transition: all 0.2s;
 }
-.btn-line:hover { background: #05a648; transform: translateY(-1px); }
-.btn-line svg { flex-shrink: 0; }
+.btn-messenger:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.btn-messenger svg { flex-shrink: 0; }
 
 
 
@@ -389,7 +389,7 @@ body.is-admin .fish-card:hover .card-admin-actions { display: flex; opacity: 1; 
 .fd-desc-wrap { background: #f0f4ff; border-radius: 12px; padding: 1rem 1.1rem; margin-bottom: 1.25rem; }
 .fd-desc-title { font-size: 0.75rem; font-weight: 600; color: var(--royal-blue); margin-bottom: 0.5rem; }
 .fd-desc { color: #374151; font-size: 0.875rem; line-height: 1.75; }
-.fd-btn-line { width: 100%; justify-content: center; font-size: 1rem; padding: 0.9rem; border-radius: 12px; }
+.fd-btn-messenger { width: 100%; justify-content: center; font-size: 1rem; padding: 0.9rem; border-radius: 12px; }
 .fd-btn-disabled {
   width: 100%; padding: 0.9rem;
   background: #f3f4f6; color: #9ca3af;
@@ -472,7 +472,7 @@ body.is-admin .fish-card:hover .card-admin-actions { display: flex; opacity: 1; 
 .cs-banner-title { font-weight: 700; font-size: 0.9rem; color: #3730a3; margin-bottom: 0.25rem; }
 .cs-banner-sub { font-size: 0.82rem; color: #4b5e9e; line-height: 1.5; }
 .cs-cta-row { display: flex; gap: 0.75rem; margin-top: 0.25rem; }
-.cs-cta-row .fd-btn-line { flex: 1; }
+.cs-cta-row .fd-btn-messenger { flex: 1; }
 .cs-notify-btn {
   flex: 1; padding: 0.9rem;
   background: #eef2ff; color: #3730a3;
@@ -642,7 +642,7 @@ footer {
   transform: scale(1.15);
 }
 
-.social-card--line .social-card-icon  { color: #00c300; } /* สว่างกว่าปกติเพื่อให้อ่านง่ายบนพื้นน้ำเงิน */
+.social-card--messenger .social-card-icon  { color: #ffffff; } /* ใช้สีขาวเพื่อให้ตัดกับพื้นหลังไล่สีของไอคอนเดิม */
 .social-card--fb .social-card-icon    { color: #4285F4; } /* ฟ้าสว่างขึ้นนิดนึง */
 .social-card--tt .social-card-icon    { 
   color: #ffffff; 

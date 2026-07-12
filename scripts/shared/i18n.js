@@ -49,7 +49,7 @@ export const translations = {
     comingDesc:       'Fish we plan to bring in — message us to reserve one in advance.',
     fishTag:          'Fish Collection',
     fishTitle:        'Our Beautiful Fish',
-    fishDesc:         'Quality fish with full details — order via LINE in one tap.',
+    fishDesc:         'Quality fish with full details — order via Messenger in one tap.',
     aboutTag:         'About Us',
     aboutTitle:       'A Love For Fish,<br/>Passed On To You',
     aboutDesc:        'Awesome Aqua was founded out of a passion for ornamental fish. We hand-pick quality fish and share the right care knowledge, so everyone can keep fish happily.',

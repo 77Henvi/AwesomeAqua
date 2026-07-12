@@ -1,5 +1,5 @@
 import { fishData } from './fishData.js';
-import { LINE_ICON } from '../shared/utils.js';
+import { MESSENGER_ICON } from '../shared/utils.js';
 
 // ── Modal ปลาปกติ ──
 export function openFishDetail(id) {
@@ -23,7 +23,7 @@ export function openFishDetail(id) {
   const txtLow = isEn ? `⚠️ Only ${f.stock} left` : `⚠️ เหลือ ${f.stock} ตัว`;
   const txtIn = isEn ? `✅ ${f.stock} in stock` : `✅ ${f.stock} ตัว`;
   const txtDescTitle = isEn ? '📖 Details' : '📖 รายละเอียด';
-  const txtOrder = isEn ? 'Order via LINE' : 'สั่งซื้อผ่านไลน์';
+  const txtOrder = isEn ? 'Order via Messenger' : 'สั่งซื้อผ่าน Messenger';
   const txtDisabled = isEn ? 'Out of stock' : 'หมดสต็อก';
   const txtOutRibbon = isEn ? 'Out of stock' : 'หมดสต็อก';
 
@@ -81,8 +81,8 @@ export function openFishDetail(id) {
         </div>` : ''}
       <div class="fd-cta">
         ${f.stock > 0
-          ? `<button class="btn-line fd-btn-line" onclick="openLine('${f.id}')">
-               ${LINE_ICON(20)} ${txtOrder}
+          ? `<button class="btn-messenger fd-btn-messenger" onclick="openMessenger('${f.id}')">
+               ${MESSENGER_ICON(20)} ${txtOrder}
              </button>`
           : `<button class="btn fd-btn-disabled" disabled>${txtDisabled}</button>`
         }
@@ -107,7 +107,7 @@ export function openComingSoonDetail(id) {
   // ── แปลคำศัพท์ UI ในป๊อปอัป Coming Soon ──
   const txtBadge = isEn ? '✨ Coming Soon' : '✨ เร็วๆ นี้';
   const txtDescTitle = isEn ? '📖 About this fish' : '📖 เกี่ยวกับปลาชนิดนี้';
-  const txtLine = isEn ? 'Inquire via LINE' : 'สอบถามผ่านไลน์';
+  const txtLine = isEn ? 'Inquire via Messenger' : 'สอบถามผ่าน Messenger';
   const txtGotIt = isEn ? '🔔 Got it' : '🔔 รับทราบ';
 
   // ── แปลระดับความยาก ──
@@ -146,8 +146,8 @@ export function openComingSoonDetail(id) {
         </div>` : ''}
 
       <div class="cs-cta-row">
-        <button class="btn-line fd-btn-line" onclick="openLine('${f.id}')">
-          ${LINE_ICON(18)} ${txtLine}
+        <button class="btn-messenger fd-btn-messenger" onclick="openMessenger('${f.id}')">
+          ${MESSENGER_ICON(18)} ${txtLine}
         </button>
         <button class="cs-notify-btn" onclick="closeCsModal()">
           ${txtGotIt}
