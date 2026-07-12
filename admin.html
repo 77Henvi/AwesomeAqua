@@ -289,34 +289,44 @@
     </div>
 
     <div class="admin-page" id="page-stats">
-      <div id="stats-kpi" class="stats-kpi-grid"></div>
-      <div class="stats-grid-2">
-        <div class="stats-section-card">
-          <div class="stats-section-title"><i class="ph ph-fish-simple"></i> สต็อกปลา (Top 10)</div>
+      <div class="stats-fin-toolbar">
+        <div class="stats-fin-toolbar-title"><i class="ph ph-chart-line"></i> ภาพรวมการเงิน</div>
+        <select id="statsYearSelect" class="stats-year-select"></select>
+      </div>
+
+      <div id="stats-fin-kpi" class="stats-kpi-grid"></div>
+
+      <div class="stats-section-card">
+        <div class="stats-section-title">
+          <i class="ph ph-chart-line"></i> รายรับ vs รายจ่าย
+          <span class="stats-hint">กดจุดเพื่อดูรายละเอียด</span>
+        </div>
+        <div id="stats-fin-chart"></div>
+      </div>
+
+      <div class="stats-section-card">
+        <div class="stats-section-title"><i class="ph ph-list-bullets"></i> รายละเอียดรายเดือน</div>
+        <div id="stats-fin-monthly-list" class="stats-month-list"></div>
+      </div>
+
+      <div class="stats-mini-title-row"><i class="ph ph-fish-simple"></i> ภาพรวมปลา &amp; สต็อก</div>
+      <div class="stats-mini-grid">
+        <div class="stats-mini-card">
+          <div class="stats-section-title small"><i class="ph ph-fish-simple"></i> สต็อกปลา (Top 5)</div>
           <div id="stats-stock-chart"></div>
         </div>
-        <div class="stats-section-card">
-          <div class="stats-section-title"><i class="ph ph-currency-circle-dollar"></i> กระจายราคา</div>
+        <div class="stats-mini-card">
+          <div class="stats-section-title small"><i class="ph ph-currency-circle-dollar"></i> กระจายราคา</div>
           <div id="stats-price-dist"></div>
         </div>
-      </div>
-      <div class="stats-grid-2">
-        <div class="stats-section-card">
-          <div class="stats-section-title"><i class="ph ph-trophy"></i> ปลาตามราคา</div>
+        <div class="stats-mini-card">
+          <div class="stats-section-title small"><i class="ph ph-trophy"></i> ปลาตามราคา</div>
           <div id="stats-top-fish" class="stats-top-wrap"></div>
         </div>
-        <div class="stats-section-card">
-          <div class="stats-section-title"><i class="ph ph-chart-pie-slice"></i> ระดับความยาก</div>
+        <div class="stats-mini-card">
+          <div class="stats-section-title small"><i class="ph ph-chart-pie-slice"></i> ระดับความยาก</div>
           <div id="stats-level-dist"></div>
         </div>
-      </div>
-      <div class="stats-section-card" style="margin-top:0;">
-        <div class="stats-section-title"><i class="ph ph-calendar-blank"></i> รายรับ-รายจ่ายรายเดือน (6 เดือนล่าสุด)</div>
-        <div style="display:flex;gap:1rem;font-size:0.75rem;margin-bottom:1rem;">
-          <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;background:#059669;border-radius:2px;display:inline-block;"></span> รายรับ</span>
-          <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;background:#dc2626;opacity:0.7;border-radius:2px;display:inline-block;"></span> รายจ่าย</span>
-        </div>
-        <div id="stats-monthly-finance"></div>
       </div>
     </div>
 
