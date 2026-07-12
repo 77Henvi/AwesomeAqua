@@ -159,14 +159,26 @@ async function handleEvent(event) {
   }
 }
 
-// ── verify signature (แนวทางเดียวกับ webhook LINE เดิมในโปรเจกต์นี้) ──
-function isValidSignature(req) {
+// ── อ่าน raw body ดิบๆ จาก request stream (จำเป็นสำหรับตรวจ signature ให้ตรงกับที่ Meta เซ็นมา) ──
+function getRawBody(req) {
+  return new Promise((resolve, reject) => {
+    let chunks = [];
+    req.on('data', (chunk) => chunks.push(chunk));
+    req.on('end', () => resolve(Buffer.concat(chunks)));
+    req.on('error', reject);
+  });
+}
+
+// ── verify signature: ต้องคำนวณจาก raw bytes ดิบ ไม่ใช่ JSON.stringify(req.body) ที่ parse ใหม่ ──
+function isValidSignature(rawBody, sig) {
   if (!APP_SECRET) return true; // ถ้ายังไม่ตั้งค่า APP_SECRET จะข้ามการตรวจ (ควรตั้งค่าก่อนใช้งานจริง)
-  const sig = req.headers['x-hub-signature-256'];
   if (!sig) return false;
-  const hash = 'sha256=' + createHmac('sha256', APP_SECRET).update(JSON.stringify(req.body)).digest('hex');
+  const hash = 'sha256=' + createHmac('sha256', APP_SECRET).update(rawBody).digest('hex');
   return hash === sig;
 }
+
+// ปิด body parser อัตโนมัติของ Vercel เพื่อให้เราอ่าน raw body เองได้
+module.exports.config = { api: { bodyParser: false } };
 
 // ── main ──
 module.exports = async (req, res) => {
@@ -186,9 +198,20 @@ module.exports = async (req, res) => {
 
   if (req.method !== 'POST') { res.status(200).send('OK'); return; }
 
-  if (!isValidSignature(req)) { res.status(401).send('Unauthorized'); return; }
+  const rawBody = await getRawBody(req);
+  const sig     = req.headers['x-hub-signature-256'];
 
-  const entries = req.body?.entry || [];
+  if (!isValidSignature(rawBody, sig)) { res.status(401).send('Unauthorized'); return; }
+
+  let body;
+  try {
+    body = JSON.parse(rawBody.toString('utf8'));
+  } catch (e) {
+    res.status(400).send('Bad Request');
+    return;
+  }
+
+  const entries = body?.entry || [];
   const events  = entries.flatMap(e => e.messaging || []);
   await Promise.all(events.map(handleEvent));
 
