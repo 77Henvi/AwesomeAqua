@@ -4,6 +4,20 @@ import { showToast }  from '../shared/utils.js';
 let _currentFish = null;
 let _onSaved     = null;
 
+// คืนค่า true ถ้าปลาตัวนี้มี 2 ไซส์ที่ต้องให้เลือก (ราคาคนละราคากัน)
+function _hasSizeOptions(fish) {
+  return fish.sizeMin != null && fish.sizeMax != null && fish.sizeMin !== fish.sizeMax;
+}
+
+// คืนราคาตามไซส์ที่เลือก ('min' | 'max') หรือ fallback ตามเดิมถ้าไม่มีตัวเลือกไซส์
+function _priceForSize(fish, sizeChoice) {
+  if (fish.sale_price && fish.sale_price > 0) return fish.sale_price;
+  if (_hasSizeOptions(fish)) {
+    return sizeChoice === 'max' ? (fish.priceMax || fish.priceMin || 0) : (fish.priceMin || 0);
+  }
+  return fish.priceMax && !fish.priceMin ? fish.priceMax : (fish.priceMin || fish.priceMax || 0);
+}
+
 // ── สร้าง modal แบบ dynamic (ไม่ต้องแก้ HTML) ──
 export function initSaleModal() {
   if (document.getElementById('saleModal')) return;
@@ -15,6 +29,11 @@ export function initSaleModal() {
     <div class="sale-modal-box">
       <h3 style="margin:0 0 4px;font-size:1.05rem;"><i class="ph ph-shopping-cart"></i> บันทึกการขาย</h3>
       <div id="saleFishName" style="font-size:0.9rem; color:#1e293b; margin-bottom:14px; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0;"></div>
+
+      <div id="saleSizeGroup" style="display:none;">
+        <label class="sale-label">ไซส์ที่ขายได้</label>
+        <select id="saleSize" class="sale-input"></select>
+      </div>
 
       <div id="saleQtyGroup">
         <label class="sale-label">จำนวนที่ขายได้ (ตัว)</label>
@@ -51,6 +70,7 @@ export function initSaleModal() {
         width: 100%; padding: 10px 12px; border: 1px solid var(--border,#ddd);
         border-radius: 8px; font-size: 1rem; box-sizing: border-box; font-family:var(--font-number);
       }
+      select.sale-input { background: #fff; cursor: pointer; }
       .sale-btn { flex: 1; padding: 10px; border-radius: 10px; border: none;
         font-weight: 600; cursor: pointer; font-size: 0.95rem; transition: 0.2s;}
       .sale-btn-primary { background: #059669; color: #fff; }
@@ -63,10 +83,33 @@ export function initSaleModal() {
 
   // ── live summary คำนวณยอดเงินรวม ──
   document.getElementById('saleQty').addEventListener('input', _updateSummary);
+  document.getElementById('saleSize').addEventListener('change', () => {
+    _updateFishInfo();
+    _updateSummary();
+  });
 
   // expose สำหรับ inline onclick
   window.closeSaleModal = closeSaleModal;
   window.confirmSale    = confirmSale;
+}
+
+function _currentSizeChoice() {
+  const sel = document.getElementById('saleSize');
+  return (sel && !sel.parentElement.style.display.includes('none')) ? sel.value : 'min';
+}
+
+function _updateFishInfo() {
+  const fish = _currentFish;
+  if (!fish) return;
+  const sellPrice = _priceForSize(fish, _currentSizeChoice());
+
+  document.getElementById('saleFishName').innerHTML = `
+    <div style="font-weight: 600; margin-bottom: 4px;">${fish.emoji || '🐟'} ${fish.name_th || fish.name}</div>
+    <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+      <span style="color: var(--gray);">เหลือในสต็อก: <strong>${fish.stock}</strong> ตัว</span>
+      <span style="color: var(--royal-blue); font-weight:600;">ตัวละ ฿${sellPrice.toLocaleString('th-TH')}</span>
+    </div>
+  `;
 }
 
 function _updateSummary() {
@@ -74,7 +117,7 @@ function _updateSummary() {
   if (!fish) return;
 
   const qty  = parseInt(document.getElementById('saleQty').value) || 0;
-  const sellPrice = (fish.sale_price && fish.sale_price > 0) ? fish.sale_price : (fish.priceMin || 0);
+  const sellPrice = _priceForSize(fish, _currentSizeChoice());
 
   const el = document.getElementById('saleSummary');
   if (!qty) { el.textContent = ''; return; }
@@ -91,16 +134,23 @@ export function openSaleModal(fish, onSaved) {
   _currentFish = fish;
   _onSaved     = onSaved;
 
-  const sellPrice = (fish.sale_price && fish.sale_price > 0) ? fish.sale_price : (fish.priceMin || 0);
+  // ── ตั้งค่า dropdown เลือกไซส์ (แสดงเฉพาะเมื่อปลามี 2 ไซส์ ราคาต่างกัน) ──
+  const sizeGroup = document.getElementById('saleSizeGroup');
+  const sizeSel   = document.getElementById('saleSize');
+  if (_hasSizeOptions(fish)) {
+    sizeSel.innerHTML = `
+      <option value="min">📏 ${fish.sizeMin} นิ้ว (฿${(fish.priceMin || 0).toLocaleString('th-TH')})</option>
+      <option value="max">📏 ${fish.sizeMax} นิ้ว (฿${(fish.priceMax || fish.priceMin || 0).toLocaleString('th-TH')})</option>
+    `;
+    sizeSel.value = 'min';
+    sizeGroup.style.display = 'block';
+  } else {
+    sizeSel.innerHTML = '';
+    sizeGroup.style.display = 'none';
+  }
 
   // อัปเดตข้อมูลบนป๊อปอัป
-  document.getElementById('saleFishName').innerHTML = `
-    <div style="font-weight: 600; margin-bottom: 4px;">${fish.emoji || '🐟'} ${fish.name_th || fish.name}</div>
-    <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
-      <span style="color: var(--gray);">เหลือในสต็อก: <strong>${fish.stock}</strong> ตัว</span>
-      <span style="color: var(--royal-blue); font-weight:600;">ตัวละ ฿${sellPrice.toLocaleString('th-TH')}</span>
-    </div>
-  `;
+  _updateFishInfo();
 
   document.getElementById('saleQty').value = '1'; // ตั้งค่าเริ่มต้นที่ 1 ตัว
   document.getElementById('saleQty').max   = fish.stock;
@@ -128,7 +178,11 @@ export async function confirmSale() {
   btn.disabled = true;
   btn.textContent = 'กำลังบันทึก...';
 
-  const sellPrice = (fish.sale_price && fish.sale_price > 0) ? fish.sale_price : (fish.priceMin || 0);
+  const sizeChoice   = _currentSizeChoice();
+  const sellPrice    = _priceForSize(fish, sizeChoice);
+  const sizeLabel    = _hasSizeOptions(fish)
+    ? ` (ไซส์ ${sizeChoice === 'max' ? fish.sizeMax : fish.sizeMin} นิ้ว)`
+    : '';
   const today     = new Date().toLocaleDateString('en-CA');
   const totalIncome = qty * sellPrice;
   const newStock  = fish.stock - qty;
@@ -142,7 +196,7 @@ export async function confirmSale() {
 
     const { error: finErr } = await supabase.from('finance').insert([{
       type: 'income',
-      name: `ขายปลา: ${fish.name_th || fish.name} x${qty} ตัว`,
+      name: `ขายปลา: ${fish.name_th || fish.name}${sizeLabel} x${qty} ตัว`,
       amount: totalIncome,
       date: today,
       fish_id: fish.id 
@@ -150,7 +204,7 @@ export async function confirmSale() {
 
     if (finErr) throw finErr;
 
-    showToast(`✅ ขาย ${fish.name_th || fish.name} x${qty} ตัว สำเร็จ (รับเงิน ฿${totalIncome.toLocaleString('th-TH')})`);
+    showToast(`✅ ขาย ${fish.name_th || fish.name}${sizeLabel} x${qty} ตัว สำเร็จ (รับเงิน ฿${totalIncome.toLocaleString('th-TH')})`);
     
     if (typeof window.loadFinanceFromDB === 'function') {
       window.loadFinanceFromDB();
