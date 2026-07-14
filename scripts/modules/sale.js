@@ -212,6 +212,26 @@ export async function confirmSale() {
 
     closeSaleModal();
     if (_onSaved) _onSaved();
+
+    // ── สต็อกหมดพอดี ถามว่าจะรีสต็อคอีกไหม ถ้าไม่รีสต็อค ให้ "เลิกขาย" ไปเลย ──
+    // (เลิกขาย = ซ่อนจากหน้าร้าน/ตารางหลัก แต่ไม่ลบข้อมูล รายรับ/รายจ่ายเดิมยังอยู่ครบ)
+    if (newStock === 0) {
+      setTimeout(async () => {
+        const willRestock = confirm(
+          `🐟 "${fish.name_th || fish.name}" หมดสต็อกแล้ว!\n\n` +
+          `จะรีสต็อคปลาตัวนี้อีกไหม?\n\n` +
+          `กด "ตกลง" = จะรีสต็อค (เก็บไว้ในตารางเหมือนเดิม)\n` +
+          `กด "ยกเลิก" = เลิกขายเลย (ซ่อนจากหน้าร้าน แต่ประวัติการขายเดิมไม่หายไป)`
+        );
+        if (!willRestock) {
+          const { error } = await supabase.from('fish').update({ is_archived: true }).eq('id', fish.id);
+          if (!error) {
+            showToast('📦 เลิกขายปลาตัวนี้แล้ว (ย้ายไปแท็บ "เลิกขายแล้ว")');
+            if (typeof window.loadFishFromDB === 'function') window.loadFishFromDB();
+          }
+        }
+      }, 300);
+    }
     
   } catch (err) {
     console.error(err);

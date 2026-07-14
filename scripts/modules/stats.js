@@ -8,7 +8,7 @@ let _selectedYear = null;
 
 // ── entry point ──────────────────────────────
 export function renderStats(fishData, financeData) {
-  _fishData    = fishData;
+  _fishData    = fishData.filter(f => !f.is_archived); // ไม่นับปลาที่เลิกขายแล้วในสถิติสต็อก/ราคา
   _financeData = financeData;
 
   _injectStatsStyle();
@@ -22,10 +22,10 @@ export function renderStats(fishData, financeData) {
   renderFinanceChart(financeData, _selectedYear);
   renderMonthlyList(financeData, _selectedYear);
 
-  renderStatsStockChart(fishData);
-  renderStatsPriceDist(fishData);
-  renderStatsTopFish(fishData);
-  renderStatsLevelDist(fishData);
+  renderStatsStockChart(_fishData);
+  renderStatsPriceDist(_fishData);
+  renderStatsTopFish(_fishData);
+  renderStatsLevelDist(_fishData);
 }
 
 // ── ปีที่มีข้อมูล + ปีปัจจุบัน ─────────────────

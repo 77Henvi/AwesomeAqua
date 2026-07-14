@@ -10,7 +10,9 @@ export async function loadFishFromDB() {
 
   if (error) { console.error(error); return; }
 
-  fishData = data.map(f => ({
+  fishData = data
+    .filter(f => !f.is_archived) // กันไว้ชั้นหนึ่ง เผื่อ view fish_public ยังไม่ได้กรองที่ DB
+    .map(f => ({
       id:       f.id,
       name_th:  f.name_th,    
       name_en:  f.name_en,    

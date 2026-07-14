@@ -22,7 +22,9 @@ setTimeout(() => {
 window.adminLogin       = adminLogin;
 window.adminLogout      = adminLogout;
 window.addFish          = addFish;
-window.deleteFish       = deleteFish;
+window.archiveFish      = archiveFish;
+window.restoreFish      = restoreFish;
+window.hardDeleteFish   = hardDeleteFish;
 window.saveEdit         = saveEdit;
 window.openEditModal    = openEditModal;
 window.closeEditModal   = closeEditModal;
@@ -147,7 +149,8 @@ async function loadFishFromDB() {
     tags_th:  f.tags_th || [],
     tags_en:  f.tags_en || [],
     sizeMin:  f.size_min || null,
-    sizeMax:  f.size_max || null
+    sizeMax:  f.size_max || null,
+    is_archived: f.is_archived || false
   }));
 
   renderAll();
@@ -345,19 +348,52 @@ async function confirmRestock() {
 }
 
 // ════════════════════════════════════════════
-//   DELETE
+//   เลิกขาย / เปิดขายอีกครั้ง / ลบถาวร
 // ════════════════════════════════════════════
-async function deleteFish(id) {
-  if (!confirm('ยืนยันลบปลานี้? (รายรับ/รายจ่ายที่ผูกกับปลานี้จะถูกลบไปด้วย)')) return;
+
+// "เลิกขาย" — ซ่อนปลาจากหน้าร้าน/ตารางหลัก แต่ไม่ลบข้อมูล
+// รายรับ/รายจ่ายเดิมที่ผูกกับปลาตัวนี้จะไม่หายไป และสามารถกลับมาเปิดขายใหม่ได้ทีหลัง
+async function archiveFish(id) {
+  if (!confirm('เลิกขายปลาตัวนี้เลยไหม?\n\nปลาจะหายจากหน้าร้านและตาราง "ขายอยู่" แต่ประวัติรายรับ/รายจ่ายเดิมจะไม่หายไป และกลับมาเปิดขายใหม่ได้ทีหลังจากแท็บ "เลิกขายแล้ว"')) return;
+
+  const { error } = await supabase.from('fish').update({ is_archived: true }).eq('id', id);
+
+  if (error) {
+    showToast('<i class="ph-fill ph-x-circle" style="color:#ef4444; font-size:1.1em; vertical-align:-2px;"></i> เลิกขายไม่สำเร็จ');
+    return;
+  }
+
+  showToast('<i class="ph-fill ph-archive" style="color:#6b7280; font-size:1.1em; vertical-align:-2px;"></i> เลิกขายเรียบร้อย');
+  loadFishFromDB();
+}
+
+// "เปิดขายอีกครั้ง" — เอาปลากลับมาแสดงในหน้าร้าน/ตารางหลักตามปกติ
+async function restoreFish(id) {
+  const { error } = await supabase.from('fish').update({ is_archived: false }).eq('id', id);
+
+  if (error) {
+    showToast('<i class="ph-fill ph-x-circle" style="color:#ef4444; font-size:1.1em; vertical-align:-2px;"></i> เปิดขายไม่สำเร็จ');
+    return;
+  }
+
+  showToast('<i class="ph-fill ph-check-circle" style="color:#10b981; font-size:1.1em; vertical-align:-2px;"></i> เปิดขายอีกครั้งเรียบร้อย');
+  loadFishFromDB();
+}
+
+// "ลบถาวร" — ใช้เฉพาะกรณีกรอกผิด/ไม่เคยขายจริง เพราะจะลบข้อมูลทิ้งกู้คืนไม่ได้
+// (รายรับ/รายจ่ายเดิมที่ผูกกับปลานี้จะกลายเป็น fish_id = null แทนที่จะถูกลบไปด้วย
+//  ถ้าตั้ง FK constraint เป็น ON DELETE SET NULL ตามคำแนะนำ)
+async function hardDeleteFish(id) {
+  if (!confirm('⚠️ ลบถาวร ไม่สามารถกู้คืนได้!\n\nยืนยันว่าจะลบปลานี้ทิ้งจริงๆ ใช่ไหม? (แนะนำให้ใช้ "เลิกขาย" แทน ถ้าเคยมีการขายปลาตัวนี้ไปแล้ว)')) return;
 
   const { error } = await supabase.from('fish').delete().eq('id', id);
 
-  if (error) { 
-    showToast('<i class="ph-fill ph-x-circle" style="color:#ef4444; font-size:1.1em; vertical-align:-2px;"></i> ลบไม่ได้'); 
-    return; 
+  if (error) {
+    showToast('<i class="ph-fill ph-x-circle" style="color:#ef4444; font-size:1.1em; vertical-align:-2px;"></i> ลบไม่ได้');
+    return;
   }
 
-  showToast('<i class="ph-fill ph-trash" style="color:#6b7280; font-size:1.1em; vertical-align:-2px;"></i> ลบปลาเรียบร้อย');
+  showToast('<i class="ph-fill ph-trash" style="color:#6b7280; font-size:1.1em; vertical-align:-2px;"></i> ลบปลาถาวรเรียบร้อย');
   loadFishFromDB();
   loadFinanceFromDB();
 }
@@ -443,10 +479,11 @@ async function uploadImage(file) {
 //   STATS
 // ════════════════════════════════════════════
 function renderAdminStats() {
-  const total    = fishData.length;
-  const inStock  = fishData.filter(f => f.stock > 0).length;
-  const lowStock = fishData.filter(f => f.stock > 0 && f.stock <= 5).length;
-  const outStock = fishData.filter(f => f.stock === 0).length;
+  const active   = fishData.filter(f => !f.is_archived);
+  const total    = active.length;
+  const inStock  = active.filter(f => f.stock > 0).length;
+  const lowStock = active.filter(f => f.stock > 0 && f.stock <= 5).length;
+  const outStock = active.filter(f => f.stock === 0).length;
 
   document.getElementById('adminStats').innerHTML = `
     <div class="admin-stat-card stat-card-total">
@@ -474,7 +511,7 @@ function renderAdminStats() {
 function renderDashboardCards() {
   const LOW_STOCK_THRESHOLD = 3; 
   const lowEl    = document.getElementById('dash-lowstock');
-  const lowItems = fishData.filter(f => f.stock <= LOW_STOCK_THRESHOLD && f.priceMin > 0);
+  const lowItems = fishData.filter(f => !f.is_archived && f.stock <= LOW_STOCK_THRESHOLD && f.priceMin > 0);
 
   if (!lowItems.length) {
     lowEl.innerHTML = _empty('<i class="ph ph-confetti"></i>', 'สต็อกครบทุกรายการ');
@@ -497,10 +534,11 @@ function renderDashboardCards() {
   }
 
   const recEl = document.getElementById('dash-recent');
-  if (!fishData.length) {
+  const recentActive = fishData.filter(f => !f.is_archived);
+  if (!recentActive.length) {
     recEl.innerHTML = _empty('<i class="ph ph-fish-simple"></i>', 'ยังไม่มีปลา');
   } else {
-    recEl.innerHTML = [...fishData].slice(0, 5).map(f => `
+    recEl.innerHTML = recentActive.slice(0, 5).map(f => `
       <div class="dash-mini-row">
         <div>
           <div class="dash-mini-name"><i class="ph ph-fish-simple" style="color:var(--royal-blue);margin-right:4px;"></i>${f.name}</div>
@@ -522,6 +560,8 @@ function renderFishTable() {
   const q    = (document.getElementById('fishSearch')?.value || '').toLowerCase();
   const list = fishData.filter(f => {
     const match = (f.name + ' ' + (f.species || '')).toLowerCase().includes(q);
+    if (_stockFilter === 'archived') return match && f.is_archived;
+    if (f.is_archived) return false; // ปลาที่เลิกขายแล้วไม่ต้องแสดงในแท็บอื่น
     if (_stockFilter === 'ok')  return match && f.stock > 5;
     if (_stockFilter === 'low') return match && f.stock > 0 && f.stock <= 5;
     if (_stockFilter === 'out') return match && f.stock === 0;
@@ -534,7 +574,7 @@ function renderFishTable() {
   const tbody = document.getElementById('fishTableBody');
   if (!list.length) {
     tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--gray);padding:2rem">
-      ${q ? 'ไม่พบปลาที่ค้นหา' : 'ยังไม่มีปลาครับ'}
+      ${q ? 'ไม่พบปลาที่ค้นหา' : _stockFilter === 'archived' ? 'ยังไม่มีปลาที่เลิกขาย' : 'ยังไม่มีปลาครับ'}
     </td></tr>`;
     return;
   }
@@ -575,9 +615,14 @@ function renderFishTable() {
         <td><span class="admin-stock-badge ${sc}">${st}</span></td>
         <td><span class="admin-level-badge ${lvCls}">${f.level}</span></td>
         <td>
-          <button class="action-btn" style="background:#059669;color:#fff;border:none;" onclick="openSale('${f.id}')"><i class="ph ph-shopping-cart-simple"></i> ขาย</button>
-          <button class="action-btn action-edit"   onclick="openEditModal('${f.id}')"><i class="ph ph-pencil-simple"></i> แก้ไข</button>
-          <button class="action-btn action-delete" onclick="deleteFish('${f.id}')"><i class="ph ph-trash"></i> ลบ</button>
+          ${f.is_archived ? `
+            <button class="action-btn" style="background:#2563eb;color:#fff;border:none;" onclick="restoreFish('${f.id}')"><i class="ph ph-arrow-counter-clockwise"></i> เปิดขายอีกครั้ง</button>
+            <button class="action-btn action-delete" onclick="hardDeleteFish('${f.id}')" title="ลบถาวร"><i class="ph ph-trash"></i></button>
+          ` : `
+            <button class="action-btn" style="background:#059669;color:#fff;border:none;" onclick="openSale('${f.id}')"><i class="ph ph-shopping-cart-simple"></i> ขาย</button>
+            <button class="action-btn action-edit"   onclick="openEditModal('${f.id}')"><i class="ph ph-pencil-simple"></i> แก้ไข</button>
+            <button class="action-btn action-delete" onclick="archiveFish('${f.id}')"><i class="ph ph-archive"></i> เลิกขาย</button>
+          `}
         </td>
       </tr>`;
   }).join('');
