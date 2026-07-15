@@ -555,6 +555,7 @@ function renderDashboardCards() {
 //   FISH TABLE (คอลัมน์กำไรสะสม - Spec 2)
 // ════════════════════════════════════════════
 function renderFishTable() {
+  _ensureProfitHeader();
   _ensureAccProfitHeader();
 
   const q    = (document.getElementById('fishSearch')?.value || '').toLowerCase();
