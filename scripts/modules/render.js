@@ -58,7 +58,7 @@ function _availableCard(f) {
             ${heartIcon}
           </button>
         ${f.image
-          ? `<img src="${f.image}" alt="${displayName}" onerror="this.parentElement.innerHTML='<span>${f.emoji || '🐟'}</span>'">`
+          ? `<img src="${f.image}" alt="${displayName}" loading="lazy" onerror="this.parentElement.innerHTML='<span>${f.emoji || '🐟'}</span>'">`
           : `<span>${f.emoji || '🐟'}</span>`
         }
         ${outOfStock ? `<div class="out-badge">${txtOut}</div>` : ''}
@@ -112,7 +112,7 @@ function _comingSoonCard(f) {
             ${heartIcon}
           </button>
         ${f.image
-          ? `<img src="${f.image}" alt="${displayName}" onerror="this.parentElement.innerHTML='<span class=coming-emoji>${f.emoji || '🐟'}</span>'">`
+          ? `<img src="${f.image}" alt="${displayName}" loading="lazy" onerror="this.parentElement.innerHTML='<span class=coming-emoji>${f.emoji || '🐟'}</span>'">`
           : `<span class="coming-emoji">${f.emoji || '🐟'}</span>`
         }
         

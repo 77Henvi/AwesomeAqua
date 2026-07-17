@@ -587,7 +587,7 @@ function renderFishTable() {
     const lvCls = lvMap[f.level] || '';
     
     const imgCell = f.image
-      ? `<img src="${f.image}" style="width:44px;height:44px;object-fit:cover;border-radius:8px;">`
+      ? `<img src="${f.image}" loading="lazy" style="width:44px;height:44px;object-fit:cover;border-radius:8px;">`
       : `<div style="width:44px;height:44px;background:#f1f5f9;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:1.5rem;"><i class="ph ph-image"></i></div>`;
 
     // คำนวณการแสดงผลกำไรสะสม
