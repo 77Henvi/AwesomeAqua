@@ -113,7 +113,7 @@ async function handleText(psid, textRaw) {
 
     await sendText(psid,
       `✅ ยืนยันสั่งซื้อ "${fish.name_th}"\n💰 ราคา: ${price(fish)}\n\n` +
-      `📲 ช่องทางชำระเงิน:\n• พร้อมเพย์: 082-237-2512\n• ธนาคารกสิกร: 123-4-56789-0\n\n` +
+      `📲 ช่องทางชำระเงิน:\n• พร้อมเพย์: 082-237-2512\n• ธนาคารกสิกร: 136-3-82691-8\n\n` +
       `โอนแล้วส่งสลิปมาในแชทนี้ได้เลยครับ 🙏`
     );
     await sendImage(psid, `${SITE}/images/qr-payment.png`);
