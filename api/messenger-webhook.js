@@ -5,8 +5,8 @@ const {
   MESSENGER_VERIFY_TOKEN: VERIFY,   // string ที่ตั้งเองตอนกรอก Webhooks (เช่น awesomeaqua_verify_2026)
   MESSENGER_APP_SECRET:  APP_SECRET, // App Secret จากหน้า "การตั้งค่าแอพ > ขั้นพื้นฐาน"
   MESSENGER_OWNER_PSID:  OWNER_ID,  // PSID ของแอดมิน ไว้ push แจ้งเตือนออเดอร์ใหม่ (หาได้หลังแอดมินทักบอทครั้งแรก)
-  SUPABASE_URL:          DB_URL,
-  SUPABASE_KEY:          DB_KEY,
+  SUPABASE_URL:               DB_URL,
+  SUPABASE_SERVICE_ROLE_KEY:  DB_KEY, // ⚠️ ต้องเป็น Service Role Key เท่านั้น (bypass RLS) ห้ามใช้ anon key
 } = process.env;
 
 const GRAPH_API = 'https://graph.facebook.com/v21.0/me/messages';
