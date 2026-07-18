@@ -1,22 +1,9 @@
 import { supabase }   from '../../supabase.js';
 import { showToast }  from '../shared/utils.js';
+import { hasSizeOptions as _hasSizeOptions, priceForSize as _priceForSize, shouldPromptArchive } from '../shared/calc.js';
 
 let _currentFish = null;
 let _onSaved     = null;
-
-// คืนค่า true ถ้าปลาตัวนี้มี 2 ไซส์ที่ต้องให้เลือก (ราคาคนละราคากัน)
-function _hasSizeOptions(fish) {
-  return fish.sizeMin != null && fish.sizeMax != null && fish.sizeMin !== fish.sizeMax;
-}
-
-// คืนราคาตามไซส์ที่เลือก ('min' | 'max') หรือ fallback ตามเดิมถ้าไม่มีตัวเลือกไซส์
-function _priceForSize(fish, sizeChoice) {
-  if (fish.sale_price && fish.sale_price > 0) return fish.sale_price;
-  if (_hasSizeOptions(fish)) {
-    return sizeChoice === 'max' ? (fish.priceMax || fish.priceMin || 0) : (fish.priceMin || 0);
-  }
-  return fish.priceMax && !fish.priceMin ? fish.priceMax : (fish.priceMin || fish.priceMax || 0);
-}
 
 // ── สร้าง modal แบบ dynamic (ไม่ต้องแก้ HTML) ──
 export function initSaleModal() {
@@ -215,7 +202,7 @@ export async function confirmSale() {
 
     // ── สต็อกหมดพอดี ถามว่าจะรีสต็อคอีกไหม ถ้าไม่รีสต็อค ให้ "เลิกขาย" ไปเลย ──
     // (เลิกขาย = ซ่อนจากหน้าร้าน/ตารางหลัก แต่ไม่ลบข้อมูล รายรับ/รายจ่ายเดิมยังอยู่ครบ)
-    if (newStock === 0) {
+    if (shouldPromptArchive(newStock)) {
       setTimeout(async () => {
         const willRestock = confirm(
           `🐟 "${fish.name_th || fish.name}" หมดสต็อกแล้ว!\n\n` +

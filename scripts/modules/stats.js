@@ -1,3 +1,5 @@
+import { niceMax as _niceMax, smoothPath as _smoothPath } from '../shared/calc.js';
+
 const MONTH_SHORT = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 const MONTH_FULL  = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
 
@@ -121,30 +123,6 @@ function renderFinanceKPI(financeData, year) {
 }
 
 // ── กราฟรายรับ vs รายจ่าย (area + line) ─────────
-function _niceMax(value) {
-  if (value <= 0) return 100;
-  const pow = Math.pow(10, Math.floor(Math.log10(value)));
-  const n = value / pow;
-  let nice;
-  if (n <= 1) nice = 1;
-  else if (n <= 2) nice = 2;
-  else if (n <= 5) nice = 5;
-  else nice = 10;
-  return nice * pow;
-}
-
-function _smoothPath(points) {
-  if (!points.length) return '';
-  if (points.length === 1) return `M${points[0].x},${points[0].y}`;
-  let d = `M${points[0].x},${points[0].y}`;
-  for (let i = 0; i < points.length - 1; i++) {
-    const p0 = points[i], p1 = points[i + 1];
-    const midX = (p0.x + p1.x) / 2;
-    d += ` C${midX},${p0.y} ${midX},${p1.y} ${p1.x},${p1.y}`;
-  }
-  return d;
-}
-
 function renderFinanceChart(financeData, year) {
   const el = document.getElementById('stats-fin-chart');
   if (!el) return;

@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: ตรวจสอบ syntax ของไฟล์ JS ทั้งหมด (กันโค้ดพังหลุดขึ้น production)
+        run: |
+          fail=0
+          for f in $(find scripts api -name "*.js"); do
+            if ! node --input-type=module --check < "$f" > /dev/null 2>&1; then
+              echo "❌ Syntax error: $f"
+              node --input-type=module --check < "$f" || true
+              fail=1
+            fi
+          done
+          if [ "$fail" -eq 1 ]; then
+            echo "พบไฟล์ syntax ผิดพลาด ดูรายละเอียดด้านบน"
+            exit 1
+          fi
+          echo "✅ syntax ผ่านหมดทุกไฟล์"
+
+      - name: รัน automated test (ฟังก์ชันคำนวณล้วนใน scripts/shared/calc.js)
+        run: node --test tests/calc.test.mjs
