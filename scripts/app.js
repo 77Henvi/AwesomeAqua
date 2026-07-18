@@ -75,17 +75,11 @@ window.hideLoader = function() {
   if (loader) loader.classList.add('hidden');
 };
 
-
-document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(() => { 
-    hideLoader(); 
-  }, 300); 
-});
-
-
+// Failsafe: เผื่อโหลดข้อมูลช้าผิดปกติหรือ error ที่ไม่คาดคิด ไม่ให้ loader ค้างตลอดไป
+// (ปกติ loadFishFromDB() ใน fishData.js จะเรียก hideLoader() เองทันทีที่ข้อมูลพร้อมแสดงจริง)
 setTimeout(() => {
   hideLoader();
-}, 3000);
+}, 4000);
 
 window.toggleLanguage = toggleLanguage;
 

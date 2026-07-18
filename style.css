@@ -12,6 +12,12 @@
   --border: #e5e7eb;
   --font-display: 'Playfair Display', 'Cormorant Garamond', serif;
   --font-body: 'Jost', sans-serif;
+
+  /* ── Radius scale (ให้ทั้งเว็บใช้ชุดค่าเดียวกัน แทนการเดาตัวเลขมั่วๆ) ── */
+  --radius-sm: 8px;    /* input, badge เล็ก, ปุ่มย่อย */
+  --radius-md: 12px;   /* ปุ่มหลัก, ช่องค้นหา, การ์ดย่อย */
+  --radius-lg: 16px;   /* การ์ดหลัก, modal */
+  --radius-pill: 999px; /* chip, badge ทรงแคปซูล */
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -80,7 +86,7 @@ nav.scrolled .nav-links a::after { background: var(--royal-blue); }
 
 /* ── BUTTONS ── */
 .btn {
-  padding: 0.6rem 1.35rem; border-radius: 8px;
+  padding: 0.6rem 1.35rem; border-radius: var(--radius-sm);
   font-size: 0.875rem; font-weight: 500;
   cursor: pointer; border: none;
   transition: all 0.2s; font-family: var(--font-body);
@@ -105,7 +111,7 @@ nav.scrolled .nav-links a::after { background: var(--royal-blue); }
   cursor: pointer;
   font-family: var(--font-body);
   font-weight: 600;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   padding: 0.6rem 1.35rem;
   transition: all 0.2s;
 }
@@ -249,7 +255,7 @@ section { padding: 5rem 5%; }
 /* อัปเกรด: เพิ่ม Hover Interactive ให้นุ่มนวลขึ้น */
 .fish-card {
   border: 1px solid var(--border);
-  border-radius: 16px; overflow: hidden;
+  border-radius: var(--radius-lg); overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
   background: var(--white); cursor: pointer;
 }
@@ -288,7 +294,7 @@ section { padding: 5rem 5%; }
 /* Modal Tag ยังแสดงปกติ */
 .tag {
   background: var(--light-blue); color: var(--royal-blue);
-  padding: 0.2rem 0.6rem; border-radius: 100px;
+  padding: 0.2rem 0.6rem; border-radius: var(--radius-pill);
   font-size: 0.72rem; font-weight: 500;
 }
 
@@ -298,6 +304,26 @@ section { padding: 5rem 5%; }
   display: none; gap: 6px; opacity: 0; transition: opacity 0.2s;
 }
 body.is-admin .fish-card:hover .card-admin-actions { display: flex; opacity: 1; }
+
+/* ── Skeleton Loading (โครงการ์ดตอนกำลังโหลดข้อมูล) ── */
+@keyframes skeleton-shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #eef1f8 25%, #f7f9fd 37%, #eef1f8 63%);
+  background-size: 800px 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+.fish-card.is-skeleton { cursor: default; }
+.fish-card.is-skeleton:hover { transform: none; box-shadow: none; border-color: var(--border); }
+.fish-card.is-skeleton .fish-card-img-wrap { background: none; }
+.skeleton-line {
+  height: 14px; border-radius: 6px; margin-bottom: 0.6rem;
+}
+.skeleton-line.w-70 { width: 70%; }
+.skeleton-line.w-40 { width: 40%; }
+.skeleton-line.w-50 { width: 50%; height: 18px; margin-top: 0.5rem; }
 .card-admin-actions button {
   width: 32px; height: 32px; border-radius: 50%;
   border: none; cursor: pointer;
@@ -396,7 +422,7 @@ body.is-admin .fish-card:hover .card-admin-actions { display: flex; opacity: 1; 
 .fd-desc-wrap { background: #f0f4ff; border-radius: 12px; padding: 1rem 1.1rem; margin-bottom: 1.25rem; }
 .fd-desc-title { font-size: 0.75rem; font-weight: 600; color: var(--royal-blue); margin-bottom: 0.5rem; }
 .fd-desc { color: #374151; font-size: 0.875rem; line-height: 1.75; }
-.fd-btn-messenger { width: 100%; justify-content: center; font-size: 1rem; padding: 0.9rem; border-radius: 12px; }
+.fd-btn-messenger { width: 100%; justify-content: center; font-size: 1rem; padding: 0.9rem; border-radius: var(--radius-md); }
 .fd-btn-disabled {
   width: 100%; padding: 0.9rem;
   background: #f3f4f6; color: #9ca3af;
@@ -980,7 +1006,7 @@ nav.scrolled .lang-opt.active {
 .status-dot.out { background: #ef4444; }
 
 .action-btn {
-  padding: 0.3rem 0.75rem; border-radius: 7px; font-size: 0.78rem;
+  padding: 0.3rem 0.75rem; border-radius: var(--radius-sm); font-size: 0.78rem;
   font-weight: 500; font-family: var(--font-body);
   cursor: pointer; border: none; transition: all 0.15s; margin-right: 4px;
 }
@@ -1018,7 +1044,7 @@ nav.scrolled .lang-opt.active {
   padding: 0.8rem 1rem 0.8rem 2.75rem;
   border: 1px solid var(--border);
   background: var(--white);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-family: inherit;
   font-size: 0.92rem;
   color: var(--black);
@@ -1046,7 +1072,7 @@ nav.scrolled .lang-opt.active {
   padding: 0.5rem 1.1rem;
   border: 1px solid var(--border);
   background: var(--white);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   cursor: pointer;
   color: var(--gray);
   font-family: inherit;

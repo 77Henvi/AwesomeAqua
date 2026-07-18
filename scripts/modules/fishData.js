@@ -8,7 +8,18 @@ export async function loadFishFromDB() {
     .select('*')
     .order('created_at', { ascending: false });
 
-  if (error) { console.error(error); return; }
+  if (error) {
+    console.error(error);
+    if (typeof window.hideLoader === 'function') window.hideLoader();
+    const grid = document.getElementById('fishGrid');
+    if (grid) {
+      grid.innerHTML = `<div class="store-empty-state" style="grid-column:1/-1;">
+        <i class="ph ph-wifi-slash"></i>
+        <div>โหลดข้อมูลปลาไม่สำเร็จ ลองรีเฟรชหน้าใหม่อีกครั้งนะครับ</div>
+      </div>`;
+    }
+    return;
+  }
 
   fishData = data
     .filter(f => !f.is_archived) // กันไว้ชั้นหนึ่ง เผื่อ view fish_public ยังไม่ได้กรองที่ DB
@@ -33,4 +44,7 @@ export async function loadFishFromDB() {
 
   const { renderFishGrid } = await import('./render.js');
   renderFishGrid();
+
+  // ซ่อน splash loader ทันทีที่ข้อมูลพร้อมแสดงจริง (ไม่ใช่แค่เดาเวลาด้วย setTimeout)
+  if (typeof window.hideLoader === 'function') window.hideLoader();
 }
