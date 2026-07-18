@@ -1,4 +1,5 @@
 import { supabase } from '../../supabase.js';
+import { storeEmpty } from '../shared/utils.js';
 
 export let fishData = [];
 
@@ -13,10 +14,7 @@ export async function loadFishFromDB() {
     if (typeof window.hideLoader === 'function') window.hideLoader();
     const grid = document.getElementById('fishGrid');
     if (grid) {
-      grid.innerHTML = `<div class="store-empty-state" style="grid-column:1/-1;">
-        <i class="ph ph-wifi-slash"></i>
-        <div>โหลดข้อมูลปลาไม่สำเร็จ ลองรีเฟรชหน้าใหม่อีกครั้งนะครับ</div>
-      </div>`;
+      grid.innerHTML = storeEmpty('ph ph-wifi-slash', 'โหลดข้อมูลปลาไม่สำเร็จ ลองรีเฟรชหน้าใหม่อีกครั้งนะครับ');
     }
     return;
   }

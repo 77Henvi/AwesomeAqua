@@ -574,9 +574,9 @@ function renderFishTable() {
 
   const tbody = document.getElementById('fishTableBody');
   if (!list.length) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--gray);padding:2rem">
-      ${q ? 'ไม่พบปลาที่ค้นหา' : _stockFilter === 'archived' ? 'ยังไม่มีปลาที่เลิกขาย' : 'ยังไม่มีปลาครับ'}
-    </td></tr>`;
+    const icon = q ? 'ph-magnifying-glass-minus' : _stockFilter === 'archived' ? 'ph-archive' : 'ph-fish-simple';
+    const msg  = q ? 'ไม่พบปลาที่ค้นหา' : _stockFilter === 'archived' ? 'ยังไม่มีปลาที่เลิกขาย' : 'ยังไม่มีปลาครับ';
+    tbody.innerHTML = `<tr><td colspan="8">${_empty(`<i class="ph ${icon}"></i>`, msg)}</td></tr>`;
     return;
   }
 
@@ -970,7 +970,7 @@ function renderFinancePage() {
   if (finFilter === 'expense') list = list.filter(f => f.type === 'expense');
 
   if (!list.length) { 
-    elList.innerHTML = `<div class="admin-empty-state" style="background:white;border-radius:12px;border:1px solid var(--border);"><div class="admin-empty-icon"><i class="ph ph-receipt"></i></div><div class="admin-empty-text">ไม่มีรายการในเดือนนี้</div></div>`; 
+    elList.innerHTML = _empty('<i class="ph ph-receipt"></i>', 'ไม่มีรายการในเดือนนี้').replace('admin-empty-state', 'admin-empty-state admin-empty-state--card');
     return; 
   }
 

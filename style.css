@@ -264,6 +264,10 @@ section { padding: 5rem 5%; }
   transform: translateY(-4px);
   border-color: #c5d3ff;
 }
+.fish-card:focus-visible {
+  outline: 3px solid var(--bright-blue);
+  outline-offset: 2px;
+}
 .fish-img {
   position: relative; overflow: hidden;
   width: 100%;
@@ -298,13 +302,6 @@ section { padding: 5rem 5%; }
   font-size: 0.72rem; font-weight: 500;
 }
 
-/* Admin card actions */
-.card-admin-actions {
-  position: absolute; top: 8px; right: 8px;
-  display: none; gap: 6px; opacity: 0; transition: opacity 0.2s;
-}
-body.is-admin .fish-card:hover .card-admin-actions { display: flex; opacity: 1; }
-
 /* ── Skeleton Loading (โครงการ์ดตอนกำลังโหลดข้อมูล) ── */
 @keyframes skeleton-shimmer {
   0%   { background-position: -400px 0; }
@@ -324,15 +321,6 @@ body.is-admin .fish-card:hover .card-admin-actions { display: flex; opacity: 1; 
 .skeleton-line.w-70 { width: 70%; }
 .skeleton-line.w-40 { width: 40%; }
 .skeleton-line.w-50 { width: 50%; height: 18px; margin-top: 0.5rem; }
-.card-admin-actions button {
-  width: 32px; height: 32px; border-radius: 50%;
-  border: none; cursor: pointer;
-  background: rgba(255,255,255,0.92);
-  backdrop-filter: blur(4px); font-size: 0.85rem;
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15); transition: transform 0.15s;
-}
-.card-admin-actions button:hover { transform: scale(1.1); }
 
 /* Tag Selector (Admin) */
 .tag-selector { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.5rem 0; }
@@ -1134,13 +1122,19 @@ nav.scrolled .lang-opt.active {
   grid-column: 1 / -1;
   text-align: center;
   padding: 4rem 1rem;
-  color: var(--font-body);
+  color: var(--gray);
 }
 
 .store-empty-state i {
-  font-size: 3.5rem;
-  color: var(--border);
-  margin-bottom: 0.5rem;
+  font-size: 2.5rem;
+  color: var(--gray);
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.store-empty-state p {
+  font-size: 0.95rem;
+  margin: 0;
 }
 
 /* --- แก้ไขสัดส่วนรูปภาพในการ์ดปลา --- */

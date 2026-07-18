@@ -29,10 +29,18 @@ export function openMessenger(fishId) {
 }
 
 export function toggleMobile() {
-  document.getElementById('mobileMenu').classList.toggle('open');
-  document.querySelector('.hamburger').classList.toggle('open');
+  const menu = document.getElementById('mobileMenu');
+  const btn  = document.querySelector('.hamburger');
+  menu.classList.toggle('open');
+  btn.classList.toggle('open');
+  btn.setAttribute('aria-expanded', menu.classList.contains('open') ? 'true' : 'false');
 }
 
 export function scrollToSection(id) {
   document.querySelector(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Empty-state ฝั่งหน้าร้าน (การ์ดปลา) — ใช้จุดเดียวกันทุกที่ ไม่ให้แต่ละหน้าเขียน markup เอง
+export function storeEmpty(iconClass, text) {
+  return `<div class="store-empty-state"><i class="${iconClass}"></i><p>${text}</p></div>`;
 }

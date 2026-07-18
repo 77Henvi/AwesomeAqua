@@ -1,6 +1,6 @@
 // scripts/modules/render.js
 import { fishData } from './fishData.js';
-import { MESSENGER_ICON } from '../shared/utils.js';
+import { MESSENGER_ICON, storeEmpty } from '../shared/utils.js';
 import { isWishlisted } from '../shared/wishlist.js'; // นำเข้าฟังก์ชัน wishlist
 
 // --- State Management ---
@@ -52,9 +52,11 @@ function _availableCard(f) {
   const heartIcon = liked ? `<i class="ph-fill ph-heart"></i>` : `<i class="ph ph-heart"></i>`;
 
   return `
-    <div class="fish-card ${outOfStock ? 'fish-card--out' : ''}" onclick="openFishDetail('${f.id}')">
+    <div class="fish-card ${outOfStock ? 'fish-card--out' : ''}" role="button" tabindex="0" aria-label="ดูรายละเอียด ${displayName}"
+         onclick="openFishDetail('${f.id}')"
+         onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openFishDetail('${f.id}')}">
       <div class="fish-card-img-wrap">
-          <button class="wishlist-btn ${liked ? 'active' : ''}" onclick="onWishToggle('${f.id}', this, event)">
+          <button class="wishlist-btn ${liked ? 'active' : ''}" onclick="onWishToggle('${f.id}', this, event)" aria-label="${liked ? 'นำออกจากรายการโปรด' : 'เพิ่มในรายการโปรด'}" aria-pressed="${liked}">
             ${heartIcon}
           </button>
         ${f.image
@@ -62,10 +64,6 @@ function _availableCard(f) {
           : `<span>${f.emoji || '🐟'}</span>`
         }
         ${outOfStock ? `<div class="out-badge">${txtOut}</div>` : ''}
-        <div class="card-admin-actions">
-          <button onclick="event.stopPropagation(); openEditModal('${f.id}')" title="แก้ไข">✏️</button>
-          <button onclick="event.stopPropagation(); deleteFish('${f.id}')" title="ลบ">🗑️</button>
-        </div>
       </div>
       <div class="fish-info">
         <div class="fish-name">${displayName}</div>
@@ -106,9 +104,11 @@ function _comingSoonCard(f) {
   const heartIcon = liked ? `<i class="ph-fill ph-heart"></i>` : `<i class="ph ph-heart"></i>`;
 
   return `
-    <div class="fish-card fish-card--coming" tabindex="0" onclick="openComingSoonDetail('${f.id}')">
+    <div class="fish-card fish-card--coming" role="button" tabindex="0" aria-label="ดูรายละเอียด ${displayName} (เร็วๆ นี้)"
+         onclick="openComingSoonDetail('${f.id}')"
+         onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openComingSoonDetail('${f.id}')}">
       <div class="fish-card-img-wrap fish-img--coming">
-         <button class="wishlist-btn ${liked ? 'active' : ''}" onclick="onWishToggle('${f.id}', this, event)">
+         <button class="wishlist-btn ${liked ? 'active' : ''}" onclick="onWishToggle('${f.id}', this, event)" aria-label="${liked ? 'นำออกจากรายการโปรด' : 'เพิ่มในรายการโปรด'}" aria-pressed="${liked}">
             ${heartIcon}
           </button>
         ${f.image
@@ -176,9 +176,9 @@ export function renderFishGrid() {
       } else {
           // Empty State Logic
           if (currentFilter === 'ถูกใจ' && searchQuery === '') {
-             grid.innerHTML = `<div class="store-empty-state"><i class="ph ph-heart-break"></i><p>ยังไม่มีปลาถูกใจ</p></div>`;
+             grid.innerHTML = storeEmpty('ph ph-heart-break', 'ยังไม่มีปลาถูกใจ');
           } else {
-             grid.innerHTML = `<div class="store-empty-state"><i class="ph ph-magnifying-glass-minus"></i><p>ไม่พบผลลัพธ์ที่ค้นหา</p></div>`;
+             grid.innerHTML = storeEmpty('ph ph-magnifying-glass-minus', 'ไม่พบผลลัพธ์ที่ค้นหา');
           }
       }
   }
