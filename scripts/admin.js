@@ -8,6 +8,11 @@ import { renderStats }                   from './modules/stats.js';
 import { initAds }                       from './modules/ads.js';
 import { calcPricePreview, profitCell }  from './modules/profit.js';
 import { openSaleModal }                 from './modules/sale.js';
+import { loadFinanceFromDB, getFinanceData, getProfitMap,
+         renderTodayFinance, renderFinancePage, onFinMonthChange, setFinFilter,
+         openFinanceModal, closeFinanceModal, saveFinanceModal,
+         showDayBreakdown, addFinance, deleteFinance,
+         bindFinanceWindowFunctions }     from './modules/finance.js';
 
 // ── Expose ไว้บน window ──
 window.hideLoader = function() {
@@ -34,33 +39,26 @@ window.toggleSyncTag    = toggleSyncTag;
 window.previewNewImage  = previewNewImage;
 window.previewEditImage = previewEditImage;
 window.handleComingSoon = handleComingSoon;
-window.onFinMonthChange = onFinMonthChange;
-window.setFinFilter     = setFinFilter;
-window.openFinanceModal = openFinanceModal;
-window.closeFinanceModal= closeFinanceModal;
-window.saveFinanceModal = saveFinanceModal;
 window.openSaleModal    = openSaleModal;
 window.openSale         = openSale;
+
+bindFinanceWindowFunctions(); // ผูก onFinMonthChange, setFinFilter, openFinanceModal ฯลฯ (ดู modules/finance.js)
 
 // ── Expose ใหม่สำหรับ Quick Restock และ Calendar ──
 window.openRestockModal = openRestockModal;
 window.closeRestockModal = closeRestockModal;
 window.calcRestockTotal = calcRestockTotal;
 window.confirmRestock   = confirmRestock;
-window.showDayBreakdown = showDayBreakdown;
 
 // ── UI helpers (called from inline onclick in HTML) ──
 window.switchTab        = switchTab;
 window.toggleAddPanel   = toggleAddPanel;
 window.calcPricePreview = calcPricePreview;
 window.setStockFilter   = setStockFilter;
-window.addFinance       = addFinance;
-window.deleteFinance    = deleteFinance;
 
 // ── State ──
 let fishData     = [];
-let financeData  = [];
-let profitMap    = {}; // { fish_id: number }
+let profitMap    = {}; // { fish_id: number } — sync มาจาก getProfitMap() ทุกครั้งที่โหลดการเงินใหม่
 let _stockFilter = 'all';
 
 // ════════════════════════════════════════════
@@ -95,32 +93,18 @@ function showDashboard() {
   document.getElementById('adminDashboard').style.display = 'block';
   _setDateHeaders();
   loadFishFromDB();
-  loadFinanceFromDB(); 
+  refreshFinance(); 
 }
 
 // ════════════════════════════════════════════
-//   LOAD DATA & PROFIT CALCULATION (Spec 2)
+//   LOAD DATA & PROFIT CALCULATION
+//   (logic จริงอยู่ที่ scripts/modules/finance.js)
 // ════════════════════════════════════════════
-async function loadFinanceFromDB() {
-  const { data, error } = await supabase
-    .from('finance')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  if (!error) {
-    financeData = data;
-    
-    // คำนวณกำไรสะสม Group By fish_id แบบยิงครั้งเดียว
-    profitMap = {};
-    financeData.forEach(r => {
-      if (!r.fish_id) return;
-      profitMap[r.fish_id] = (profitMap[r.fish_id] || 0) + (r.type === 'income' ? r.amount : -r.amount);
-    });
-
-    renderTodayFinance();
-    renderFinancePage(); 
+function refreshFinance() {
+  return loadFinanceFromDB(() => {
+    profitMap = getProfitMap(); // sync ให้ renderFishTable() อ่านค่าล่าสุดได้
     if (fishData.length > 0) renderFishTable(); // รีเรนเดอร์ตารางปลาเพื่ออัปเดตกำไรสะสม
-  }
+  });
 }
 
 async function loadFishFromDB() {
@@ -251,7 +235,7 @@ async function addFish() {
   clearForm();
   toggleAddPanel(false); 
   loadFishFromDB();
-  loadFinanceFromDB();
+  refreshFinance();
 }
 
 // ════════════════════════════════════════════
@@ -339,7 +323,7 @@ async function confirmRestock() {
     showToast('<i class="ph-fill ph-check-circle" style="color:#10b981;"></i> เติมสต็อกเรียบร้อย');
     closeRestockModal();
     loadFishFromDB(); 
-    loadFinanceFromDB();
+    refreshFinance();
   } catch(e) {
     showToast('<i class="ph-fill ph-x-circle" style="color:#ef4444;"></i> เกิดข้อผิดพลาด');
   } finally {
@@ -395,7 +379,7 @@ async function hardDeleteFish(id) {
 
   showToast('<i class="ph-fill ph-trash" style="color:#6b7280; font-size:1.1em; vertical-align:-2px;"></i> ลบปลาถาวรเรียบร้อย');
   loadFishFromDB();
-  loadFinanceFromDB();
+  refreshFinance();
 }
 
 // ════════════════════════════════════════════
@@ -663,7 +647,7 @@ function openSale(id) {
   if (!f) return;
   openSaleModal(f, () => {
     loadFishFromDB();
-    loadFinanceFromDB();
+    refreshFinance();
   });
 }
 
@@ -768,7 +752,7 @@ function switchTab(tab) {
   document.getElementById('nav-'  + tab)?.classList.add('active');
   document.getElementById('bnav-' + tab)?.classList.add('active');
   if (tab === 'finance') renderFinancePage();
-  if (tab === 'stats')   renderStats(fishData, financeData);
+  if (tab === 'stats')   renderStats(fishData, getFinanceData());
   if (tab === 'ads')     initAds();
 }
 
@@ -819,290 +803,6 @@ function handleComingSoon(prefix) {
   
   if (prefix === 'new') calcPricePreview();
   if (prefix === 'new') updateAddFishTotal(); 
-}
-
-// ════════════════════════════════════════════
-//   FINANCE SYSTEM (เพิ่มเติม Spec 3 Calendar)
-// ════════════════════════════════════════════
-async function addFinance(type) {
-  const name = document.getElementById('finItemName').value.trim();
-  const amount = parseFloat(document.getElementById('finItemAmount').value);
-
-  if (!name || !amount) {
-    showToast('<i class="ph-fill ph-warning-circle" style="color:#f59e0b; font-size:1.1em; vertical-align:-2px;"></i> กรุณากรอกชื่อรายการและจำนวนเงิน');
-    return;
-  }
-
-  const today = new Date().toLocaleDateString('en-CA'); 
-
-  const { error } = await supabase.from('finance').insert({
-    type: type,
-    name: name,
-    amount: amount,
-    date: today
-  });
-
-  if (error) {
-    showToast('<i class="ph-fill ph-x-circle" style="color:#ef4444; font-size:1.1em; vertical-align:-2px;"></i> บันทึกไม่ได้: ' + error.message);
-    return;
-  }
-
-  showToast('<i class="ph-fill ph-check-circle" style="color:#10b981; font-size:1.1em; vertical-align:-2px;"></i> บันทึกยอดเรียบร้อย');
-  document.getElementById('finItemName').value = '';
-  document.getElementById('finItemAmount').value = '';
-  loadFinanceFromDB(); 
-}
-
-async function deleteFinance(id) {
-  if (!confirm('ลบรายการนี้?')) return;
-  const { error } = await supabase.from('finance').delete().eq('id', id);
-  
-  if (error) {
-    showToast('<i class="ph-fill ph-x-circle" style="color:#ef4444; font-size:1.1em; vertical-align:-2px;"></i> ลบไม่ได้'); return;
-  }
-  
-  showToast('<i class="ph-fill ph-trash" style="color:#6b7280; font-size:1.1em; vertical-align:-2px;"></i> ลบรายการแล้ว');
-  loadFinanceFromDB();
-}
-
-function renderTodayFinance() {
-  const el = document.getElementById('financeTodayList');
-  if (!el) return;
-
-  const today = new Date().toLocaleDateString('en-CA');
-  const list = financeData.filter(f => f.date === today);
-
-  if (!list.length) {
-    el.innerHTML = _empty('<i class="ph ph-receipt"></i>', 'ยังไม่มีรายการเคลื่อนไหววันนี้');
-    return;
-  }
-
-  el.innerHTML = list.map(f => `
-    <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: white; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px;">
-      <div>
-        <div style="font-weight: 500; font-size: 0.95rem;">${f.name}</div>
-        <div style="font-size: 0.75rem; color: var(--gray); display: flex; align-items: center; gap: 4px;">
-          <i class="ph-fill ${f.type === 'income' ? 'ph-arrow-circle-up' : 'ph-arrow-circle-down'}" style="color: ${f.type === 'income' ? '#059669' : '#dc2626'};"></i>
-          ${f.type === 'income' ? 'รายรับ' : 'รายจ่าย'}
-        </div>
-      </div>
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <span style="font-family: var(--font-number); font-weight: 700; color: ${f.type === 'income' ? '#059669' : '#dc2626'};">
-          ${f.type === 'income' ? '+' : '-'}฿${f.amount.toLocaleString()}
-        </span>
-        <button onclick="deleteFinance('${f.id}')" style="background:none; border:none; color:var(--gray); cursor:pointer; padding:4px; font-size:1.1rem; display:flex;"><i class="ph ph-trash"></i></button>
-      </div>
-    </div>
-  `).join('');
-}
-
-let finFilter = 'all';
-let selectedFinMonth = new Date().toLocaleDateString('en-CA').slice(0, 7);
-
-function populateFinMonthSelect() {
-  const select = document.getElementById('fin-month-select');
-  if (!select) return;
-
-  const months = new Set(financeData.map(f => (f.date || '').slice(0, 7)).filter(Boolean));
-  months.add(new Date().toLocaleDateString('en-CA').slice(0, 7));
-
-  const sorted = [...months].sort((a, b) => b.localeCompare(a));
-  const monthNames = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
-
-  select.innerHTML = sorted.map(m => {
-    const [y, mo] = m.split('-');
-    const yearTh = parseInt(y) + 543;
-    const label = `${monthNames[parseInt(mo) - 1]} ${yearTh}`;
-    const isNow = m === new Date().toLocaleDateString('en-CA').slice(0, 7) ? ' (เดือนนี้)' : '';
-    return `<option value="${m}" ${m === selectedFinMonth ? 'selected' : ''}>${label}${isNow}</option>`;
-  }).join('');
-}
-
-function onFinMonthChange() {
-  selectedFinMonth = document.getElementById('fin-month-select').value;
-  renderFinancePage();
-}
-
-function setFinFilter(f, el) {
-  finFilter = f;
-  document.querySelectorAll('.fin-chip').forEach(c => c.classList.remove('active'));
-  el.classList.add('active');
-  renderFinancePage();
-}
-
-function renderFinancePage() {
-  populateFinMonthSelect();
-
-  const isCurrentMonth = selectedFinMonth === new Date().toLocaleDateString('en-CA').slice(0, 7);
-  const monthFin = financeData.filter(f => (f.date || '').startsWith(selectedFinMonth));
-
-  const income  = monthFin.filter(f => f.type === 'income').reduce((s,f) => s + f.amount, 0);
-  const expense = monthFin.filter(f => f.type === 'expense').reduce((s,f) => s + f.amount, 0);
-  const profit  = income - expense;
-
-  const suffix = isCurrentMonth ? 'เดือนนี้' : 'เดือนนั้น';
-  
-  if(document.getElementById('fin-label-income')) document.getElementById('fin-label-income').textContent  = `รายรับ${suffix}`;
-  if(document.getElementById('fin-label-expense')) document.getElementById('fin-label-expense').textContent  = `รายจ่าย${suffix}`;
-  if(document.getElementById('fin-label-profit')) document.getElementById('fin-label-profit').textContent  = `กำไร/ขาดทุน${suffix}`;
-
-  if(document.getElementById('fin-month-income')) document.getElementById('fin-month-income').textContent  = '฿' + income.toLocaleString('th-TH');
-  if(document.getElementById('fin-month-expense')) document.getElementById('fin-month-expense').textContent  = '฿' + expense.toLocaleString('th-TH');
-
-  const elProVal = document.getElementById('fin-profit');
-  if(elProVal) {
-    elProVal.textContent = (profit >= 0 ? '+' : '') + '฿' + profit.toLocaleString('th-TH');
-    elProVal.className   = 'fin-profit-val ' + (profit >= 0 ? 'good' : 'bad');
-  }
-
-  const elList = document.getElementById('finance-list');
-  if (!elList) return;
-
-  // ── Render Calendar View ──
-  if (finFilter === 'calendar') {
-    renderCalendarView(monthFin, elList);
-    return;
-  }
-
-  // ── Render List View ──
-  let list = [...monthFin].sort((a,b) => (b.date||'').localeCompare(a.date||''));
-  if (finFilter === 'income')  list = list.filter(f => f.type === 'income');
-  if (finFilter === 'expense') list = list.filter(f => f.type === 'expense');
-
-  if (!list.length) { 
-    elList.innerHTML = _empty('<i class="ph ph-receipt"></i>', 'ไม่มีรายการในเดือนนี้').replace('admin-empty-state', 'admin-empty-state admin-empty-state--card');
-    return; 
-  }
-
-  elList.innerHTML = list.map(f => {
-    const [y, mo, d] = f.date.split('-');
-    const dateStr = `${parseInt(d)} ${['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'][parseInt(mo)-1]} ${(parseInt(y)+543).toString().slice(-2)}`;
-    
-    return `
-    <div class="fin-item">
-      <div class="fin-item-left">
-        <div class="fin-item-name">${f.name}</div>
-        <div class="fin-item-sub">${dateStr} · ${f.type === 'income' ? 'รายรับ' : 'รายจ่าย'}</div>
-      </div>
-      <div class="fin-item-right">
-        <div class="fin-item-amt ${f.type === 'income' ? 'inc' : 'exp'}">${f.type === 'income' ? '+' : '-'}฿${f.amount.toLocaleString('th-TH')}</div>
-        <button class="fin-item-del" onclick="deleteFinance('${f.id}')"><i class="ph ph-trash"></i></button>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function renderCalendarView(monthData, container) {
-  const [yyyy, mm] = selectedFinMonth.split('-');
-  const year = parseInt(yyyy), month = parseInt(mm) - 1;
-  const firstDay = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-  const dayMap = {};
-  monthData.forEach(r => {
-    if(!r.date) return;
-    const d = new Date(r.date);
-    if(isNaN(d)) return;
-    const dateStr = r.date;
-    dayMap[dateStr] = dayMap[dateStr] || [];
-    dayMap[dateStr].push(r);
-  });
-
-  const days = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
-  let html = `<div class="cal-grid">`;
-  days.forEach(d => html += `<div class="cal-head">${d}</div>`);
-
-  for (let i = 0; i < firstDay; i++) {
-    html += `<div class="cal-day empty"></div>`;
-  }
-
-  for (let i = 1; i <= daysInMonth; i++) {
-    const dStr = `${year}-${String(month+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
-    const records = dayMap[dStr] || [];
-    let hasInc = false, hasExp = false;
-    let net = 0;
-
-    records.forEach(r => {
-      if (r.type === 'income') { hasInc = true; net += r.amount; }
-      if (r.type === 'expense') { hasExp = true; net -= r.amount; }
-    });
-
-    html += `
-      <div class="cal-day" onclick="showDayBreakdown('${dStr}')">
-        <div class="cal-date-num">${i}</div>
-        <div class="cal-dots">
-          ${hasInc ? '<div class="cal-dot inc"></div>' : ''}
-          ${hasExp ? '<div class="cal-dot exp"></div>' : ''}
-        </div>
-        ${net !== 0 ? `<div class="cal-net ${net > 0 ? 'pos' : 'neg'}">${net > 0 ? '+' : ''}${Math.abs(net).toLocaleString('en-US')}</div>` : ''}
-      </div>`;
-  }
-  html += `</div><div id="cal-breakdown"></div>`;
-  container.innerHTML = html;
-}
-
-function showDayBreakdown(dateStr) {
-  const box = document.getElementById('cal-breakdown');
-  if(!box) return;
-  const records = financeData.filter(f => f.date === dateStr);
-  
-  if(!records.length) {
-    box.innerHTML = `<div class="cal-breakdown-box" style="text-align:center;color:var(--gray);">ไม่มีรายการวันนี้</div>`;
-    return;
-  }
-
-  const [y, m, d] = dateStr.split('-');
-  const displayDate = `${parseInt(d)}/${parseInt(m)}/${parseInt(y)+543}`;
-
-  box.innerHTML = `<div class="cal-breakdown-box">
-    <div style="font-weight:600;margin-bottom:10px;border-bottom:1px solid #e2e8f0;padding-bottom:8px;">รายการวันที่ ${displayDate}</div>
-    ${records.map(f => `
-      <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:0.85rem;">
-        <span>${f.name}</span>
-        <span style="font-family:var(--font-number);font-weight:600;color:${f.type==='income'?'#10b981':'#ef4444'}">${f.type==='income'?'+':'-'}฿${f.amount.toLocaleString('th-TH')}</span>
-      </div>
-    `).join('')}
-  </div>`;
-}
-
-function openFinanceModal() {
-  document.getElementById('finModalName').value = '';
-  document.getElementById('finModalAmount').value = '';
-  document.getElementById('finModalDate').value = new Date().toLocaleDateString('en-CA');
-  document.getElementById('finModalType').value = 'income';
-  document.getElementById('financeModal').classList.add('open');
-}
-
-function closeFinanceModal() {
-  document.getElementById('financeModal').classList.remove('open');
-}
-
-async function saveFinanceModal() {
-  const type = document.getElementById('finModalType').value;
-  const name = document.getElementById('finModalName').value.trim();
-  const amount = parseFloat(document.getElementById('finModalAmount').value);
-  const date = document.getElementById('finModalDate').value;
-
-  if (!name || !amount || !date) {
-    showToast('<i class="ph-fill ph-warning-circle" style="color:#f59e0b; font-size:1.1em; vertical-align:-2px;"></i> กรุณากรอกข้อมูลให้ครบ');
-    return;
-  }
-
-  const { error } = await supabase.from('finance').insert({
-    type: type,
-    name: name,
-    amount: amount,
-    date: date
-  });
-
-  if (error) {
-    showToast('<i class="ph-fill ph-x-circle" style="color:#ef4444; font-size:1.1em; vertical-align:-2px;"></i> บันทึกไม่ได้: ' + error.message);
-    return;
-  }
-
-  showToast('<i class="ph-fill ph-check-circle" style="color:#10b981; font-size:1.1em; vertical-align:-2px;"></i> บันทึกรายการเรียบร้อย');
-  closeFinanceModal();
-  loadFinanceFromDB();
 }
 
 // ════════════════════════════════════════════

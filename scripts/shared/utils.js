@@ -44,3 +44,8 @@ export function scrollToSection(id) {
 export function storeEmpty(iconClass, text) {
   return `<div class="store-empty-state"><i class="${iconClass}"></i><p>${text}</p></div>`;
 }
+
+// Empty-state ฝั่ง admin — เดิมชื่อ _empty() อยู่ใน admin.js ย้ายมาไว้ที่เดียวเพื่อให้ finance.js ใช้ร่วมได้
+export function adminEmpty(icon, text) {
+  return `<div class="admin-empty-state"><div class="admin-empty-icon">${icon}</div><div class="admin-empty-text">${text}</div></div>`;
+}
