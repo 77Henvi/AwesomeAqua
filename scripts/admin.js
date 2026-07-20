@@ -1,7 +1,7 @@
 import { supabase }                       from '../supabase.js';
 import { showToast }                      from './shared/utils.js';
 import { compressImage, previewNewImage,
-         previewEditImage }               from './shared/image.js';
+         previewEditImage, uploadImage }  from './shared/image.js';
 import { toggleTag, getSelectedTags,
          setSelectedTags }                from './shared/tags.js';
 import { renderStats }                   from './modules/stats.js';
@@ -186,7 +186,7 @@ async function addFish() {
 
   let imageUrl = null;
   if (file) {
-    imageUrl = await uploadImage(file);
+    imageUrl = await uploadImage(file, supabase, showToast);
     if (!imageUrl) return;
   }
 
@@ -295,7 +295,7 @@ async function saveEdit() {
 
   let imageUrl = oldData?.image || null;
   if (file) {
-    imageUrl = await uploadImage(file);
+    imageUrl = await uploadImage(file, supabase, showToast);
     if (!imageUrl) return;
   }
 
@@ -333,32 +333,6 @@ async function saveEdit() {
   showToast('<i class="ph-fill ph-check-circle" style="color:#10b981; font-size:1.1em; vertical-align:-2px;"></i> บันทึกการแก้ไขเรียบร้อย');
   closeEditModal();
   loadFishFromDB();
-}
-
-// ════════════════════════════════════════════
-//   UPLOAD IMAGE
-// ════════════════════════════════════════════
-async function uploadImage(file) {
-  const filename   = `fish_${Date.now()}.jpg`;
-  const compressed = await new Promise(resolve => compressImage(file, resolve));
-  const res        = await fetch(compressed);
-  const blob       = await res.blob();
-
-  const { error } = await supabase.storage
-    .from('fish-images')
-    .upload(filename, blob, { contentType: 'image/jpeg', upsert: false });
-
-  if (error) {
-    console.error('Upload error:', error);
-    showToast('<i class="ph-fill ph-x-circle" style="color:#ef4444; font-size:1.1em; vertical-align:-2px;"></i> อัปโหลดรูปไม่ได้: ' + error.message);
-    return null;
-  }
-
-  const { data: urlData } = supabase.storage
-    .from('fish-images')
-    .getPublicUrl(filename);
-
-  return urlData.publicUrl;
 }
 
 // ════════════════════════════════════════════
