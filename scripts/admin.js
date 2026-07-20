@@ -13,6 +13,8 @@ import { loadFinanceFromDB, getFinanceData, getProfitMap,
          openFinanceModal, closeFinanceModal, saveFinanceModal,
          showDayBreakdown, addFinance, deleteFinance,
          bindFinanceWindowFunctions }     from './modules/finance.js';
+import { archiveFish as _archiveFish, restoreFish as _restoreFish,
+         hardDeleteFish as _hardDeleteFish }  from './modules/fishArchive.js';
 
 // ── Expose ไว้บน window ──
 window.hideLoader = function() {
@@ -333,54 +335,11 @@ async function confirmRestock() {
 
 // ════════════════════════════════════════════
 //   เลิกขาย / เปิดขายอีกครั้ง / ลบถาวร
+//   (logic จริงอยู่ที่ scripts/modules/fishArchive.js)
 // ════════════════════════════════════════════
-
-// "เลิกขาย" — ซ่อนปลาจากหน้าร้าน/ตารางหลัก แต่ไม่ลบข้อมูล
-// รายรับ/รายจ่ายเดิมที่ผูกกับปลาตัวนี้จะไม่หายไป และสามารถกลับมาเปิดขายใหม่ได้ทีหลัง
-async function archiveFish(id) {
-  if (!confirm('เลิกขายปลาตัวนี้เลยไหม?\n\nปลาจะหายจากหน้าร้านและตาราง "ขายอยู่" แต่ประวัติรายรับ/รายจ่ายเดิมจะไม่หายไป และกลับมาเปิดขายใหม่ได้ทีหลังจากแท็บ "เลิกขายแล้ว"')) return;
-
-  const { error } = await supabase.from('fish').update({ is_archived: true }).eq('id', id);
-
-  if (error) {
-    showToast('<i class="ph-fill ph-x-circle" style="color:#ef4444; font-size:1.1em; vertical-align:-2px;"></i> เลิกขายไม่สำเร็จ');
-    return;
-  }
-
-  showToast('<i class="ph-fill ph-archive" style="color:#6b7280; font-size:1.1em; vertical-align:-2px;"></i> เลิกขายเรียบร้อย');
-  loadFishFromDB();
-}
-
-// "เปิดขายอีกครั้ง" — เอาปลากลับมาแสดงในหน้าร้าน/ตารางหลักตามปกติ
-async function restoreFish(id) {
-  const { error } = await supabase.from('fish').update({ is_archived: false }).eq('id', id);
-
-  if (error) {
-    showToast('<i class="ph-fill ph-x-circle" style="color:#ef4444; font-size:1.1em; vertical-align:-2px;"></i> เปิดขายไม่สำเร็จ');
-    return;
-  }
-
-  showToast('<i class="ph-fill ph-check-circle" style="color:#10b981; font-size:1.1em; vertical-align:-2px;"></i> เปิดขายอีกครั้งเรียบร้อย');
-  loadFishFromDB();
-}
-
-// "ลบถาวร" — ใช้เฉพาะกรณีกรอกผิด/ไม่เคยขายจริง เพราะจะลบข้อมูลทิ้งกู้คืนไม่ได้
-// (รายรับ/รายจ่ายเดิมที่ผูกกับปลานี้จะกลายเป็น fish_id = null แทนที่จะถูกลบไปด้วย
-//  ถ้าตั้ง FK constraint เป็น ON DELETE SET NULL ตามคำแนะนำ)
-async function hardDeleteFish(id) {
-  if (!confirm('⚠️ ลบถาวร ไม่สามารถกู้คืนได้!\n\nยืนยันว่าจะลบปลานี้ทิ้งจริงๆ ใช่ไหม? (แนะนำให้ใช้ "เลิกขาย" แทน ถ้าเคยมีการขายปลาตัวนี้ไปแล้ว)')) return;
-
-  const { error } = await supabase.from('fish').delete().eq('id', id);
-
-  if (error) {
-    showToast('<i class="ph-fill ph-x-circle" style="color:#ef4444; font-size:1.1em; vertical-align:-2px;"></i> ลบไม่ได้');
-    return;
-  }
-
-  showToast('<i class="ph-fill ph-trash" style="color:#6b7280; font-size:1.1em; vertical-align:-2px;"></i> ลบปลาถาวรเรียบร้อย');
-  loadFishFromDB();
-  refreshFinance();
-}
+function archiveFish(id)    { return _archiveFish(id, loadFishFromDB); }
+function restoreFish(id)    { return _restoreFish(id, loadFishFromDB); }
+function hardDeleteFish(id) { return _hardDeleteFish(id, () => { loadFishFromDB(); refreshFinance(); }); }
 
 // ════════════════════════════════════════════
 //   SAVE EDIT
