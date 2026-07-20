@@ -15,6 +15,8 @@ import { loadFinanceFromDB, getFinanceData, getProfitMap,
          bindFinanceWindowFunctions }     from './modules/finance.js';
 import { archiveFish as _archiveFish, restoreFish as _restoreFish,
          hardDeleteFish as _hardDeleteFish }  from './modules/fishArchive.js';
+import { openRestockModal as _openRestockModal, closeRestockModal,
+         calcRestockTotal, confirmRestock as _confirmRestock } from './modules/restock.js';
 
 // ── Expose ไว้บน window ──
 window.hideLoader = function() {
@@ -268,70 +270,11 @@ function updateAddFishTotal() {
 // ════════════════════════════════════════════
 //   QUICK RESTOCK (Spec 1)
 // ════════════════════════════════════════════
-function openRestockModal(id) {
-  const f = fishData.find(x => x.id === id);
-  if (!f) return;
-  document.getElementById('rsFishId').value = f.id;
-  document.getElementById('rsFishName').value = f.name_th || f.name;
-  document.getElementById('rsQty').value = '';
-  document.getElementById('rsCost').value = f.cost || 0;
-  document.getElementById('rsDate').value = new Date().toLocaleDateString('en-CA');
-  calcRestockTotal();
-  document.getElementById('restockModal').classList.add('open');
-}
-
-function closeRestockModal() {
-  document.getElementById('restockModal').classList.remove('open');
-}
-
-function calcRestockTotal() {
-  const q = parseInt(document.getElementById('rsQty').value) || 0;
-  const c = parseFloat(document.getElementById('rsCost').value) || 0;
-  document.getElementById('rsTotal').value = (q * c).toLocaleString('th-TH');
-}
-
-async function confirmRestock() {
-  const id   = document.getElementById('rsFishId').value;
-  const qty  = parseInt(document.getElementById('rsQty').value) || 0;
-  const cost = parseFloat(document.getElementById('rsCost').value) || 0;
-  const date = document.getElementById('rsDate').value;
-  
-  if (qty <= 0 || isNaN(qty)) { showToast('<i class="ph-fill ph-warning-circle" style="color:#f59e0b;"></i> กรุณากรอกจำนวนที่ต้องการเติม'); return; }
-  if (isNaN(cost)) { showToast('<i class="ph-fill ph-warning-circle" style="color:#f59e0b;"></i> กรุณากรอกต้นทุนให้ถูกต้อง'); return; }
-  
-  const f = fishData.find(x => x.id === id);
-  const btn = document.getElementById('btnConfirmRestock');
-  btn.disabled = true; btn.textContent = 'กำลังบันทึก...';
-
-  try {
-    const newStock = f.stock + qty;
-    // 1. อัปเดตสต็อก
-    const { error: stockErr } = await supabase.from('fish').update({ stock: newStock }).eq('id', id);
-    if (stockErr) { showToast('<i class="ph-fill ph-x-circle" style="color:#ef4444;"></i> ผิดพลาด: อัปเดตสต็อกไม่สำเร็จ'); return; }
-
-    const amount = qty * cost;
-    // 2. บันทึกรายจ่าย
-    if (amount > 0) {
-      const { error: finErr } = await supabase.from('finance').insert({
-        type: 'expense',
-        name: `เติมสต็อก: ${f.name_th || f.name} x${qty} ตัว`,
-        amount: amount,
-        date: date || new Date().toLocaleDateString('en-CA'),
-        fish_id: id
-      });
-      if (finErr) { showToast('<i class="ph-fill ph-warning-circle" style="color:#f59e0b;"></i> เติมสต็อกสำเร็จ แต่บันทึกรายจ่ายไม่สำเร็จ'); }
-    }
-
-    showToast('<i class="ph-fill ph-check-circle" style="color:#10b981;"></i> เติมสต็อกเรียบร้อย');
-    closeRestockModal();
-    loadFishFromDB(); 
-    refreshFinance();
-  } catch(e) {
-    showToast('<i class="ph-fill ph-x-circle" style="color:#ef4444;"></i> เกิดข้อผิดพลาด');
-  } finally {
-    btn.disabled = false; btn.innerHTML = '<i class="ph ph-check-circle"></i> ยืนยันการเติม';
-  }
-}
+// ════════════════════════════════════════════
+//   เติมสต็อก (logic จริงอยู่ที่ scripts/modules/restock.js)
+// ════════════════════════════════════════════
+function openRestockModal(id) { return _openRestockModal(id, fishData); }
+function confirmRestock()     { return _confirmRestock(fishData, () => { loadFishFromDB(); refreshFinance(); }); }
 
 // ════════════════════════════════════════════
 //   เลิกขาย / เปิดขายอีกครั้ง / ลบถาวร
