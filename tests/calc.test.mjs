@@ -10,6 +10,8 @@ import {
   niceMax,
   smoothPath,
   shouldPromptArchive,
+  isLowStock,
+  LOW_STOCK_THRESHOLD,
 } from '../scripts/shared/calc.js';
 
 // ── hasSizeOptions ─────────────────────────────
@@ -82,4 +84,12 @@ test('shouldPromptArchive: ถามเฉพาะตอนสต็อกเ�
   assert.equal(shouldPromptArchive(0), true);
   assert.equal(shouldPromptArchive(1), false);
   assert.equal(shouldPromptArchive(-1), false); // กันเคส edge case ที่ไม่ควรเกิดแต่เผื่อไว้
+});
+
+// ── isLowStock ─────────────────────────────────
+test('isLowStock: เท่ากับหรือน้อยกว่าเกณฑ์ถือว่าใกล้หมด', () => {
+  assert.equal(LOW_STOCK_THRESHOLD, 3);
+  assert.equal(isLowStock(3), true);
+  assert.equal(isLowStock(0), true);
+  assert.equal(isLowStock(4), false);
 });

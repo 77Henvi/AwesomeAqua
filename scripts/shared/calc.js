@@ -53,3 +53,13 @@ export function smoothPath(points) {
 export function shouldPromptArchive(newStock) {
   return newStock === 0;
 }
+
+// ── สต็อกใกล้หมด (แจ้งเตือน Messenger + การ์ด dashboard) ───────
+
+/** เกณฑ์ "สต็อกใกล้หมด" ใช้ร่วมกันทั้งการ์ด dashboard และ auto-alert Messenger */
+export const LOW_STOCK_THRESHOLD = 3;
+
+/** เหลือน้อยกว่าหรือเท่ากับเกณฑ์ไหม (รวมกรณีหมดสต็อกพอดีด้วย) */
+export function isLowStock(stock) {
+  return stock <= LOW_STOCK_THRESHOLD;
+}

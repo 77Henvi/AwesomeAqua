@@ -1,5 +1,6 @@
 import { supabase }                       from '../supabase.js';
 import { showToast }                      from './shared/utils.js';
+import { LOW_STOCK_THRESHOLD }            from './shared/calc.js';
 import { previewNewImage, previewEditImage } from './shared/image.js';
 import { toggleTag }                      from './shared/tags.js';
 import { renderStats }                   from './modules/stats.js';
@@ -234,7 +235,6 @@ function renderAdminStats() {
 //   DASHBOARD CARDS (low stock + recent - Spec 1)
 // ════════════════════════════════════════════
 function renderDashboardCards() {
-  const LOW_STOCK_THRESHOLD = 3; 
   const lowEl    = document.getElementById('dash-lowstock');
   const lowItems = fishData.filter(f => !f.is_archived && f.stock <= LOW_STOCK_THRESHOLD && f.priceMin > 0);
 

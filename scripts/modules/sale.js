@@ -1,6 +1,6 @@
 import { supabase }   from '../../supabase.js';
 import { showToast }  from '../shared/utils.js';
-import { hasSizeOptions as _hasSizeOptions, priceForSize as _priceForSize, shouldPromptArchive } from '../shared/calc.js';
+import { hasSizeOptions as _hasSizeOptions, priceForSize as _priceForSize, shouldPromptArchive, isLowStock, LOW_STOCK_THRESHOLD } from '../shared/calc.js';
 
 let _currentFish = null;
 let _onSaved     = null;
@@ -153,6 +153,28 @@ export function closeSaleModal() {
   _currentFish = null;
 }
 
+// ── แจ้งเตือนแอดมินผ่าน Messenger ตอนสต็อกใกล้หมด/หมดแล้ว ──
+// fire-and-forget: ไม่ await ผลลัพธ์ตรงๆ ในจุดเรียกใช้ กันไม่ให้ error เรื่องแจ้งเตือนไปกระทบ flow การขายหลัก
+async function _notifyLowStock(fishName, stock) {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return; // ไม่มี session ก็ข้ามไปเงียบๆ ไม่ต้อง error ให้กวนใจ
+
+    const res = await fetch('/api/notify-low-stock', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ fishName, stock, threshold: LOW_STOCK_THRESHOLD }),
+    });
+
+    if (!res.ok) console.warn('แจ้งเตือนสต็อกใกล้หมดไม่สำเร็จ:', await res.text());
+  } catch (err) {
+    console.warn('แจ้งเตือนสต็อกใกล้หมด: เกิดข้อผิดพลาด', err);
+  }
+}
+
 export async function confirmSale() {
   const fish = _currentFish;
   if (!fish) return;
@@ -199,6 +221,11 @@ export async function confirmSale() {
 
     closeSaleModal();
     if (_onSaved) _onSaved();
+
+    // ── สต็อกใกล้หมด/หมดแล้ว แจ้งเตือนแอดมินผ่าน Messenger (เผื่อไม่ได้อยู่หน้าจอตอนนั้น) ──
+    if (isLowStock(newStock)) {
+      _notifyLowStock(fish.name_th || fish.name, newStock);
+    }
 
     // ── สต็อกหมดพอดี ถามว่าจะรีสต็อคอีกไหม ถ้าไม่รีสต็อค ให้ "เลิกขาย" ไปเลย ──
     // (เลิกขาย = ซ่อนจากหน้าร้าน/ตารางหลัก แต่ไม่ลบข้อมูล รายรับ/รายจ่ายเดิมยังอยู่ครบ)
