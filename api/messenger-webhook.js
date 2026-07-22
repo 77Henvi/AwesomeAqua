@@ -26,7 +26,7 @@ const sendText = (psid, text) => sendMessage(psid, { text });
 const sendImage = (psid, url) =>
   sendMessage(psid, { attachment: { type: 'image', payload: { url, is_reusable: true } } });
 
-// ── Supabase helpers (เหมือนกับ webhook LINE เดิม) ──
+// ── Supabase REST helpers ──
 const dbGet = async (path) => {
   const res  = await fetch(`${DB_URL}/rest/v1/${path}`, { headers: DB_HEADS });
   const data = await res.json();
@@ -40,16 +40,43 @@ const dbUpsert = (path, body) =>
     body: JSON.stringify(body)
   });
 
+// insert แถวใหม่ + คืนค่าแถวที่สร้างกลับมา (ใช้ตอนสร้าง order เพื่อเอา id)
+const dbInsert = async (path, body) => {
+  const res = await fetch(`${DB_URL}/rest/v1/${path}`, {
+    method: 'POST',
+    headers: { ...DB_HEADS, 'Content-Type': 'application/json', Prefer: 'return=representation' },
+    body: JSON.stringify(body)
+  });
+  const data = await res.json();
+  return Array.isArray(data) ? data[0] : data;
+};
+
+const dbPatch = (path, body) =>
+  fetch(`${DB_URL}/rest/v1/${path}`, {
+    method: 'PATCH',
+    headers: { ...DB_HEADS, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+
 const price = (f) => (!f.price_max || f.price_max === f.price_min)
   ? `฿${f.price_min}`
   : `฿${f.price_min} – ฿${f.price_max}`;
 
-// ── ส่งรายละเอียดปลา 1 ตัว พร้อมบันทึก session ──
+const unitPrice = (f) => (f.sale_price && f.sale_price > 0) ? f.sale_price : f.price_min;
+
+const getSession = (psid) => dbGet(`messenger_sessions?user_id=eq.${psid}&limit=1`);
+
+const isSessionExpired = (session) => {
+  if (!session?.updated_at) return true;
+  const hoursDiff = (new Date() - new Date(session.updated_at)) / (1000 * 60 * 60);
+  return hoursDiff > 24;
+};
+
+// ── ส่งรายละเอียดปลา 1 ตัว พร้อมบันทึก session (ตัวที่กำลังดูล่าสุด) ──
 async function sendFishDetail(psid, fishId) {
   const fish = await dbGet(`fish?id=eq.${fishId}&limit=1`);
   if (!fish) { await sendText(psid, 'ขออภัยครับ ไม่พบข้อมูลปลา'); return; }
 
-  // "messenger_sessions" ต้องสร้างในตาราง Supabase ก่อน (schema เหมือน line_sessions เดิม)
   await dbUpsert('messenger_sessions', { user_id: psid, fish_id: fishId, updated_at: new Date().toISOString() });
 
   if (fish.image) await sendImage(psid, fish.image);
@@ -58,8 +85,10 @@ async function sendFishDetail(psid, fishId) {
     `💰 ราคา: ${price(fish)}\n` +
     `📦 ${fish.stock === 0 ? '❌ หมดสต็อก' : `✅ ${fish.stock} ตัว`}\n\n` +
     `${fish.desc_th || ''}\n\n──────────────\n` +
-    `พิมพ์ "สั่ง" เพื่อสั่งซื้อตัวนี้ 🛒\n` +
+    `พิมพ์ "เพิ่ม" เพื่อใส่ตะกร้า 🛒\n` +
+    `พิมพ์ "สั่งซื้อ" เพื่อสั่งตัวนี้เลย ⚡\n` +
     `พิมพ์ "ดูปลา" เพื่อดูปลาตัวอื่น 🐠\n` +
+    `พิมพ์ "ตะกร้า" เพื่อดูตะกร้า 🧺\n` +
     `พิมพ์ "ติดต่อ" เพื่อคุยกับแอดมิน 👨‍💼`
   );
 }
@@ -68,12 +97,133 @@ async function sendFishDetail(psid, fishId) {
 async function sendGreeting(psid) {
   await sendText(psid,
     `สวัสดีครับ! 🐟 Awesome Aqua ยินดีให้บริการ\n\n` +
-    `🐠 "ดูปลา" — ดูปลาทั้งหมด\n🛒 "สั่ง" — สั่งซื้อ\n👨‍💼 "ติดต่อ" — คุยกับแอดมิน\n\n` +
+    `🐠 "ดูปลา" — ดูปลาทั้งหมด\n➕ "เพิ่ม" — ใส่ตะกร้า\n🧺 "ตะกร้า" — ดูตะกร้า\n🛒 "สั่งซื้อ" — ยืนยันสั่งซื้อ\n👨‍💼 "ติดต่อ" — คุยกับแอดมิน\n\n` +
     `${SITE}`
   );
 }
 
-// ── จัดการข้อความ text (คำสั่งเดียวกับฝั่ง LINE เดิม) ──
+// ── สรุปตะกร้าเป็นข้อความ (คืนราคาปัจจุบันของแต่ละตัวเสมอ ไม่ cache ราคาเก่า) ──
+async function cartSummaryText(cart) {
+  if (!cart || !cart.length) return '🧺 ตะกร้าว่างเปล่าครับ\n\nลองเลือกปลาที่สนใจแล้วพิมพ์ "เพิ่ม" ได้เลย';
+
+  let total = 0;
+  const lines = [];
+  for (const item of cart) {
+    const fish = await dbGet(`fish?id=eq.${item.fish_id}&limit=1`);
+    if (!fish) continue;
+    const sub = unitPrice(fish) * item.qty;
+    total += sub;
+    lines.push(`• ${fish.name_th} x${item.qty} ตัว = ฿${sub.toLocaleString('th-TH')}`);
+  }
+
+  return `🧺 ตะกร้าของคุณ:\n${lines.join('\n')}\n\n💰 รวม: ฿${total.toLocaleString('th-TH')}\n\n` +
+    `พิมพ์ "สั่งซื้อ" เพื่อยืนยัน หรือ "ล้างตะกร้า" เพื่อเริ่มใหม่`;
+}
+
+// ── เพิ่มปลาที่กำลังดูอยู่ลงตะกร้า ──
+async function addToCart(psid) {
+  const session = await getSession(psid);
+  if (!session?.fish_id) {
+    await sendText(psid, `ยังไม่ได้เลือกปลาเลยครับ ลองกดดูปลาจากหน้าเว็บก่อนนะครับ 🐟\n${SITE}`);
+    return;
+  }
+
+  const fish = await dbGet(`fish?id=eq.${session.fish_id}&limit=1`);
+  if (!fish || fish.stock === 0) {
+    await sendText(psid, '😢 ขออภัยครับ ปลาตัวนี้หมดสต็อกแล้ว เพิ่มลงตะกร้าไม่ได้ครับ');
+    return;
+  }
+
+  const cart = session.cart || [];
+  const existing = cart.find(c => c.fish_id === fish.id);
+  if (existing) existing.qty += 1;
+  else cart.push({ fish_id: fish.id, qty: 1 });
+
+  await dbUpsert('messenger_sessions', { user_id: psid, cart, updated_at: new Date().toISOString() });
+
+  await sendText(psid, `➕ เพิ่ม "${fish.name_th}" ลงตะกร้าแล้วครับ\n\n${await cartSummaryText(cart)}`);
+}
+
+// ── ล้างตะกร้า ──
+async function clearCart(psid) {
+  await dbUpsert('messenger_sessions', { user_id: psid, cart: [], updated_at: new Date().toISOString() });
+  await sendText(psid, '🗑️ ล้างตะกร้าเรียบร้อยครับ');
+}
+
+// ── ยืนยันสั่งซื้อ: รองรับทั้งตะกร้าหลายชิ้น และเคสเดิม (ดูปลาตัวเดียวแล้วสั่งเลยโดยไม่ผ่านตะกร้า) ──
+async function checkout(psid) {
+  const session = await getSession(psid);
+
+  if (isSessionExpired(session)) {
+    await sendText(psid, `ขออภัยครับ เซสชันการทำรายการหมดอายุแล้ว ⏱️\nรบกวนคุณลูกค้ากดเลือกปลาที่สนใจจากหน้าเว็บใหม่อีกครั้งนะครับ 🐟\n${SITE}`);
+    return;
+  }
+
+  let cart = session?.cart || [];
+  // เข้ากันได้กับ flow เดิม: ถ้าตะกร้าว่างแต่กำลังดูปลาอยู่ ให้ถือว่าสั่งตัวนั้นตัวเดียว
+  if (!cart.length && session?.fish_id) {
+    cart = [{ fish_id: session.fish_id, qty: 1 }];
+  }
+
+  if (!cart.length) {
+    await sendText(psid, `ยังไม่มีปลาในตะกร้าเลยครับ 🧺\nลองเลือกปลาที่สนใจจากหน้าเว็บก่อนนะครับ\n${SITE}`);
+    return;
+  }
+
+  // ดึงข้อมูลปลาทุกตัว + เช็คสต็อก
+  const items = [];
+  for (const item of cart) {
+    const fish = await dbGet(`fish?id=eq.${item.fish_id}&limit=1`);
+    if (fish) items.push({ fish, qty: item.qty || 1 });
+  }
+
+  const outOfStock = items.filter(i => i.fish.stock < i.qty);
+  if (outOfStock.length) {
+    const names = outOfStock.map(i => `${i.fish.name_th} (เหลือ ${i.fish.stock} ตัว)`).join(', ');
+    await sendText(psid, `😢 สต็อกไม่พอสำหรับ: ${names}\nลองปรับจำนวนหรือลบออกจากตะกร้าก่อนนะครับ (พิมพ์ "ล้างตะกร้า" แล้วเลือกใหม่)`);
+    return;
+  }
+
+  const total = items.reduce((sum, i) => sum + unitPrice(i.fish) * i.qty, 0);
+
+  const order = await dbInsert('orders', { psid, status: 'pending', total_amount: total });
+  if (!order?.id) {
+    await sendText(psid, 'เกิดข้อผิดพลาดในการสร้างออเดอร์ กรุณาลองใหม่อีกครั้งครับ 🙏');
+    return;
+  }
+
+  const today = new Date().toLocaleDateString('en-CA');
+  for (const { fish, qty } of items) {
+    await dbInsert('finance', {
+      type: 'income',
+      name: `ขายปลา: ${fish.name_th} x${qty} ตัว (ออเดอร์ #${order.id.slice(0, 8)})`,
+      amount: unitPrice(fish) * qty,
+      date: today,
+      fish_id: fish.id,
+      order_id: order.id,
+    });
+    await dbPatch(`fish?id=eq.${fish.id}`, { stock: fish.stock - qty });
+  }
+
+  // ล้างตะกร้าหลังยืนยันสำเร็จ
+  await dbUpsert('messenger_sessions', { user_id: psid, cart: [], updated_at: new Date().toISOString() });
+
+  const itemLines = items.map(i => `• ${i.fish.name_th} x${i.qty} ตัว`).join('\n');
+
+  await sendText(psid,
+    `✅ ยืนยันคำสั่งซื้อแล้วครับ! (ออเดอร์ #${order.id.slice(0, 8)})\n\n${itemLines}\n\n` +
+    `💰 ยอดรวม: ฿${total.toLocaleString('th-TH')}\n\n` +
+    `📲 ช่องทางชำระเงิน:\n• พร้อมเพย์: 082-237-2512\n• ธนาคารกสิกร: 136-3-82691-8\n\n` +
+    `โอนแล้วส่งสลิปมาในแชทนี้ได้เลยครับ 🙏`
+  );
+  await sendImage(psid, `${SITE}/images/qr-payment.png`);
+
+  if (OWNER_ID) {
+    await sendText(OWNER_ID, `🔔 มีออเดอร์ใหม่! #${order.id.slice(0, 8)}\n${itemLines}\n💰 รวม ฿${total.toLocaleString('th-TH')}\n👤 PSID: ${psid}`);
+  }
+}
+
+// ── จัดการข้อความ text ──
 async function handleText(psid, textRaw) {
   const text = textRaw.trim();
 
@@ -91,34 +241,24 @@ async function handleText(psid, textRaw) {
     return;
   }
 
-  if (['สั่ง', 'จอง', 'สั่งซื้อ'].includes(text)) {
-    const session = await dbGet(`messenger_sessions?user_id=eq.${psid}&limit=1`);
+  if (['เพิ่ม', 'หยิบใส่ตะกร้า', 'ใส่ตะกร้า'].includes(text)) {
+    await addToCart(psid);
+    return;
+  }
 
-    let isExpired = false;
-    if (session && session.updated_at) {
-      const hoursDiff = (new Date() - new Date(session.updated_at)) / (1000 * 60 * 60);
-      if (hoursDiff > 24) isExpired = true;
-    }
+  if (['ตะกร้า', 'ดูตะกร้า'].includes(text)) {
+    const session = await getSession(psid);
+    await sendText(psid, await cartSummaryText(session?.cart || []));
+    return;
+  }
 
-    if (!session || isExpired) {
-      await sendText(psid, `ขออภัยครับ เซสชันการทำรายการหมดอายุแล้ว ⏱️\nรบกวนคุณลูกค้ากดเลือกปลาที่สนใจจากหน้าเว็บใหม่อีกครั้งนะครับ 🐟\n${SITE}`);
-      return;
-    }
+  if (['ล้างตะกร้า', 'เคลียร์ตะกร้า'].includes(text)) {
+    await clearCart(psid);
+    return;
+  }
 
-    const fish = await dbGet(`fish?id=eq.${session.fish_id}&limit=1`);
-    if (!fish || fish.stock === 0) {
-      await sendText(psid, '😢 ขออภัยครับ ปลาตัวนี้หมดสต็อกแล้ว\nลองเลือกตัวอื่นได้เลยครับ');
-      return;
-    }
-
-    await sendText(psid,
-      `✅ ยืนยันสั่งซื้อ "${fish.name_th}"\n💰 ราคา: ${price(fish)}\n\n` +
-      `📲 ช่องทางชำระเงิน:\n• พร้อมเพย์: 082-237-2512\n• ธนาคารกสิกร: 136-3-82691-8\n\n` +
-      `โอนแล้วส่งสลิปมาในแชทนี้ได้เลยครับ 🙏`
-    );
-    await sendImage(psid, `${SITE}/images/qr-payment.png`);
-
-    if (OWNER_ID) await sendText(OWNER_ID, `🔔 มีออเดอร์ใหม่!\n🐟 ${fish.name_th}\n💰 ${price(fish)}\n👤 Messenger PSID: ${psid}`);
+  if (['สั่ง', 'จอง', 'สั่งซื้อ', 'ยืนยัน', 'เช็คเอาท์', 'checkout'].includes(text)) {
+    await checkout(psid);
     return;
   }
 
@@ -141,19 +281,16 @@ async function handleEvent(event) {
   const psid = event.sender?.id;
   if (!psid) return;
 
-  // m.me link พร้อม ?ref= (ก่อนพิมพ์ข้อความใดๆ)
   if (event.referral) { await handleReferral(psid, event.referral); return; }
 
-  // postback (ปุ่ม Get Started ฯลฯ) ที่อาจแนบ referral มาด้วย
   if (event.postback) {
     if (event.postback.referral) { await handleReferral(psid, event.postback.referral); return; }
     await sendGreeting(psid);
     return;
   }
 
-  // ข้อความปกติ (อาจมี referral แนบมาด้วยถ้าเป็นข้อความแรกจากลิงก์ ref)
   if (event.message) {
-    if (event.message.is_echo) return; // ข้าม event ที่บอทส่งเอง
+    if (event.message.is_echo) return;
     if (event.message.referral) { await handleReferral(psid, event.message.referral); return; }
     if (event.message.text) { await handleText(psid, event.message.text); return; }
   }
@@ -171,18 +308,15 @@ function getRawBody(req) {
 
 // ── verify signature: ต้องคำนวณจาก raw bytes ดิบ ไม่ใช่ JSON.stringify(req.body) ที่ parse ใหม่ ──
 function isValidSignature(rawBody, sig) {
-  if (!APP_SECRET) return true; // ถ้ายังไม่ตั้งค่า APP_SECRET จะข้ามการตรวจ (ควรตั้งค่าก่อนใช้งานจริง)
+  if (!APP_SECRET) return true;
   if (!sig) return false;
   const hash = 'sha256=' + createHmac('sha256', APP_SECRET).update(rawBody).digest('hex');
   return hash === sig;
 }
 
-// ปิด body parser อัตโนมัติของ Vercel เพื่อให้เราอ่าน raw body เองได้
 module.exports.config = { api: { bodyParser: false } };
 
-// ── main ──
 module.exports = async (req, res) => {
-  // ── Meta เรียก GET มาตอน verify webhook ──
   if (req.method === 'GET') {
     const mode      = req.query['hub.mode'];
     const token     = req.query['hub.verify_token'];
