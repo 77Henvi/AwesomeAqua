@@ -1,4 +1,4 @@
-import { niceMax as _niceMax, smoothPath as _smoothPath } from '../shared/calc.js';
+import { niceMax as _niceMax, smoothPath as _smoothPath, LOW_STOCK_THRESHOLD } from '../shared/calc.js';
 
 const MONTH_SHORT = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 const MONTH_FULL  = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
@@ -23,6 +23,8 @@ export function renderStats(fishData, financeData) {
   renderFinanceKPI(financeData, _selectedYear);
   renderFinanceChart(financeData, _selectedYear);
   renderMonthlyList(financeData, _selectedYear);
+  renderBestSellers(_fishData, financeData, _selectedYear);
+  renderRestockSuggest(_fishData, financeData, _selectedYear);
 
   renderStatsStockChart(_fishData);
   renderStatsPriceDist(_fishData);
@@ -64,6 +66,8 @@ function renderYearSelect(financeData) {
     renderFinanceKPI(_financeData, _selectedYear);
     renderFinanceChart(_financeData, _selectedYear);
     renderMonthlyList(_financeData, _selectedYear);
+    renderBestSellers(_fishData, _financeData, _selectedYear);
+    renderRestockSuggest(_fishData, _financeData, _selectedYear);
   };
 }
 
@@ -396,6 +400,71 @@ function renderStatsTopFish(fishData) {
       <div class="stats-top-title">🌱 ราคาเริ่มต้น</div>
       ${topCheap.map((f, i) => row(f, i + 1)).join('')}
     </div>`;
+}
+
+// ── สรุปยอดขาย (รายรับ) ต่อปลา 1 ตัว ในปีที่เลือก ────
+function _revenueByFish(financeData, year) {
+  const map = {}; // { fish_id: revenue }
+  financeData.forEach(f => {
+    if (f.type !== 'income' || !f.fish_id) return;
+    if (!(f.date || '').startsWith(String(year))) return;
+    map[f.fish_id] = (map[f.fish_id] || 0) + f.amount;
+  });
+  return map;
+}
+
+// ── ปลาขายดี (เรียงตามรายรับสะสมในปีที่เลือก) ────
+function renderBestSellers(fishData, financeData, year) {
+  const el = document.getElementById('stats-best-sellers');
+  if (!el) return;
+
+  const revenue = _revenueByFish(financeData, year);
+  const ranked = fishData
+    .map(f => ({ f, revenue: revenue[f.id] || 0 }))
+    .filter(x => x.revenue > 0)
+    .sort((a, b) => b.revenue - a.revenue)
+    .slice(0, 5);
+
+  if (!ranked.length) { el.innerHTML = statsEmpty(`ยังไม่มีข้อมูลการขายในปี ${year}`); return; }
+
+  el.innerHTML = ranked.map((x, i) => `
+    <div class="stats-top-row">
+      <div class="stats-top-rank">${i + 1}</div>
+      <div class="stats-top-info">
+        <div class="stats-top-name">${x.f.emoji || '🐟'} ${x.f.name}</div>
+        <div class="stats-top-species">${x.f.species || '—'}</div>
+      </div>
+      <div class="stats-top-price">฿${x.revenue.toLocaleString('th-TH')}</div>
+    </div>`).join('');
+}
+
+// ── แนะนำรีสต็อคก่อน: สต็อกน้อย + เคยขายดี = ควรรีบเติม ────
+// คะแนนความสำคัญ = รายรับปีนี้ / (สต็อกที่เหลือ + 1) ยิ่งขายดีและสต็อกน้อย ยิ่งคะแนนสูง
+function renderRestockSuggest(fishData, financeData, year) {
+  const el = document.getElementById('stats-restock-suggest');
+  if (!el) return;
+
+  const revenue = _revenueByFish(financeData, year);
+  const candidates = fishData
+    .filter(f => f.stock <= LOW_STOCK_THRESHOLD && (revenue[f.id] || 0) > 0)
+    .map(f => ({ f, revenue: revenue[f.id] || 0, score: (revenue[f.id] || 0) / (f.stock + 1) }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 5);
+
+  if (!candidates.length) {
+    el.innerHTML = statsEmpty('ยังไม่มีปลาที่ต้องรีบรีสต็อค 🎉');
+    return;
+  }
+
+  el.innerHTML = candidates.map((x, i) => `
+    <div class="stats-top-row">
+      <div class="stats-top-rank">${i + 1}</div>
+      <div class="stats-top-info">
+        <div class="stats-top-name">${x.f.emoji || '🐟'} ${x.f.name}</div>
+        <div class="stats-top-species">เหลือ ${x.f.stock} ตัว · ขายได้ ฿${x.revenue.toLocaleString('th-TH')}</div>
+      </div>
+      <div class="stats-top-price" style="color:${x.f.stock === 0 ? '#dc2626' : '#d97706'}">${x.f.stock === 0 ? 'หมดแล้ว' : `เหลือ ${x.f.stock}`}</div>
+    </div>`).join('');
 }
 
 // ── ระดับความยาก ──────────────────────────────

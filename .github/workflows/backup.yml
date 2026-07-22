@@ -1,0 +1,46 @@
+name: Daily Database Backup
+
+on:
+  schedule:
+    # รันทุกวันตอน 18:00 UTC (= ตี 1 เมืองไทย) — ปรับเวลาได้ตามสะดวก
+    - cron: '0 18 * * *'
+  workflow_dispatch: {} # กดรันเองได้จากแท็บ Actions เผื่ออยากทดสอบ/backup ด่วน
+
+# ต้องให้สิทธิ์เขียน repo (commit ไฟล์ backup กลับเข้า branch data-backups)
+permissions:
+  contents: write
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: รันสคริปต์ backup
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/backup/backup-db.mjs
+
+      - name: Commit backup ไปยัง branch data-backups (ไม่ปนกับ main)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # ย้ายไป branch data-backups (สร้างใหม่แบบว่างเปล่าถ้ายังไม่เคยมี) — ไฟล์ backups/ ที่เพิ่งสร้างจะยังอยู่ในโฟลเดอร์ทำงานเสมอ
+          if git fetch origin data-backups 2>/dev/null; then
+            git checkout data-backups
+          else
+            git checkout --orphan data-backups
+            git rm -rf --cached . > /dev/null 2>&1 || true
+          fi
+
+          git add backups/
+          git commit -m "backup: $(date -u +%Y-%m-%d)" || echo "ไม่มีอะไรเปลี่ยนแปลง ข้ามการ commit"
+          git push origin data-backups
