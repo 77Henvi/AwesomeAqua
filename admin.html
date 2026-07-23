@@ -37,6 +37,7 @@
       <button class="admin-nav-tab"        id="nav-finance" onclick="switchTab('finance')"><i class="ph ph-wallet"></i> การเงิน</button>
       <button class="admin-nav-tab"        id="nav-stats"   onclick="switchTab('stats')"><i class="ph ph-chart-bar"></i> สถิติ</button>
       <button class="admin-nav-tab"        id="nav-ads"     onclick="switchTab('ads')"><i class="ph ph-megaphone"></i> โฆษณา</button>
+      <button class="admin-nav-tab"        id="nav-admins"  onclick="switchTab('admins')"><i class="ph ph-users"></i> แอดมิน</button>
     </div>
     <div class="admin-topbar-right">
       <a href="index.html" target="_blank">← ดูหน้าลูกค้า</a>
@@ -378,6 +379,42 @@
           Toggle เปิด/ปิด — ลูกค้าจะเห็น popup เฉพาะรายการที่เปิดอยู่ (ตัวล่าสุด)
         </p>
         <div id="ads-list"></div>
+      </div>
+    </div>
+
+    <div class="admin-page" id="page-admins">
+      <div class="admin-card" id="admin-users-add-form" style="margin-bottom:1.25rem;display:none;">
+        <div class="admin-panel-title"><i class="ph ph-user-plus"></i> เพิ่มแอดมินใหม่</div>
+        <p style="font-size:0.8rem;color:var(--gray);margin-bottom:1rem;">
+          สร้างบัญชี login ใหม่ให้พนักงาน ตั้งรหัสผ่านชั่วคราวแล้วส่งให้เขาเปลี่ยนเองทีหลังได้
+        </p>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>อีเมล</label>
+            <input type="email" id="newAdminEmail" placeholder="staff@example.com">
+          </div>
+          <div class="form-group">
+            <label>รหัสผ่านชั่วคราว (อย่างน้อย 8 ตัวอักษร)</label>
+            <input type="password" id="newAdminPassword" placeholder="••••••••">
+          </div>
+          <div class="form-group">
+            <label>ระดับสิทธิ์</label>
+            <select id="newAdminRole">
+              <option value="staff">พนักงาน (staff)</option>
+              <option value="owner">เจ้าของร้าน (owner)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary" onclick="addAdminUser()">
+            <i class="ph ph-plus-circle"></i> เพิ่มแอดมิน
+          </button>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <div class="admin-panel-title"><i class="ph ph-users"></i> รายชื่อแอดมินทั้งหมด</div>
+        <div id="admin-users-list"></div>
       </div>
     </div>
 

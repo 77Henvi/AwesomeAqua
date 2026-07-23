@@ -5,6 +5,7 @@ import { previewNewImage, previewEditImage } from './shared/image.js';
 import { toggleTag }                      from './shared/tags.js';
 import { renderStats }                   from './modules/stats.js';
 import { initAds }                       from './modules/ads.js';
+import { renderAdminUsers, addAdminUser, removeAdminUser } from './modules/adminUsers.js';
 import { calcPricePreview, profitCell }  from './modules/profit.js';
 import { openSaleModal }                 from './modules/sale.js';
 import { loadFinanceFromDB, getFinanceData, getProfitMap,
@@ -58,6 +59,8 @@ window.confirmRestock   = confirmRestock;
 
 // ── UI helpers (called from inline onclick in HTML) ──
 window.switchTab        = switchTab;
+window.addAdminUser     = addAdminUser;
+window.removeAdminUser  = removeAdminUser;
 window.renderFishTable  = renderFishTable; // แก้บั๊กเดิม: ช่องค้นหาปลา (oninput) เรียกฟังก์ชันนี้แต่ไม่เคยถูก bind ไว้เลย
 window.toggleAddPanel   = toggleAddPanel;
 window.calcPricePreview = calcPricePreview;
@@ -410,6 +413,7 @@ function switchTab(tab) {
   if (tab === 'finance') renderFinancePage();
   if (tab === 'stats')   renderStats(fishData, getFinanceData());
   if (tab === 'ads')     initAds();
+  if (tab === 'admins')  renderAdminUsers();
 }
 
 function toggleAddPanel(forceOpen) {
