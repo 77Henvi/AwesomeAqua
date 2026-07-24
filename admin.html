@@ -37,6 +37,7 @@
       <button class="admin-nav-tab"        id="nav-finance" onclick="switchTab('finance')"><i class="ph ph-wallet"></i> การเงิน</button>
       <button class="admin-nav-tab"        id="nav-stats"   onclick="switchTab('stats')"><i class="ph ph-chart-bar"></i> สถิติ</button>
       <button class="admin-nav-tab"        id="nav-ads"     onclick="switchTab('ads')"><i class="ph ph-megaphone"></i> โฆษณา</button>
+      <button class="admin-nav-tab"        id="nav-orders"  onclick="switchTab('orders')"><i class="ph ph-receipt"></i> ออเดอร์</button>
       <button class="admin-nav-tab"        id="nav-admins"  onclick="switchTab('admins')"><i class="ph ph-users"></i> แอดมิน</button>
     </div>
     <div class="admin-topbar-right">
@@ -380,6 +381,21 @@
         </p>
         <div id="ads-list"></div>
       </div>
+    </div>
+
+    <div class="admin-page" id="page-orders">
+      <div class="stats-fin-toolbar">
+        <div class="stats-fin-toolbar-title"><i class="ph ph-receipt"></i> ออเดอร์จากตะกร้า Messenger</div>
+      </div>
+
+      <div class="filter-chips" style="margin-bottom:1.25rem;">
+        <button class="filter-chip order-filter-chip active" onclick="setOrderStatusFilter('all', this)">ทั้งหมด</button>
+        <button class="filter-chip order-filter-chip" onclick="setOrderStatusFilter('pending', this)"><i class="ph ph-clock"></i> รอชำระ</button>
+        <button class="filter-chip order-filter-chip" onclick="setOrderStatusFilter('paid', this)"><i class="ph ph-check-circle"></i> ชำระแล้ว</button>
+        <button class="filter-chip order-filter-chip" onclick="setOrderStatusFilter('cancelled', this)"><i class="ph ph-x-circle"></i> ยกเลิก</button>
+      </div>
+
+      <div id="orders-list"></div>
     </div>
 
     <div class="admin-page" id="page-admins">
