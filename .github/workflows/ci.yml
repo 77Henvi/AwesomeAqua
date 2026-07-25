@@ -32,5 +32,5 @@ jobs:
           fi
           echo "✅ syntax ผ่านหมดทุกไฟล์"
 
-      - name: รัน automated test (ฟังก์ชันคำนวณล้วนใน scripts/shared/calc.js)
-        run: node --test tests/calc.test.mjs
+      - name: รัน automated test ทั้งหมด (calc, orders, pagination)
+        run: node --test tests/*.test.mjs

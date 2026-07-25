@@ -202,7 +202,7 @@
         </div>
         <div class="search-filter-row">
           <div class="search-wrap">
-            <input type="text" id="fishSearch" placeholder="ค้นหาชื่อปลา หรือชนิด..." oninput="renderFishTable()">
+            <input type="text" id="fishSearch" placeholder="ค้นหาชื่อปลา หรือชนิด..." oninput="onFishSearchInput()">
           </div>
           <div class="filter-chips">
             <button class="filter-chip active" onclick="setStockFilter('all',this)">ทั้งหมด</button>
@@ -232,6 +232,7 @@
             </tbody>
           </table>
         </div>
+        <div id="fishTablePager"></div>
       </div>
     </div>
     
@@ -270,6 +271,7 @@
       </div>
 
       <div id="finance-list"></div>
+      <div id="financePager"></div>
     </div>
 
     <div class="admin-page" id="page-todos">

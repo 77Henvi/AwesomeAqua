@@ -2,21 +2,14 @@
 // หน้า "ออเดอร์" — ดูรายการสั่งซื้อที่มาจากตะกร้า Messenger + อัปเดตสถานะ
 import { supabase }  from '../../supabase.js';
 import { showToast, adminEmpty } from '../shared/utils.js';
+import { STATUS_LABEL, STATUS_COLOR, filterOrdersByStatus, groupItemsByOrder, formatOrderDate }
+  from '../shared/orders.js';
 
 let _orders = [];
 let _itemsByOrder = {}; // { order_id: [ {name, amount, fish_id}, ... ] }
 let _statusFilter = 'all';
 
-const STATUS_LABEL = { pending: 'รอชำระ', paid: 'ชำระแล้ว', cancelled: 'ยกเลิก' };
-const STATUS_COLOR = { pending: '#d97706', paid: '#059669', cancelled: '#dc2626' };
-
-const MONTH_SHORT = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-
-function _fmtDate(iso) {
-  const d = new Date(iso);
-  const y = d.getFullYear() + 543;
-  return `${d.getDate()} ${MONTH_SHORT[d.getMonth()]} ${String(y).slice(-2)} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-}
+const _fmtDate = formatOrderDate;
 
 export async function loadOrders() {
   const [ordersRes, itemsRes] = await Promise.all([
@@ -30,11 +23,7 @@ export async function loadOrders() {
   }
 
   _orders = ordersRes.data || [];
-  _itemsByOrder = {};
-  (itemsRes.data || []).forEach(row => {
-    if (!_itemsByOrder[row.order_id]) _itemsByOrder[row.order_id] = [];
-    _itemsByOrder[row.order_id].push(row);
-  });
+  _itemsByOrder = groupItemsByOrder(itemsRes.data);
 
   renderOrders();
 }
@@ -50,7 +39,7 @@ export function renderOrders() {
   const el = document.getElementById('orders-list');
   if (!el) return;
 
-  const list = _statusFilter === 'all' ? _orders : _orders.filter(o => o.status === _statusFilter);
+  const list = filterOrdersByStatus(_orders, _statusFilter);
 
   if (!list.length) {
     el.innerHTML = adminEmpty('<i class="ph ph-receipt"></i>', _statusFilter === 'all' ? 'ยังไม่มีออเดอร์เข้ามาเลยครับ' : `ไม่มีออเดอร์สถานะ "${STATUS_LABEL[_statusFilter] || _statusFilter}"`);

@@ -1,5 +1,5 @@
 import { supabase }                       from '../supabase.js';
-import { showToast }                      from './shared/utils.js';
+import { showToast, paginate, renderPager } from './shared/utils.js';
 import { LOW_STOCK_THRESHOLD }            from './shared/calc.js';
 import { previewNewImage, previewEditImage } from './shared/image.js';
 import { toggleTag }                      from './shared/tags.js';
@@ -68,11 +68,15 @@ window.renderFishTable  = renderFishTable; // แก้บั๊กเดิม:
 window.toggleAddPanel   = toggleAddPanel;
 window.calcPricePreview = calcPricePreview;
 window.setStockFilter   = setStockFilter;
+window.onFishPageChange   = onFishPageChange;
+window.onFishSearchInput  = onFishSearchInput;
 
 // ── State ──
 let fishData     = [];
 let profitMap    = {}; // { fish_id: number } — sync มาจาก getProfitMap() ทุกครั้งที่โหลดการเงินใหม่
 let _stockFilter = 'all';
+let _fishPage     = 1;
+const FISH_PAGE_SIZE = 15;
 
 // ════════════════════════════════════════════
 //   AUTH
@@ -304,14 +308,20 @@ function renderFishTable() {
   if (countEl) countEl.textContent = list.length + ' รายการ';
 
   const tbody = document.getElementById('fishTableBody');
+  const pagerEl = document.getElementById('fishTablePager');
   if (!list.length) {
     const icon = q ? 'ph-magnifying-glass-minus' : _stockFilter === 'archived' ? 'ph-archive' : 'ph-fish-simple';
     const msg  = q ? 'ไม่พบปลาที่ค้นหา' : _stockFilter === 'archived' ? 'ยังไม่มีปลาที่เลิกขาย' : 'ยังไม่มีปลาครับ';
     tbody.innerHTML = `<tr><td colspan="8">${_empty(`<i class="ph ${icon}"></i>`, msg)}</td></tr>`;
+    if (pagerEl) pagerEl.innerHTML = '';
     return;
   }
 
-  tbody.innerHTML = list.map(f => {
+  const { items: pageList, page, totalPages, total } = paginate(list, _fishPage, FISH_PAGE_SIZE);
+  _fishPage = page; // clamp กลับถ้าหน้าเดิมเกินขอบเขต (เช่น ลบปลาจนหน้าสุดท้ายว่าง)
+  renderPager(pagerEl, { page, totalPages, total }, 'onFishPageChange', FISH_PAGE_SIZE);
+
+  tbody.innerHTML = pageList.map(f => {
     const sc   = f.stock === 0 ? 'out' : f.stock <= 5 ? 'low' : 'ok';
     const st = f.stock === 0 ? '<i class="ph ph-x-circle"></i> หมด' : f.stock <= 5 ? `<i class="ph ph-warning-circle"></i> ${f.stock} ตัว` : `<i class="ph ph-check-circle"></i> ${f.stock} ตัว`;
     const lvMap = { 'มือใหม่': 'easy', 'ปานกลาง': 'medium', 'ผู้เชี่ยวชาญ': 'hard' };
@@ -430,8 +440,21 @@ function toggleAddPanel(forceOpen) {
 
 function setStockFilter(f, el) {
   _stockFilter = f;
+  _fishPage = 1;
   document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
   el.classList.add('active');
+  renderFishTable();
+}
+
+// ── เปลี่ยนหน้าตารางปลา (เรียกจากปุ่มใน table-pager) ──
+function onFishPageChange(page) {
+  _fishPage = page;
+  renderFishTable();
+}
+
+// ── ค้นหาปลา: reset กลับหน้า 1 ทุกครั้งที่พิมพ์ค้นหาใหม่ ──
+function onFishSearchInput() {
+  _fishPage = 1;
   renderFishTable();
 }
 

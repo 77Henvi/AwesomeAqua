@@ -31,11 +31,19 @@ connected directly through **Messenger**.
 * Contact/order seller via Messenger instantly (auto-fills fish reference)
 * Skeleton loading, accessible (keyboard navigable, aria-labeled)
 
+**Messenger Bot**
+* ตะกร้าสินค้า — สั่งหลายปลาต่อออเดอร์ ปรับจำนวนได้
+* ลบทีละชิ้นจากตะกร้า (`"ลบ 1"`) หรือล้างตะกร้าทั้งหมด (`"ล้างตะกร้า"`)
+* Auto-alert สต็อกใกล้หมด แจ้งเตือนแอดมินอัตโนมัติ
+
 **Admin**
 * CRUD ปลา + จัดการสต็อก พร้อมไซส์/ราคาคู่ (min–max)
 * ระบบ "เลิกขาย" (soft-delete) — ไม่ลบประวัติการเงินทิ้งไปด้วย
 * บันทึกการขาย พร้อมเลือกไซส์ที่ขายได้จริง
 * Dashboard การเงิน: KPI รายปี, กราฟรายรับ-รายจ่าย, ดูย้อนหลังรายเดือน
+* ตารางปลา/รายการการเงิน แบ่งหน้า (pagination) รองรับข้อมูลจำนวนมาก
+* หน้า Orders — ดูออเดอร์จากตะกร้า Messenger, filter สถานะ, อัปเดต pending → paid/cancelled
+* Multi-admin (role owner/staff) + Dashboard วิเคราะห์เชิงลึก (ปลาขายดี, แนะนำรีสต็อค)
 * Real-time sync กับ Supabase DB
 
 ---
@@ -45,19 +53,36 @@ connected directly through **Messenger**.
 * Row Level Security (RLS) เปิดใช้งานทุกตาราง — public อ่านได้เฉพาะข้อมูลปลาที่เผยแพร่ ส่วนเขียน/แก้/ลบจำกัดเฉพาะ authenticated admin
 * Messenger webhook ใช้ Supabase **Service Role Key** (ฝั่ง server เท่านั้น ไม่เคยส่งเข้า client)
 * View สาธารณะ (`fish_public`) ไม่เปิดเผยข้อมูลภายใน (ต้นทุน/ราคาขายพิเศษ)
-* ดูสคริปต์ตรวจสอบ/ตั้งค่าความปลอดภัยได้ที่โฟลเดอร์ `supabase/`
+* Backup อัตโนมัติรายวันผ่าน GitHub Actions (`.github/workflows/backup.yml`, `scripts/backup/backup-db.mjs`) — เพราะ Supabase Free Plan ไม่มี backup ในตัว
 
 ---
 
 ## Testing & CI
 
 ```bash
-node --test tests/
+node --test tests/*.test.mjs
 ```
 
 ทุก push ขึ้น `main` จะรัน GitHub Actions อัตโนมัติ (`.github/workflows/ci.yml`):
-1. ตรวจ syntax ไฟล์ JS ทั้งหมด
-2. รัน automated test ของฟังก์ชันคำนวณหลัก (`scripts/shared/calc.js`)
+1. ตรวจ syntax ไฟล์ JS ทั้งหมด (`scripts/`, `api/`)
+2. รัน automated test ทั้งหมด:
+   - `tests/calc.test.mjs` — ฟังก์ชันคำนวณราคา/ไซส์/กราฟ (`scripts/shared/calc.js`)
+   - `tests/orders.test.mjs` — filter/group/format ของแท็บ Orders (`scripts/shared/orders.js`)
+   - `tests/pagination.test.mjs` — ตัวแบ่งหน้าที่ใช้ร่วมกันในตารางปลา/รายการการเงิน (`scripts/shared/utils.js`)
+
+---
+
+## Staging
+
+Branch `develop` + Vercel preview deployment ใช้ทดสอบก่อนขึ้น production
+รายละเอียดการแยก Supabase project จริงจังสำหรับ staging (ไม่ปนกับ DB จริง) อยู่ที่
+[`docs/STAGING_SETUP.md`](docs/STAGING_SETUP.md)
+
+## Messenger App Review
+
+ตอนนี้บอทเปิดให้คุยได้แค่ tester/admin ของแอป — ขั้นตอนเปิดให้ลูกค้าทั่วไปคุยได้จริง
+(Business Verification, Live Mode, Privacy Policy ฯลฯ) สรุปไว้ที่
+[`docs/MESSENGER_APP_REVIEW.md`](docs/MESSENGER_APP_REVIEW.md)
 
 ---
 

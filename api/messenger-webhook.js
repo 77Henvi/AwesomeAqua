@@ -1,4 +1,5 @@
 const { createHmac } = require('crypto');
+const { parseRemoveCommand, findCartRemovalIndex } = require('../scripts/shared/cart.js');
 
 const {
   MESSENGER_PAGE_TOKEN:  TOKEN,     // Page Access Token จากขั้นตอน "สร้างโทเค็นการเข้าถึง"
@@ -108,16 +109,18 @@ async function cartSummaryText(cart) {
 
   let total = 0;
   const lines = [];
+  let idx = 0;
   for (const item of cart) {
     const fish = await dbGet(`fish?id=eq.${item.fish_id}&limit=1`);
     if (!fish) continue;
+    idx += 1;
     const sub = unitPrice(fish) * item.qty;
     total += sub;
-    lines.push(`• ${fish.name_th} x${item.qty} ตัว = ฿${sub.toLocaleString('th-TH')}`);
+    lines.push(`${idx}. ${fish.name_th} x${item.qty} ตัว = ฿${sub.toLocaleString('th-TH')}`);
   }
 
   return `🧺 ตะกร้าของคุณ:\n${lines.join('\n')}\n\n💰 รวม: ฿${total.toLocaleString('th-TH')}\n\n` +
-    `พิมพ์ "สั่งซื้อ" เพื่อยืนยัน หรือ "ล้างตะกร้า" เพื่อเริ่มใหม่`;
+    `พิมพ์ "สั่งซื้อ" เพื่อยืนยัน\nพิมพ์ "ลบ [เลข]" เพื่อลบทีละชิ้น เช่น "ลบ 1"\nพิมพ์ "ล้างตะกร้า" เพื่อเริ่มใหม่`;
 }
 
 // ── เพิ่มปลาที่กำลังดูอยู่ลงตะกร้า ──
@@ -148,6 +151,43 @@ async function addToCart(psid) {
 async function clearCart(psid) {
   await dbUpsert('messenger_sessions', { user_id: psid, cart: [], updated_at: new Date().toISOString() });
   await sendText(psid, '🗑️ ล้างตะกร้าเรียบร้อยครับ');
+}
+
+// ── ลบปลาทีละชิ้นจากตะกร้า ตามหมายเลขที่แสดงใน cartSummaryText (นับเฉพาะรายการที่ยังพบข้อมูลปลาอยู่) ──
+async function removeFromCart(psid, indexText) {
+  const session = await getSession(psid);
+  const cart = session?.cart || [];
+
+  if (!cart.length) {
+    await sendText(psid, '🧺 ตะกร้าว่างเปล่าครับ ไม่มีอะไรให้ลบ');
+    return;
+  }
+
+  const targetIdx = parseInt(indexText, 10);
+  if (!targetIdx || targetIdx < 1) {
+    await sendText(psid, 'พิมพ์ "ลบ [เลข]" นะครับ เช่น "ลบ 1" (ดูเลขได้จากพิมพ์ "ตะกร้า")');
+    return;
+  }
+
+  // นับเฉพาะรายการที่ยังหาปลาเจอ ให้ตรงกับเลขที่แสดงใน cartSummaryText
+  const fishById = {};
+  for (const item of cart) {
+    fishById[item.fish_id] = await dbGet(`fish?id=eq.${item.fish_id}&limit=1`);
+  }
+  const removeAt = findCartRemovalIndex(cart, targetIdx, (item) => !!fishById[item.fish_id]);
+
+  if (removeAt === -1) {
+    await sendText(psid, `ไม่พบรายการหมายเลข ${targetIdx} ในตะกร้าครับ ลองพิมพ์ "ตะกร้า" เพื่อดูรายการปัจจุบัน`);
+    return;
+  }
+
+  const removedFish = fishById[cart[removeAt].fish_id];
+  cart.splice(removeAt, 1);
+
+  await dbUpsert('messenger_sessions', { user_id: psid, cart, updated_at: new Date().toISOString() });
+
+  const removedName = removedFish?.name_th || 'รายการ';
+  await sendText(psid, `🗑️ ลบ "${removedName}" ออกจากตะกร้าแล้วครับ\n\n${await cartSummaryText(cart)}`);
 }
 
 // ── ยืนยันสั่งซื้อ: รองรับทั้งตะกร้าหลายชิ้น และเคสเดิม (ดูปลาตัวเดียวแล้วสั่งเลยโดยไม่ผ่านตะกร้า) ──
@@ -254,6 +294,13 @@ async function handleText(psid, textRaw) {
 
   if (['ล้างตะกร้า', 'เคลียร์ตะกร้า'].includes(text)) {
     await clearCart(psid);
+    return;
+  }
+
+  // "ลบ 1", "ลบตัวที่ 1", "ลบทีละชิ้น 1" ฯลฯ — จับหมายเลขท้ายข้อความ
+  const removeIdx = parseRemoveCommand(text);
+  if (removeIdx !== null) {
+    await removeFromCart(psid, removeIdx);
     return;
   }
 

@@ -49,3 +49,37 @@ export function storeEmpty(iconClass, text) {
 export function adminEmpty(icon, text) {
   return `<div class="admin-empty-state"><div class="admin-empty-icon">${icon}</div><div class="admin-empty-text">${text}</div></div>`;
 }
+
+// ── Pagination (ใช้ร่วมกันระหว่างตารางปลา และรายการการเงิน) ──
+// ตัด array เต็มให้เหลือแค่หน้าที่ต้องการ พร้อม clamp หน้าไม่ให้เกินขอบเขต
+export function paginate(list, page, pageSize) {
+  const totalPages = Math.max(1, Math.ceil(list.length / pageSize));
+  const safePage    = Math.min(Math.max(1, page), totalPages);
+  const start        = (safePage - 1) * pageSize;
+  return {
+    items: list.slice(start, start + pageSize),
+    page: safePage,
+    totalPages,
+    total: list.length,
+  };
+}
+
+// สร้าง markup ปุ่ม prev/next + เลขหน้า สำหรับใส่ใน container ใต้ตาราง/รายการ
+// onPageChangeFnName คือชื่อฟังก์ชันที่ผูกไว้บน window แล้ว (รับ page number เป็น argument)
+export function renderPager(container, { page, totalPages, total }, onPageChangeFnName, pageSize) {
+  if (!container) return;
+  if (total === 0 || totalPages <= 1) { container.innerHTML = ''; return; }
+
+  const from = (page - 1) * pageSize + 1;
+  const to   = Math.min(page * pageSize, total);
+
+  container.innerHTML = `
+    <div class="table-pager">
+      <span class="table-pager-info">${from}–${to} จาก ${total} รายการ</span>
+      <div class="table-pager-btns">
+        <button class="table-pager-btn" ${page <= 1 ? 'disabled' : ''} onclick="${onPageChangeFnName}(${page - 1})"><i class="ph ph-caret-left"></i></button>
+        <span class="table-pager-page">${page} / ${totalPages}</span>
+        <button class="table-pager-btn" ${page >= totalPages ? 'disabled' : ''} onclick="${onPageChangeFnName}(${page + 1})"><i class="ph ph-caret-right"></i></button>
+      </div>
+    </div>`;
+}

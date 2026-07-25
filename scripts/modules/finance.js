@@ -2,13 +2,15 @@
 // ระบบการเงินทั้งหมด (แยกออกจาก admin.js): บันทึกรายรับ-รายจ่าย, สรุปวันนี้/รายเดือน,
 // ปฏิทินการเงิน, กำไรสะสมต่อปลา (profitMap ใช้ในตารางปลาที่ admin.js)
 import { supabase }               from '../../supabase.js';
-import { showToast, adminEmpty }  from '../shared/utils.js';
+import { showToast, adminEmpty, paginate, renderPager }  from '../shared/utils.js';
 
 // ── state ภายในโมดูล ──────────────────────────
 let financeData       = [];
 let profitMap          = {};   // { fish_id: กำไรสะสม } — ใช้ในตารางปลาที่ admin.js
 let finFilter          = 'all';
 let selectedFinMonth   = new Date().toLocaleDateString('en-CA').slice(0, 7);
+let finPage            = 1;
+const FIN_PAGE_SIZE    = 20;
 
 const MONTH_NAMES = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
 const MONTH_SHORT = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
@@ -141,13 +143,21 @@ function populateFinMonthSelect() {
   }).join('');
 }
 
+// ── เปลี่ยนหน้ารายการการเงิน (เรียกจากปุ่มใน table-pager) ──
+export function onFinPageChange(page) {
+  finPage = page;
+  renderFinancePage();
+}
+
 export function onFinMonthChange() {
+  finPage = 1;
   selectedFinMonth = document.getElementById('fin-month-select').value;
   renderFinancePage();
 }
 
 export function setFinFilter(f, el) {
   finFilter = f;
+  finPage = 1;
   document.querySelectorAll('.fin-chip').forEach(c => c.classList.remove('active'));
   el.classList.add('active');
   renderFinancePage();
@@ -178,11 +188,13 @@ export function renderFinancePage() {
     elProVal.className   = 'fin-profit-val ' + (profit >= 0 ? 'good' : 'bad');
   }
 
-  const elList = document.getElementById('finance-list');
+  const elList  = document.getElementById('finance-list');
+  const pagerEl = document.getElementById('financePager');
   if (!elList) return;
 
   // ── Render Calendar View ──
   if (finFilter === 'calendar') {
+    if (pagerEl) pagerEl.innerHTML = ''; // ปฏิทินไม่ต้องแบ่งหน้า
     renderCalendarView(monthFin, elList);
     return;
   }
@@ -194,10 +206,15 @@ export function renderFinancePage() {
 
   if (!list.length) {
     elList.innerHTML = adminEmpty('<i class="ph ph-receipt"></i>', 'ไม่มีรายการในเดือนนี้').replace('admin-empty-state', 'admin-empty-state admin-empty-state--card');
+    if (pagerEl) pagerEl.innerHTML = '';
     return;
   }
 
-  elList.innerHTML = list.map(f => {
+  const { items: pageList, page, totalPages, total } = paginate(list, finPage, FIN_PAGE_SIZE);
+  finPage = page; // clamp กลับถ้าหน้าเดิมเกินขอบเขต (เช่น ลบรายการจนหน้าสุดท้ายว่าง)
+  renderPager(pagerEl, { page, totalPages, total }, 'onFinPageChange', FIN_PAGE_SIZE);
+
+  elList.innerHTML = pageList.map(f => {
     const [y, mo, d] = f.date.split('-');
     const dateStr = `${parseInt(d)} ${MONTH_SHORT[parseInt(mo) - 1]} ${(parseInt(y) + 543).toString().slice(-2)}`;
 
@@ -330,6 +347,7 @@ export async function saveFinanceModal() {
 // เรียกครั้งเดียวตอน init จาก admin.js
 export function bindFinanceWindowFunctions() {
   window.onFinMonthChange  = onFinMonthChange;
+  window.onFinPageChange   = onFinPageChange;
   window.setFinFilter      = setFinFilter;
   window.openFinanceModal  = openFinanceModal;
   window.closeFinanceModal = closeFinanceModal;
