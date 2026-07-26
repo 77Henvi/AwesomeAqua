@@ -1,5 +1,5 @@
 const { createHmac } = require('crypto');
-const { parseRemoveCommand, findCartRemovalIndex } = require('../scripts/shared/cart.js');
+const { parseRemoveCommand, findCartRemovalIndex } = require('./_shared/cart.js');
 
 const {
   MESSENGER_PAGE_TOKEN:  TOKEN,     // Page Access Token จากขั้นตอน "สร้างโทเค็นการเข้าถึง"
@@ -98,7 +98,7 @@ async function sendFishDetail(psid, fishId) {
 async function sendGreeting(psid) {
   await sendText(psid,
     `สวัสดีครับ! 🐟 Awesome Aqua ยินดีให้บริการ\n\n` +
-    `🐠 "ดูปลา" — ดูปลาทั้งหมด\n➕ "เพิ่ม" — ใส่ตะกร้า\n🧺 "ตะกร้า" — ดูตะกร้า\n🛒 "สั่งซื้อ" — ยืนยันสั่งซื้อ\n👨‍💼 "ติดต่อ" — คุยกับแอดมิน\n\n` +
+    `🐠 "ดูปลา" — ดูปลาทั้งหมด\n➕ "เพิ่ม" — ใส่ตะกร้า\n🧺 "ตะกร้า" — ดูตะกร้า\n🛒 "สั่งซื้อ" — ยืนยันสั่งซื้อ\n👨‍💼 "ติดต่อ" — คุยกับแอดมิน\n\n🔒 พิมพ์ "ลบข้อมูลฉัน" ได้ทุกเมื่อถ้าต้องการลบข้อมูลของคุณออกจากระบบ\n\n` +
     `${SITE}`
   );
 }
@@ -309,7 +309,33 @@ async function handleText(psid, textRaw) {
     return;
   }
 
+  // ── ลบข้อมูลตัวเอง (self-service data deletion — ตามข้อกำหนด Meta Data Deletion) ──
+  if (['ลบข้อมูลฉัน', 'ลบข้อมูลของฉัน', 'ลบข้อมูลผม', 'ลบข้อมูลส่วนตัว'].includes(text)) {
+    await deleteMyData(psid);
+    return;
+  }
+
   await sendGreeting(psid);
+}
+
+// ── ลบข้อมูลของผู้ใช้เอง (ตะกร้า/session) + ตัดการเชื่อมโยง PSID ออกจากออเดอร์เดิม ──
+// เก็บยอดขาย/บัญชีไว้เหมือนเดิม (ไม่ใช่ PII) แค่ตัดไม่ให้ผูกกับตัวบุคคลอีกต่อไป
+async function deleteMyData(psid) {
+  await fetch(`${DB_URL}/rest/v1/messenger_sessions?user_id=eq.${encodeURIComponent(psid)}`, {
+    method: 'DELETE',
+    headers: DB_HEADS,
+  }).catch(() => {});
+
+  await fetch(`${DB_URL}/rest/v1/orders?psid=eq.${encodeURIComponent(psid)}`, {
+    method: 'PATCH',
+    headers: { ...DB_HEADS, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ psid: null }),
+  }).catch(() => {});
+
+  await sendText(psid,
+    '🗑️ ลบข้อมูลของคุณเรียบร้อยแล้วครับ (ตะกร้า + การเชื่อมโยงกับคำสั่งซื้อเดิม)\n\n' +
+    'พิมพ์ "ดูปลา" เพื่อเริ่มดูสินค้าใหม่ได้เลยครับ 😊'
+  );
 }
 
 // ── จัดการ referral จากลิงก์ m.me/PAGE?ref=fish_xxx (กดจากปุ่มบนเว็บ) ──

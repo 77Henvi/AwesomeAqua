@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="images/logo.png" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>สถานะการลบข้อมูล — Awesome Aqua</title>
+  <meta name="robots" content="noindex, nofollow">
+  <style>
+    body {
+      font-family: 'Sarabun', 'Segoe UI', sans-serif;
+      background: #f8faff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 1.5rem;
+      box-sizing: border-box;
+    }
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 2.5rem 2rem;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    }
+    .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    h1 { font-size: 1.15rem; margin: 0 0 0.75rem; color: #1e293b; }
+    p { color: #64748b; font-size: 0.9rem; line-height: 1.6; margin: 0 0 1rem; }
+    .code {
+      display: inline-block;
+      background: #f1f5f9;
+      color: #334155;
+      padding: 0.4rem 0.9rem;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      margin-top: 0.25rem;
+      word-break: break-all;
+    }
+    a { color: #2563eb; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">✅</div>
+    <h1>คำขอลบข้อมูลของคุณได้รับการดำเนินการแล้ว</h1>
+    <p>
+      ข้อมูลที่ผูกกับบัญชี Messenger ของคุณ (ตะกร้าสินค้า, ปลาที่กำลังดูล่าสุด,
+      การเชื่อมโยงกับคำสั่งซื้อเดิม) ถูกลบ/ตัดการเชื่อมโยงออกจากระบบของ Awesome Aqua แล้ว
+    </p>
+    <p>รหัสอ้างอิงคำขอนี้:</p>
+    <div class="code" id="confirmationCode">—</div>
+    <p style="margin-top:1.5rem;">
+      มีคำถามเพิ่มเติม ติดต่อ
+      <a href="https://awesome-aqua.vercel.app/">Awesome Aqua</a> ได้เลยครับ
+    </p>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    if (code) {
+      document.getElementById('confirmationCode').textContent = code;
+    }
+  </script>
+</body>
+</html>

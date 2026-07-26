@@ -31,8 +31,16 @@
 - **Privacy Policy URL** — ต้องมีหน้านโยบายความเป็นส่วนตัวที่อธิบายว่าเก็บข้อมูลอะไรบ้าง
   (PSID, ข้อความ, ตะกร้า/ออเดอร์) และใช้ทำอะไร — ยังไม่มีในเว็บตอนนี้ ต้องทำเพิ่ม
 - **App Icon + Category** — กรอกให้ครบใน App Settings → Basic
-- **Data Deletion Instructions** — ต้องมีลิงก์/ขั้นตอนให้ผู้ใช้ขอให้ลบข้อมูลของตัวเองได้
-  (เช่น พิมพ์ "ลบข้อมูลฉัน" ในแชท หรือหน้าเว็บฟอร์มติดต่อ) — ยังไม่มี ต้องทำเพิ่ม
+- ✅ **Data Deletion Instructions** — ทำเสร็จแล้ว 2 ทาง:
+  1. **Data Deletion Callback URL** (`api/data-deletion.js`) — กรอกในหน้า
+     App Settings → Advanced → "อนุญาต URL การเรียกกลับ":
+     ```
+     https://awesome-aqua.vercel.app/api/data-deletion
+     ```
+     Meta จะ POST `signed_request` มาที่ endpoint นี้เวลาลูกค้ากดลบข้อมูลจากฝั่ง Facebook เอง
+     ระบบจะตรวจลายเซ็น ลบ session/ตัดการเชื่อมโยง PSID ออกจากออเดอร์ แล้วตอบกลับลิงก์เช็คสถานะ
+     (`data-deletion-status.html`) ตามฟอร์แมตที่ Meta กำหนด
+  2. **คำสั่งในแชท** — ลูกค้าพิมพ์ `"ลบข้อมูลฉัน"` กับบอทได้เองทุกเมื่อ (self-service)
 
 ### 4) สลับ App Mode เป็น Live
 Developer Console → มุมขวาบนของหน้าแอป จะมี toggle "Development / Live" → กดสลับ
@@ -55,7 +63,10 @@ Developer Console → มุมขวาบนของหน้าแอป จ
 
 ## สิ่งที่ยังขาดและต้องเพิ่ม (เพื่อให้ยื่นได้/สลับ Live Mode ได้)
 - [ ] หน้า Privacy Policy บนเว็บ (พร้อมลิงก์ในแอป Meta)
-- [ ] กลไก/ขั้นตอนให้ผู้ใช้ขอลบข้อมูลตัวเอง (Data Deletion Instructions)
+- [x] กลไก/ขั้นตอนให้ผู้ใช้ขอลบข้อมูลตัวเอง (Data Deletion Instructions) — เสร็จแล้ว
+      (`api/data-deletion.js` + คำสั่ง "ลบข้อมูลฉัน" ในแชท) เหลือแค่ตั้งค่า env var
+      `MESSENGER_APP_SECRET` บน Vercel (ตัวเดียวกับที่ webhook ปกติใช้) แล้วเอา URL
+      ไปกรอกในหน้า App Settings → Advanced ตามข้างต้น
 - [ ] Business Verification ผ่านแล้ว
 - [ ] สลับ Development → Live Mode
 - [ ] (ถ้าจำเป็น) ยื่น App Review พร้อม screencast ตามข้างต้น

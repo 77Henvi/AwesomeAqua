@@ -34,6 +34,7 @@ connected directly through **Messenger**.
 **Messenger Bot**
 * ตะกร้าสินค้า — สั่งหลายปลาต่อออเดอร์ ปรับจำนวนได้
 * ลบทีละชิ้นจากตะกร้า (`"ลบ 1"`) หรือล้างตะกร้าทั้งหมด (`"ล้างตะกร้า"`)
+* ลบข้อมูลตัวเอง (`"ลบข้อมูลฉัน"`) + Meta Data Deletion Callback (`api/data-deletion.js`)
 * Auto-alert สต็อกใกล้หมด แจ้งเตือนแอดมินอัตโนมัติ
 
 **Admin**
@@ -69,6 +70,8 @@ node --test tests/*.test.mjs
    - `tests/calc.test.mjs` — ฟังก์ชันคำนวณราคา/ไซส์/กราฟ (`scripts/shared/calc.js`)
    - `tests/orders.test.mjs` — filter/group/format ของแท็บ Orders (`scripts/shared/orders.js`)
    - `tests/pagination.test.mjs` — ตัวแบ่งหน้าที่ใช้ร่วมกันในตารางปลา/รายการการเงิน (`scripts/shared/utils.js`)
+   - `tests/cart.test.mjs` — parse คำสั่งลบของในตะกร้า Messenger (`api/_shared/cart.js`)
+   - `tests/signedRequest.test.mjs` — ตรวจลายเซ็น Meta Data Deletion Callback (`api/_shared/signedRequest.js`)
 
 ---
 
