@@ -62,7 +62,11 @@ Developer Console → มุมขวาบนของหน้าแอป จ
 - ไม่มีการเก็บข้อมูลอ่อนไหว เก็บแค่ PSID + ตะกร้า/ประวัติสั่งซื้อใน `messenger_sessions`/`orders`
 
 ## สิ่งที่ยังขาดและต้องเพิ่ม (เพื่อให้ยื่นได้/สลับ Live Mode ได้)
-- [ ] หน้า Privacy Policy บนเว็บ (พร้อมลิงก์ในแอป Meta)
+- [x] หน้า Privacy Policy บนเว็บ — เสร็จแล้ว (`privacy.html`, ลิงก์จาก footer หน้าแรก)
+      URL สำหรับกรอกในหน้า App Settings → Basic → Privacy Policy URL:
+      ```
+      https://awesome-aqua.vercel.app/privacy.html
+      ```
 - [x] กลไก/ขั้นตอนให้ผู้ใช้ขอลบข้อมูลตัวเอง (Data Deletion Instructions) — เสร็จแล้ว
       (`api/data-deletion.js` + คำสั่ง "ลบข้อมูลฉัน" ในแชท) เหลือแค่ตั้งค่า env var
       `MESSENGER_APP_SECRET` บน Vercel (ตัวเดียวกับที่ webhook ปกติใช้) แล้วเอา URL
