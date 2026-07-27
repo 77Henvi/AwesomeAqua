@@ -3,7 +3,7 @@
 import { supabase }  from '../../supabase.js';
 import { showToast, adminEmpty } from '../shared/utils.js';
 import { STATUS_LABEL, STATUS_COLOR, filterOrdersByStatus, groupItemsByOrder, formatOrderDate }
-  from '../../api/_shared/orderHelpers.js';
+  from '../shared/orders.js';
 
 let _orders = [];
 let _itemsByOrder = {}; // { order_id: [ {name, amount, fish_id}, ... ] }

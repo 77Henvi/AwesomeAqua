@@ -72,6 +72,7 @@ node --test tests/*.test.mjs
 2. รัน automated test ทั้งหมด:
    - `tests/calc.test.mjs` — ฟังก์ชันคำนวณราคา/ไซส์/กราฟ (`scripts/shared/calc.js`)
    - `tests/orders.test.mjs` — filter/group/format ของแท็บ Orders (`scripts/shared/orders.js`)
+   - `tests/orderHelpersSync.test.mjs` — กันไม่ให้ `scripts/shared/orders.js` (ฝั่ง admin browser) กับ `api/_shared/orderHelpers.js` (ฝั่ง server) พฤติกรรมเพี้ยนไปคนละทาง (ไฟล์ทั้งสองมีเนื้อหาซ้ำกันโดยตั้งใจ เพราะ `/api` บน Vercel ไม่ได้เสิร์ฟเป็น static file ให้เบราว์เซอร์ดึงได้)
    - `tests/pagination.test.mjs` — ตัวแบ่งหน้าที่ใช้ร่วมกันในตารางปลา/รายการการเงิน (`scripts/shared/utils.js`)
    - `tests/cart.test.mjs` — parse คำสั่งลบของในตะกร้า Messenger (`api/_shared/cart.js`)
    - `tests/signedRequest.test.mjs` — ตรวจลายเซ็น Meta Data Deletion Callback (`api/_shared/signedRequest.js`)
