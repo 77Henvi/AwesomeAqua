@@ -39,6 +39,12 @@ async function deleteUserData(userId) {
     headers: DB_HEADS,
   }).catch(() => {}); // ไม่ throw ถ้าลบไม่ได้ ไม่ให้ endpoint ล่มเพราะเหตุนี้
 
+  // การสมัครแจ้งเตือนสต็อกกลับมา ก็เป็นข้อมูลที่ผูกกับ psid เช่นกัน
+  await fetch(`${DB_URL}/rest/v1/restock_alerts?psid=eq.${encodeURIComponent(userId)}`, {
+    method: 'DELETE',
+    headers: DB_HEADS,
+  }).catch(() => {});
+
   // orders ผูกกับ psid โดยตรง — ลบแถวที่เป็น PII แต่เก็บ finance ไว้ (ประวัติบัญชี ไม่ใช่ข้อมูลส่วนตัว)
   await fetch(`${DB_URL}/rest/v1/orders?psid=eq.${encodeURIComponent(userId)}`, {
     method: 'PATCH',

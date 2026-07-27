@@ -1,5 +1,7 @@
 const { createHmac } = require('crypto');
 const { parseRemoveCommand, findCartRemovalIndex } = require('./_shared/cart.js');
+const { searchFish } = require('./_shared/fishSearch.js');
+const { STATUS_LABEL, STATUS_EMOJI, formatOrderDate } = require('./_shared/orderHelpers.js');
 
 const {
   MESSENGER_PAGE_TOKEN:  TOKEN,     // Page Access Token จากขั้นตอน "สร้างโทเค็นการเข้าถึง"
@@ -32,6 +34,13 @@ const dbGet = async (path) => {
   const res  = await fetch(`${DB_URL}/rest/v1/${path}`, { headers: DB_HEADS });
   const data = await res.json();
   return data[0] || null;
+};
+
+// เหมือน dbGet แต่คืนมาทั้ง array (ใช้ตอนค้นหาปลาหลายตัว / ดึงประวัติออเดอร์หลายรายการ)
+const dbList = async (path) => {
+  const res  = await fetch(`${DB_URL}/rest/v1/${path}`, { headers: DB_HEADS });
+  const data = await res.json();
+  return Array.isArray(data) ? data : [];
 };
 
 const dbUpsert = (path, body) =>
@@ -86,8 +95,9 @@ async function sendFishDetail(psid, fishId) {
     `💰 ราคา: ${price(fish)}\n` +
     `📦 ${fish.stock === 0 ? '❌ หมดสต็อก' : `✅ ${fish.stock} ตัว`}\n\n` +
     `${fish.desc_th || ''}\n\n──────────────\n` +
-    `พิมพ์ "เพิ่ม" เพื่อใส่ตะกร้า 🛒\n` +
-    `พิมพ์ "สั่งซื้อ" เพื่อสั่งตัวนี้เลย ⚡\n` +
+    (fish.stock === 0
+      ? `🔔 พิมพ์ "แจ้งเตือน" เพื่อให้บอทแจ้งทันทีที่มีของ\n`
+      : `พิมพ์ "เพิ่ม" เพื่อใส่ตะกร้า 🛒\nพิมพ์ "สั่งซื้อ" เพื่อสั่งตัวนี้เลย ⚡\n`) +
     `พิมพ์ "ดูปลา" เพื่อดูปลาตัวอื่น 🐠\n` +
     `พิมพ์ "ตะกร้า" เพื่อดูตะกร้า 🧺\n` +
     `พิมพ์ "ติดต่อ" เพื่อคุยกับแอดมิน 👨‍💼`
@@ -98,7 +108,7 @@ async function sendFishDetail(psid, fishId) {
 async function sendGreeting(psid) {
   await sendText(psid,
     `สวัสดีครับ! 🐟 Awesome Aqua ยินดีให้บริการ\n\n` +
-    `🐠 "ดูปลา" — ดูปลาทั้งหมด\n➕ "เพิ่ม" — ใส่ตะกร้า\n🧺 "ตะกร้า" — ดูตะกร้า\n🛒 "สั่งซื้อ" — ยืนยันสั่งซื้อ\n👨‍💼 "ติดต่อ" — คุยกับแอดมิน\n\n🔒 พิมพ์ "ลบข้อมูลฉัน" ได้ทุกเมื่อถ้าต้องการลบข้อมูลของคุณออกจากระบบ\n\n` +
+    `🐠 "ดูปลา" — ดูปลาทั้งหมด\n➕ "เพิ่ม" — ใส่ตะกร้า\n🧺 "ตะกร้า" — ดูตะกร้า\n🛒 "สั่งซื้อ" — ยืนยันสั่งซื้อ\n📋 "ประวัติ" — ดูออเดอร์ที่เคยสั่ง\n👨‍💼 "ติดต่อ" — คุยกับแอดมิน\n\n💡 หรือพิมพ์ชื่อปลาที่สนใจได้เลย บอทจะช่วยค้นหาให้ครับ\n\n🔒 พิมพ์ "ลบข้อมูลฉัน" ได้ทุกเมื่อถ้าต้องการลบข้อมูลของคุณออกจากระบบ\n\n` +
     `${SITE}`
   );
 }
@@ -263,7 +273,72 @@ async function checkout(psid) {
   }
 }
 
-// ── จัดการข้อความ text ──
+// ── ค้นหาปลาแบบ fuzzy จากข้อความอิสระที่ลูกค้าพิมพ์ (ไม่ตรงคำสั่งไหนเลย) ──
+async function searchAndReply(psid, query, preFetchedFish) {
+  const allFish = preFetchedFish || await dbList('fish?is_archived=eq.false&select=id,name_th,name_en,species,stock,price_min,price_max,sale_price,image');
+  const results = searchFish(query, allFish);
+
+  if (!results.length) {
+    await sendGreeting(psid);
+    return;
+  }
+
+  if (results.length === 1) {
+    await sendFishDetail(psid, results[0].id);
+    return;
+  }
+
+  const lines = results.map((f, i) =>
+    `${i + 1}. ${f.name_th}${f.stock === 0 ? ' (หมดสต็อก)' : ''} — ${price(f)}`
+  ).join('\n');
+
+  await dbUpsert('messenger_sessions', { user_id: psid, search_results: results.map(f => f.id), updated_at: new Date().toISOString() });
+
+  await sendText(psid,
+    `🔍 เจอปลาที่ใกล้เคียงกับ "${query}" ${results.length} ตัวครับ:\n\n${lines}\n\n` +
+    `พิมพ์เลข (เช่น "1") เพื่อดูรายละเอียดตัวนั้น หรือดูทั้งหมดที่เว็บ:\n${SITE}`
+  );
+}
+
+// ── สมัครรับแจ้งเตือนเมื่อปลาที่กำลังดู (หมดสต็อกอยู่) กลับมามีสต็อก ──
+async function subscribeRestockAlert(psid) {
+  const session = await getSession(psid);
+  if (!session?.fish_id) {
+    await sendText(psid, 'ยังไม่ได้เลือกปลาเลยครับ ลองดูปลาที่สนใจก่อนแล้วค่อยพิมพ์คำสั่งนี้นะครับ 🐟');
+    return;
+  }
+
+  const fish = await dbGet(`fish?id=eq.${session.fish_id}&limit=1`);
+  if (!fish) { await sendText(psid, 'ขออภัยครับ ไม่พบข้อมูลปลาตัวนี้แล้ว'); return; }
+
+  if (fish.stock > 0) {
+    await sendText(psid, `🐟 "${fish.name_th}" มีสต็อกอยู่แล้วครับ! พิมพ์ "เพิ่ม" เพื่อใส่ตะกร้าได้เลย 😊`);
+    return;
+  }
+
+  await dbUpsert('restock_alerts', { fish_id: fish.id, psid });
+  await sendText(psid, `🔔 รับทราบครับ! พอ "${fish.name_th}" กลับมามีสต็อก จะรีบแจ้งคุณลูกค้าทันทีเลยครับ 😊`);
+}
+
+// ── ดูประวัติคำสั่งซื้อของตัวเอง (5 รายการล่าสุด) ──
+async function sendOrderHistory(psid) {
+  const orders = await dbList(
+    `orders?psid=eq.${encodeURIComponent(psid)}&order=created_at.desc&limit=5`
+  );
+
+  if (!orders.length) {
+    await sendText(psid, `📋 ยังไม่มีประวัติคำสั่งซื้อครับ\n\nลองดูปลาที่สนใจแล้วสั่งซื้อได้เลยที่:\n${SITE}`);
+    return;
+  }
+
+  const lines = orders.map((o) => {
+    const emoji = STATUS_EMOJI[o.status] || '•';
+    const label = STATUS_LABEL[o.status] || o.status;
+    return `${emoji} #${o.id.slice(0, 8)} — ฿${(o.total_amount || 0).toLocaleString('th-TH')} (${label})\n   ${formatOrderDate(o.created_at)}`;
+  }).join('\n\n');
+
+  await sendText(psid, `📋 ประวัติคำสั่งซื้อล่าสุดของคุณ:\n\n${lines}\n\n👨‍💼 มีคำถามเกี่ยวกับออเดอร์ไหน พิมพ์ "ติดต่อ" ได้เลยครับ`);
+}
 async function handleText(psid, textRaw) {
   const text = textRaw.trim();
 
@@ -315,6 +390,37 @@ async function handleText(psid, textRaw) {
     return;
   }
 
+  if (['ประวัติ', 'ประวัติการสั่งซื้อ', 'ประวัติออเดอร์', 'ออเดอร์ของฉัน', 'ดูออเดอร์'].includes(text)) {
+    await sendOrderHistory(psid);
+    return;
+  }
+
+  if (['แจ้งเตือน', 'แจ้งเมื่อมีของ', 'แจ้งเตือนสต็อก', 'แจ้งเตือนของ'].includes(text)) {
+    await subscribeRestockAlert(psid);
+    return;
+  }
+
+  // ── เลือกจากรายการค้นหา (เช่น พิมพ์ "1" หลังบอทโชว์ผลค้นหาหลายตัว) ──
+  if (/^\d+$/.test(text)) {
+    const session = await getSession(psid);
+    const idx = parseInt(text, 10) - 1;
+    const picked = session?.search_results?.[idx];
+    if (picked) {
+      await sendFishDetail(psid, picked);
+      return;
+    }
+  }
+
+  // ── ไม่ตรงคำสั่งไหนเลย: ลองค้นหาชื่อปลาแบบ fuzzy ก่อน ถ้าไม่เจอค่อย fallback เป็นทักทาย ──
+  if (text.length >= 2) {
+    const allFish = await dbList('fish?is_archived=eq.false&select=id,name_th,name_en,species,stock,price_min,price_max,sale_price,image&limit=200');
+    const quickMatch = searchFish(text, allFish, { limit: 1 });
+    if (quickMatch.length) {
+      await searchAndReply(psid, text, allFish);
+      return;
+    }
+  }
+
   await sendGreeting(psid);
 }
 
@@ -322,6 +428,11 @@ async function handleText(psid, textRaw) {
 // เก็บยอดขาย/บัญชีไว้เหมือนเดิม (ไม่ใช่ PII) แค่ตัดไม่ให้ผูกกับตัวบุคคลอีกต่อไป
 async function deleteMyData(psid) {
   await fetch(`${DB_URL}/rest/v1/messenger_sessions?user_id=eq.${encodeURIComponent(psid)}`, {
+    method: 'DELETE',
+    headers: DB_HEADS,
+  }).catch(() => {});
+
+  await fetch(`${DB_URL}/rest/v1/restock_alerts?psid=eq.${encodeURIComponent(psid)}`, {
     method: 'DELETE',
     headers: DB_HEADS,
   }).catch(() => {});

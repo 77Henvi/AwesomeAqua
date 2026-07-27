@@ -50,6 +50,15 @@ export async function confirmRestock(fishData, onDone) {
     const { error: stockErr } = await supabase.from('fish').update({ stock: newStock }).eq('id', id);
     if (stockErr) { showToast('<i class="ph-fill ph-x-circle" style="color:#ef4444;"></i> ผิดพลาด: อัปเดตสต็อกไม่สำเร็จ'); return; }
 
+    // แจ้งลูกค้าที่กด "แจ้งเตือน" ไว้ตอนปลาหมดสต็อก (ไม่บล็อก flow หลักถ้าแจ้งไม่สำเร็จ)
+    if (f.stock === 0 && newStock > 0) {
+      fetch('/api/notify-restock', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fish_id: id }),
+      }).catch(() => {});
+    }
+
     const amount = qty * cost;
     // 2. บันทึกรายจ่าย
     if (amount > 0) {

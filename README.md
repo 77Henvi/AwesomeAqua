@@ -36,6 +36,9 @@ connected directly through **Messenger**.
 * ลบทีละชิ้นจากตะกร้า (`"ลบ 1"`) หรือล้างตะกร้าทั้งหมด (`"ล้างตะกร้า"`)
 * ลบข้อมูลตัวเอง (`"ลบข้อมูลฉัน"`) + Meta Data Deletion Callback (`api/data-deletion.js`)
 * Auto-alert สต็อกใกล้หมด แจ้งเตือนแอดมินอัตโนมัติ
+* **ค้นหาปลาแบบ fuzzy** — พิมพ์ชื่อปลาแบบไม่ต้องตรงเป๊ะ (พิมพ์ผิด/สะกดใกล้เคียงก็เจอ) บอทจะโชว์ผลลัพธ์ให้เลือก
+* **แจ้งเตือนเมื่อของกลับมามีสต็อก** (`"แจ้งเตือน"`) — สมัครรับแจ้งเตือนตอนดูปลาที่หมดสต็อก แล้วบอทจะทักอัตโนมัติทันทีที่แอดมินเติมสต็อก (ต้องตั้งค่าตาราง `restock_alerts` ก่อน ดู [`docs/RESTOCK_ALERTS_SETUP.md`](docs/RESTOCK_ALERTS_SETUP.md))
+* **ประวัติคำสั่งซื้อของตัวเอง** (`"ประวัติ"`) — ลูกค้าดูออเดอร์ 5 รายการล่าสุดของตัวเองได้เอง
 
 **Admin**
 * CRUD ปลา + จัดการสต็อก พร้อมไซส์/ราคาคู่ (min–max)
@@ -72,6 +75,7 @@ node --test tests/*.test.mjs
    - `tests/pagination.test.mjs` — ตัวแบ่งหน้าที่ใช้ร่วมกันในตารางปลา/รายการการเงิน (`scripts/shared/utils.js`)
    - `tests/cart.test.mjs` — parse คำสั่งลบของในตะกร้า Messenger (`api/_shared/cart.js`)
    - `tests/signedRequest.test.mjs` — ตรวจลายเซ็น Meta Data Deletion Callback (`api/_shared/signedRequest.js`)
+   - `tests/fishSearch.test.mjs` — fuzzy search หาปลาจากข้อความอิสระ (`api/_shared/fishSearch.js`)
 
 ---
 

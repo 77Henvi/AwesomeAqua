@@ -1,6 +1,6 @@
 // tests/orders.test.mjs
 // รันด้วย: node --test tests/
-// ทดสอบ logic ล้วนของแท็บ Orders (scripts/shared/orders.js) —
+// ทดสอบ logic ล้วนของแท็บ Orders (api/_shared/orderHelpers.js) —
 // ไม่แตะ DOM หรือ Supabase client จริง เพื่อให้รันบน CI ได้โดยไม่ต้องมี network/credential
 
 import test from 'node:test';
@@ -12,7 +12,7 @@ import {
   formatOrderDate,
   nextActionsForStatus,
   sumOrderTotals,
-} from '../scripts/shared/orders.js';
+} from '../api/_shared/orderHelpers.js';
 
 const sampleOrders = [
   { id: 'order-1', status: 'pending',   total_amount: 500,  created_at: '2026-07-20T10:15:00Z' },

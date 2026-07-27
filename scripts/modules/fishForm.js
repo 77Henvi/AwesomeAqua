@@ -246,6 +246,15 @@ export async function saveEdit(fishData, onDone) {
 
   if (error) { showToast('<i class="ph-fill ph-x-circle" style="color:#ef4444; font-size:1.1em; vertical-align:-2px;"></i> บันทึกไม่ได้'); return; }
 
+  // แจ้งลูกค้าที่กด "แจ้งเตือน" ไว้ตอนปลาหมดสต็อก ถ้าแก้ไขแล้วสต็อกกลับมาเป็นบวก
+  if (oldData?.stock === 0 && stock > 0) {
+    fetch('/api/notify-restock', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fish_id: id }),
+    }).catch(() => {});
+  }
+
   showToast('<i class="ph-fill ph-check-circle" style="color:#10b981; font-size:1.1em; vertical-align:-2px;"></i> บันทึกการแก้ไขเรียบร้อย');
   closeEditModal();
   onDone?.();
