@@ -52,9 +52,11 @@ connected directly through **Messenger**.
 * ระบบ "เลิกขาย" (soft-delete) — ไม่ลบประวัติการเงินทิ้งไปด้วย
 * บันทึกการขาย พร้อมเลือกไซส์ที่ขายได้จริง
 * Dashboard การเงิน: KPI รายปี, กราฟรายรับ-รายจ่าย, ดูย้อนหลังรายเดือน
+* **Export CSV** — ดาวน์โหลดรายการรายรับ-รายจ่ายของเดือนที่เลือกเป็นไฟล์ CSV เปิดด้วย Excel ได้ตรงๆ (ปุ่ม "Export" หน้า Finance)
 * ตารางปลา/รายการการเงิน แบ่งหน้า (pagination) รองรับข้อมูลจำนวนมาก
 * หน้า Orders — ดูออเดอร์จากตะกร้า Messenger, filter สถานะ, อัปเดต pending → paid/cancelled
 * Multi-admin (role owner/staff) + Dashboard วิเคราะห์เชิงลึก (ปลาขายดี, แนะนำรีสต็อค)
+* **แจ้งเตือนสต็อกใกล้หมดผ่าน 2 ช่องทาง** — Messenger (หลัก) + Line Notify (สำรอง กันพลาดกรณี Messenger ส่งไม่ถึง) — ตั้งค่าเพิ่มได้ที่ [`docs/ERROR_MONITORING_SETUP.md`](docs/ERROR_MONITORING_SETUP.md)
 * Real-time sync กับ Supabase DB
 
 ---
@@ -85,6 +87,7 @@ node --test tests/*.test.mjs
    - `tests/signedRequest.test.mjs` — ตรวจลายเซ็น Meta Data Deletion Callback (`api/_shared/signedRequest.js`)
    - `tests/fishSearch.test.mjs` — fuzzy search หาปลาจากข้อความอิสระ (`api/_shared/fishSearch.js`)
    - `tests/rateLimiter.test.mjs` — sliding-window rate limiter กันสแปม webhook (`api/_shared/rateLimiter.js`)
+   - `tests/csvExport.test.mjs` — สร้างไฟล์ CSV export หน้า Finance (`scripts/shared/utils.js`)
 
 ---
 

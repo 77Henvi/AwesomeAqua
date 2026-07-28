@@ -2,7 +2,7 @@
 // ระบบการเงินทั้งหมด (แยกออกจาก admin.js): บันทึกรายรับ-รายจ่าย, สรุปวันนี้/รายเดือน,
 // ปฏิทินการเงิน, กำไรสะสมต่อปลา (profitMap ใช้ในตารางปลาที่ admin.js)
 import { supabase }               from '../../supabase.js';
-import { showToast, adminEmpty, paginate, renderPager }  from '../shared/utils.js';
+import { showToast, adminEmpty, paginate, renderPager, toCSV, downloadTextFile }  from '../shared/utils.js';
 
 // ── state ภายในโมดูล ──────────────────────────
 let financeData       = [];
@@ -147,6 +147,37 @@ function populateFinMonthSelect() {
 export function onFinPageChange(page) {
   finPage = page;
   renderFinancePage();
+}
+
+// ── Export CSV ของเดือนที่เลือกอยู่ตอนนี้ (เปิดด้วย Excel ได้ตรงๆ) ──
+// export ทุกรายการในเดือนนั้น (ไม่ผูกกับ filter รายรับ/รายจ่ายที่กำลังดูอยู่บนจอ
+// เพราะแอดมินน่าจะอยากได้ข้อมูลครบเดือนไปทำบัญชีต่อมากกว่า)
+export function exportFinanceCSV() {
+  const monthFin = financeData.filter(f => (f.date || '').startsWith(selectedFinMonth));
+
+  if (!monthFin.length) {
+    showToast('<i class="ph-fill ph-warning-circle" style="color:#d97706;"></i> เดือนนี้ไม่มีรายการให้ export');
+    return;
+  }
+
+  const sorted = [...monthFin].sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+
+  const rows = sorted.map(f => ({
+    date: f.date,
+    type: f.type === 'income' ? 'รายรับ' : 'รายจ่าย',
+    name: f.name,
+    amount: f.amount,
+  }));
+
+  const csv = toCSV(rows, [
+    { key: 'date',   label: 'วันที่' },
+    { key: 'type',   label: 'ประเภท' },
+    { key: 'name',   label: 'รายการ' },
+    { key: 'amount', label: 'จำนวนเงิน (บาท)' },
+  ]);
+
+  downloadTextFile(`awesomeaqua-finance-${selectedFinMonth}.csv`, csv);
+  showToast('<i class="ph-fill ph-check-circle" style="color:#10b981;"></i> ดาวน์โหลดไฟล์ CSV เรียบร้อย');
 }
 
 export function onFinMonthChange() {
@@ -348,6 +379,7 @@ export async function saveFinanceModal() {
 export function bindFinanceWindowFunctions() {
   window.onFinMonthChange  = onFinMonthChange;
   window.onFinPageChange   = onFinPageChange;
+  window.exportFinanceCSV  = exportFinanceCSV;
   window.setFinFilter      = setFinFilter;
   window.openFinanceModal  = openFinanceModal;
   window.closeFinanceModal = closeFinanceModal;

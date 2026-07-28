@@ -83,3 +83,34 @@ export function renderPager(container, { page, totalPages, total }, onPageChange
       </div>
     </div>`;
 }
+
+// ── CSV export (ใช้กับปุ่ม "Export Excel" ในหน้า Finance) ──
+// รับ array ของ object + คำนิยามคอลัมน์ [{ key, label }] คืนเป็น string CSV พร้อม escape
+// ให้ถูกต้องตามสเปก (ครอบ quote ถ้ามี comma/quote/newline อยู่ในค่า) เปิดด้วย Excel ได้ตรงๆ
+export function toCSV(rows, columns) {
+  const escapeCell = (val) => {
+    const s = val === null || val === undefined ? '' : String(val);
+    return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  };
+
+  const header = columns.map((c) => escapeCell(c.label)).join(',');
+  const body = (rows || []).map((row) =>
+    columns.map((c) => escapeCell(row[c.key])).join(',')
+  );
+
+  // \uFEFF (BOM) นำหน้า กัน Excel เปิดภาษาไทยเป็นตัวอักษรมั่ว (mojibake) เวลาเปิดไฟล์ UTF-8
+  return '\uFEFF' + [header, ...body].join('\r\n');
+}
+
+// ── สั่งดาวน์โหลด string เป็นไฟล์ในเบราว์เซอร์ (ใช้คู่กับ toCSV) ──
+export function downloadTextFile(filename, content, mimeType = 'text/csv;charset=utf-8;') {
+  const blob = new Blob([content], { type: mimeType });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}

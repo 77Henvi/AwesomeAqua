@@ -239,6 +239,9 @@
     <div class="admin-page" id="page-finance">
       <div class="fin-month-container">
         <select id="fin-month-select" class="fin-month-select" onchange="onFinMonthChange()"></select>
+        <button class="btn-export-csv" onclick="exportFinanceCSV()" title="ดาวน์โหลดรายการเดือนนี้เป็นไฟล์ CSV (เปิดด้วย Excel ได้)">
+          <i class="ph ph-download-simple"></i> Export
+        </button>
       </div>
 
       <div class="fin-summary-grid">

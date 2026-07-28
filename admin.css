@@ -411,16 +411,24 @@
 .fin-month-container {
   background: white; border-radius: 12px; border: 1px solid var(--border);
   padding: 0.25rem 1rem; margin-bottom: 1.5rem; position: relative;
+  display: flex; align-items: center; gap: 0.75rem;
 }
 .fin-month-container::after {
-  content: '▼'; position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);
+  content: '▼'; position: absolute; right: calc(1rem + 100px); top: 50%; transform: translateY(-50%);
   font-size: 0.7rem; color: var(--gray); pointer-events: none;
 }
 .fin-month-select {
-  width: 100%; border: none; background: transparent; padding: 0.75rem 0;
+  flex: 1; min-width: 0; border: none; background: transparent; padding: 0.75rem 0;
   font-size: 0.95rem; font-weight: 500; color: var(--black); font-family: var(--font-body);
   appearance: none; outline: none; cursor: pointer;
 }
+.btn-export-csv {
+  flex-shrink: 0; display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.5rem 0.9rem; border-radius: 8px; border: 1px solid var(--border);
+  background: #f8faff; color: #2563eb; font-size: 0.85rem; font-weight: 600;
+  cursor: pointer; transition: 0.15s; white-space: nowrap;
+}
+.btn-export-csv:hover { background: #2563eb; color: white; border-color: #2563eb; }
 
 .fin-summary-grid {
   display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;
