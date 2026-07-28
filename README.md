@@ -1,5 +1,7 @@
 # 🐠 AwesomeAqua
 
+[![CI](https://github.com/77Henvi/AwesomeAqua/actions/workflows/ci.yml/badge.svg)](https://github.com/77Henvi/AwesomeAqua/actions/workflows/ci.yml)
+
 > Aquarium fish marketplace — simple, direct, real
 
 ---
@@ -30,6 +32,11 @@ connected directly through **Messenger**.
 * Multi-language (TH/EN)
 * Contact/order seller via Messenger instantly (auto-fills fish reference)
 * Skeleton loading, accessible (keyboard navigable, aria-labeled)
+
+**Reliability & Ops**
+* Error monitoring — แจ้งเตือนแอดมินอัตโนมัติผ่าน Discord/Line เมื่อ webhook หรือ API function พัง (`api/_shared/errorNotify.js`, ดู [`docs/ERROR_MONITORING_SETUP.md`](docs/ERROR_MONITORING_SETUP.md))
+* Rate limiting — จำกัดไม่เกิน 20 ข้อความ/นาทีต่อ PSID บน Messenger webhook กันสแปม/abuse (`api/_shared/rateLimiter.js`)
+* CI status badge บน README (ดูด้านบนสุดของไฟล์นี้)
 
 **Messenger Bot**
 * ตะกร้าสินค้า — สั่งหลายปลาต่อออเดอร์ ปรับจำนวนได้
@@ -77,6 +84,7 @@ node --test tests/*.test.mjs
    - `tests/cart.test.mjs` — parse คำสั่งลบของในตะกร้า Messenger (`api/_shared/cart.js`)
    - `tests/signedRequest.test.mjs` — ตรวจลายเซ็น Meta Data Deletion Callback (`api/_shared/signedRequest.js`)
    - `tests/fishSearch.test.mjs` — fuzzy search หาปลาจากข้อความอิสระ (`api/_shared/fishSearch.js`)
+   - `tests/rateLimiter.test.mjs` — sliding-window rate limiter กันสแปม webhook (`api/_shared/rateLimiter.js`)
 
 ---
 

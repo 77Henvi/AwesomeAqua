@@ -9,6 +9,7 @@
 //   { "url": "<ลิงก์เช็คสถานะการลบ>", "confirmation_code": "<รหัสอ้างอิง>" }
 
 const { parseSignedRequest } = require('./_shared/signedRequest.js');
+const { notifyError } = require('./_shared/errorNotify.js');
 
 const {
   MESSENGER_APP_SECRET: APP_SECRET, // ตัวเดียวกับที่ใช้ verify webhook ปกติ
@@ -74,7 +75,12 @@ module.exports = async (req, res) => {
   const userId = payload.user_id;
   const confirmationCode = `del_${userId.slice(0, 8)}_${Date.now()}`;
 
-  await deleteUserData(userId);
+  try {
+    await deleteUserData(userId);
+  } catch (err) {
+    // ยังต้องตอบ Meta ตามฟอร์แมตที่กำหนดเสมอ แม้การลบข้อมูลจะพังบางส่วน — แค่แจ้งแอดมินให้ไปเช็คมือ
+    await notifyError('data-deletion', err);
+  }
 
   // Meta ต้องการ JSON รูปแบบนี้เป๊ะๆ — url ให้ลูกค้าเช็คสถานะได้เอง
   res.status(200).json({

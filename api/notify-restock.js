@@ -7,6 +7,8 @@
 // ไม่ต้อง verify signature แบบ Messenger เพราะเรียกจาก admin.js (มี Supabase auth ของแอดมินอยู่แล้ว)
 // แต่ยังใช้ Service Role Key ฝั่ง server เท่านั้น ไม่เปิด endpoint ให้ทำอะไรได้เกินขอบเขตนี้
 
+const { notifyError } = require('./_shared/errorNotify.js');
+
 const {
   MESSENGER_PAGE_TOKEN: TOKEN,
   SUPABASE_URL:              DB_URL,
@@ -52,35 +54,40 @@ module.exports = async (req, res) => {
   const fishId = body?.fish_id;
   if (!fishId) { res.status(400).json({ error: 'fish_id is required' }); return; }
 
-  const fishRes = await fetch(`${DB_URL}/rest/v1/fish?id=eq.${fishId}&limit=1`, { headers: DB_HEADS });
-  const fishArr = await fishRes.json();
-  const fish = fishArr[0];
+  try {
+    const fishRes = await fetch(`${DB_URL}/rest/v1/fish?id=eq.${fishId}&limit=1`, { headers: DB_HEADS });
+    const fishArr = await fishRes.json();
+    const fish = fishArr[0];
 
-  if (!fish || fish.stock <= 0) {
-    res.status(200).json({ notified: 0, reason: 'fish not found or still out of stock' });
-    return;
+    if (!fish || fish.stock <= 0) {
+      res.status(200).json({ notified: 0, reason: 'fish not found or still out of stock' });
+      return;
+    }
+
+    const alertsRes = await fetch(`${DB_URL}/rest/v1/restock_alerts?fish_id=eq.${fishId}`, { headers: DB_HEADS });
+    const alerts = await alertsRes.json();
+
+    if (!Array.isArray(alerts) || !alerts.length) {
+      res.status(200).json({ notified: 0 });
+      return;
+    }
+
+    await Promise.all(
+      alerts.map((a) =>
+        sendText(a.psid, `🎉 ข่าวดี! "${fish.name_th}" กลับมามีสต็อกแล้วครับ (${fish.stock} ตัว)\n\nพิมพ์คุยกับบอทเพื่อสั่งซื้อได้เลยครับ 🐟`)
+          .catch(() => {}) // psid บางคนอาจ block บอทไปแล้ว ไม่ให้กระทบคนอื่น
+      )
+    );
+
+    // ลบรายการแจ้งเตือนที่ส่งไปแล้วทิ้ง กันแจ้งซ้ำรอบหน้า
+    await fetch(`${DB_URL}/rest/v1/restock_alerts?fish_id=eq.${fishId}`, {
+      method: 'DELETE',
+      headers: DB_HEADS,
+    }).catch(() => {});
+
+    res.status(200).json({ notified: alerts.length });
+  } catch (err) {
+    await notifyError('notify-restock', err);
+    res.status(500).json({ error: 'Internal error, admin has been notified' });
   }
-
-  const alertsRes = await fetch(`${DB_URL}/rest/v1/restock_alerts?fish_id=eq.${fishId}`, { headers: DB_HEADS });
-  const alerts = await alertsRes.json();
-
-  if (!Array.isArray(alerts) || !alerts.length) {
-    res.status(200).json({ notified: 0 });
-    return;
-  }
-
-  await Promise.all(
-    alerts.map((a) =>
-      sendText(a.psid, `🎉 ข่าวดี! "${fish.name_th}" กลับมามีสต็อกแล้วครับ (${fish.stock} ตัว)\n\nพิมพ์คุยกับบอทเพื่อสั่งซื้อได้เลยครับ 🐟`)
-        .catch(() => {}) // psid บางคนอาจ block บอทไปแล้ว ไม่ให้กระทบคนอื่น
-    )
-  );
-
-  // ลบรายการแจ้งเตือนที่ส่งไปแล้วทิ้ง กันแจ้งซ้ำรอบหน้า
-  await fetch(`${DB_URL}/rest/v1/restock_alerts?fish_id=eq.${fishId}`, {
-    method: 'DELETE',
-    headers: DB_HEADS,
-  }).catch(() => {});
-
-  res.status(200).json({ notified: alerts.length });
 };

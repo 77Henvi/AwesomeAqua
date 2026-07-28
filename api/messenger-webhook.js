@@ -2,6 +2,8 @@ const { createHmac } = require('crypto');
 const { parseRemoveCommand, findCartRemovalIndex } = require('./_shared/cart.js');
 const { searchFish } = require('./_shared/fishSearch.js');
 const { STATUS_LABEL, STATUS_EMOJI, formatOrderDate } = require('./_shared/orderHelpers.js');
+const { notifyError } = require('./_shared/errorNotify.js');
+const { checkRateLimit } = require('./_shared/rateLimiter.js');
 
 const {
   MESSENGER_PAGE_TOKEN:  TOKEN,     // Page Access Token จากขั้นตอน "สร้างโทเค็นการเข้าถึง"
@@ -465,6 +467,10 @@ async function handleEvent(event) {
   const psid = event.sender?.id;
   if (!psid) return;
 
+  // ── กันสแปม: จำกัดไม่เกิน 20 ข้อความ/นาทีต่อคน (กันบอทถูกยิงรัวๆ จนเปลือง Graph API quota) ──
+  const rl = checkRateLimit(psid, { limit: 20, windowMs: 60_000 });
+  if (!rl.allowed) return; // เงียบไว้ ไม่ตอบอะไรเลย กันเปลืองโควต้าส่งข้อความไปเปล่าๆ
+
   if (event.referral) { await handleReferral(psid, event.referral); return; }
 
   if (event.postback) {
@@ -516,22 +522,37 @@ module.exports = async (req, res) => {
 
   if (req.method !== 'POST') { res.status(200).send('OK'); return; }
 
-  const rawBody = await getRawBody(req);
-  const sig     = req.headers['x-hub-signature-256'];
-
-  if (!isValidSignature(rawBody, sig)) { res.status(401).send('Unauthorized'); return; }
-
-  let body;
   try {
-    body = JSON.parse(rawBody.toString('utf8'));
-  } catch (e) {
-    res.status(400).send('Bad Request');
-    return;
+    const rawBody = await getRawBody(req);
+    const sig     = req.headers['x-hub-signature-256'];
+
+    if (!isValidSignature(rawBody, sig)) { res.status(401).send('Unauthorized'); return; }
+
+    let body;
+    try {
+      body = JSON.parse(rawBody.toString('utf8'));
+    } catch (e) {
+      res.status(400).send('Bad Request');
+      return;
+    }
+
+    const entries = body?.entry || [];
+    const events  = entries.flatMap(e => e.messaging || []);
+
+    // ใช้ allSettled แทน all — event หนึ่งพังไม่ทำให้ event อื่นในชุดเดียวกันพังไปด้วย
+    const results = await Promise.allSettled(events.map(handleEvent));
+
+    const failed = results.filter(r => r.status === 'rejected');
+    if (failed.length) {
+      await notifyError('messenger-webhook', failed.map(f => f.reason?.stack || f.reason).join('\n---\n'));
+    }
+
+    // ตอบ 200 ให้ Meta เสมอไม่ว่าข้างในจะพังกี่ event ก็ตาม (สำคัญ: ถ้าไม่ตอบ 200
+    // ต่อเนื่องหลายครั้ง Meta จะปิดใช้งาน webhook ของแอปอัตโนมัติ)
+    res.status(200).send('EVENT_RECEIVED');
+  } catch (err) {
+    // safety net สุดท้าย เผื่อ error เกิดขึ้นก่อนถึงจุด allSettled (เช่น getRawBody พัง)
+    await notifyError('messenger-webhook (top-level)', err);
+    res.status(200).send('EVENT_RECEIVED'); // ตอบ 200 เสมอ กัน Meta ปิด webhook
   }
-
-  const entries = body?.entry || [];
-  const events  = entries.flatMap(e => e.messaging || []);
-  await Promise.all(events.map(handleEvent));
-
-  res.status(200).send('EVENT_RECEIVED');
 };
