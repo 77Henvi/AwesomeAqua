@@ -1,11 +1,16 @@
 // api/_shared/orderHelpers.js
-// ฟังก์ชัน "ล้วน" (pure) เกี่ยวกับออเดอร์ — ใช้ร่วมกันทั้งฝั่ง admin (scripts/modules/orders.js, ESM)
-// และฝั่ง Messenger webhook (api/messenger-webhook.js, CJS)
+// ฟังก์ชัน "ล้วน" (pure) เกี่ยวกับออเดอร์ — ใช้ฝั่ง server เท่านั้น
+// (api/messenger-webhook.js, api/notify-restock.js — ทั้งคู่เป็น CJS)
 //
-// เดิมไฟล์นี้อยู่ที่ scripts/shared/orders.js (ESM only) ย้ายมาไว้ที่นี่เพราะ scripts/
-// มี package.json "type":"module" บังคับให้ทุกไฟล์ในนั้นเป็น ESM — ถ้า api/*.js (CJS) มา
-// require() ไฟล์ที่อยู่ใน scope นั้น จะได้ exports ว่างเปล่าแบบเงียบๆ ไม่ throw error เลย
-// (เจอบั๊กนี้มาแล้วครั้งหนึ่งกับ cart.js — ย้ายมาไว้ที่นี่กันไว้ก่อนเกิดซ้ำ)
+// ⚠️ ไฟล์นี้จงใจมีเนื้อหาซ้ำกับ scripts/shared/orders.js (ฝั่ง admin browser) — ไม่ได้ import
+// ต่อกัน เพราะ api/ บน Vercel เป็นพื้นที่ serverless functions เท่านั้น เบราว์เซอร์ดึงไฟล์จาก
+// /api/*.js ผ่าน GET ไม่ได้ (404) ส่วน scripts/ ที่มี package.json "type":"module" ก็ require()
+// จากฝั่ง CJS ไม่ได้เหมือนกัน (ได้ exports ว่างเปล่าแบบเงียบๆ ไม่ throw error เลย — เจอบั๊กนี้
+// มาแล้วจริงกับทั้ง cart.js และไฟล์นี้เอง ตอนที่เคยรวมไว้ที่เดียว)
+//
+// ถ้าจะแก้ logic การจัดการออเดอร์ ต้องแก้ทั้ง 2 ไฟล์นี้ให้ตรงกัน:
+//   - api/_shared/orderHelpers.js     (ไฟล์นี้ — ฝั่ง server)
+//   - scripts/shared/orders.js        (ฝั่ง admin browser)
 
 const STATUS_LABEL = { pending: 'รอชำระ', paid: 'ชำระแล้ว', cancelled: 'ยกเลิก' };
 const STATUS_COLOR = { pending: '#d97706', paid: '#059669', cancelled: '#dc2626' };
