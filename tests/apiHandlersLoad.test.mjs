@@ -1,15 +1,4 @@
-// tests/apiHandlersLoad.test.mjs
-// รันด้วย: node --test tests/
-//
-// ⚠️ เทสนี้เกิดขึ้นเพราะมีบั๊กจริงหลุดขึ้น production มาแล้วครั้งหนึ่ง: api/errorNotify.js
-// ถูกวางผิดที่ (นอก _shared/) ทำให้ require('./_shared/errorNotify.js') จาก
-// messenger-webhook.js, notify-restock.js, data-deletion.js หาไฟล์ไม่เจอ และทั้ง 3 endpoint
-// crash ทันทีที่ถูกเรียก — แต่ชุดเทสเดิมทั้งหมดทดสอบแค่ pure-logic module แยกไฟล์ ไม่เคย
-// require() ตัว API handler จริงเลยสักครั้ง เลยไม่มีเทสไหนจับบั๊กนี้ได้ก่อนขึ้น production
-//
-// เทสนี้แก้ช่องโหว่นั้น: require() ทุกไฟล์ใน api/*.js ตรงๆ เหมือนที่ Vercel จะทำตอน
-// serverless function เริ่มทำงาน ถ้ามีไฟล์ที่ require() ไม่เจอ (วางผิดที่, ลบไปเฉยๆ,
-// พิมพ์ path ผิด) เทสนี้จะ fail ทันทีตั้งแต่ตอน build/CI ก่อนขึ้น production
+
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
