@@ -629,6 +629,89 @@
   </div>
 </div>
 
+<!-- ══════════════ TO-DO LIST ══════════════ -->
+<button class="todo-fab" id="todoFab" onclick="openTodoModal()" title="To-do List">
+  <i class="ph ph-check-square"></i>
+</button>
+
+<div class="modal-overlay" id="todoModal" onclick="if(event.target===this)closeTodoModal()">
+  <div class="modal" style="max-width:420px;">
+    <button class="modal-close" onclick="closeTodoModal()">✕</button>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
+      <div class="modal-logo" style="font-size:1.2rem;"><i class="ph ph-check-square"></i> To-do List</div>
+      <button class="btn-archive" onclick="openArchiveModal()"><i class="ph ph-archive"></i> ประวัติ</button>
+    </div>
+
+    <div class="todo-input-group">
+      <input class="form-input" id="todoText" placeholder="งานที่ต้องทำ..." onkeydown="if(event.key==='Enter')addTodo()">
+      <div class="todo-input-actions">
+        <button type="button" class="todo-time-input" id="todoDateBtn" onclick="openDatePicker()">
+          <i class="ph ph-calendar-blank"></i>
+          <span id="todoDateLabel">วันนี้</span>
+        </button>
+        <input type="hidden" id="todoDate" value="">
+        <button type="button" class="todo-time-input" id="todoTimeBtn" onclick="openTimePicker()">
+          <i class="ph ph-clock"></i>
+          <span id="todoTimeLabel">เวลา</span>
+        </button>
+        <input type="hidden" id="todoTime" value="">
+        <button type="button" class="btn-todo-add" onclick="addTodo()" aria-label="เพิ่มงาน">
+          <i class="ph ph-plus"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="admin-list" id="todoList" style="margin-top:16px;"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="archiveModal" onclick="if(event.target===this)closeArchiveModal()">
+  <div class="modal" style="max-width:420px;">
+    <button class="modal-close" onclick="closeArchiveModal()">✕</button>
+    <div class="modal-logo" style="font-size:1.2rem;margin-bottom:1.25rem;"><i class="ph ph-archive"></i> ประวัติ To-do</div>
+    <div class="admin-list" id="archiveList"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="todoTimePickerModal" onclick="if(event.target===this)closeTimePickerModal()">
+  <div class="modal time-picker-modal" style="max-width:340px;">
+    <button class="modal-close" onclick="closeTimePickerModal()">✕</button>
+    <div class="modal-logo" style="font-size:1.2rem;margin-bottom:1rem;"><i class="ph ph-clock"></i> เลือกเวลา</div>
+
+    <div class="time-picker-display" id="timePickerDisplay">--:--</div>
+
+    <div class="time-picker-columns">
+      <div class="time-picker-col" id="timePickerHours"></div>
+      <div class="time-picker-col-sep">:</div>
+      <div class="time-picker-col" id="timePickerMinutes"></div>
+    </div>
+
+    <div class="time-picker-quick">
+      <button type="button" class="chip" onclick="setTimePickerNow()">ตอนนี้</button>
+      <button type="button" class="chip" onclick="clearTimePicker()">ล้างเวลา</button>
+    </div>
+
+    <button type="button" class="btn btn-primary" style="width:100%;margin-top:16px;" onclick="confirmTimePicker()">เสร็จสิ้น</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="todoDatePickerModal" onclick="if(event.target===this)closeDatePickerModal()">
+  <div class="modal" style="max-width:340px;">
+    <button class="modal-close" onclick="closeDatePickerModal()">✕</button>
+    <div class="modal-logo" style="font-size:1.2rem;margin-bottom:1rem;"><i class="ph ph-calendar-blank"></i> เลือกวัน</div>
+
+    <div class="time-picker-quick" style="margin-bottom:16px;">
+      <button type="button" class="chip" onclick="setDatePickerToday()">วันนี้</button>
+      <button type="button" class="chip" onclick="setDatePickerTomorrow()">พรุ่งนี้</button>
+    </div>
+
+    <input type="date" id="todoDatePickerNative" class="form-input" style="width:100%;" onchange="onDatePickerNativeChange(this.value)">
+    <div class="admin-empty-text" id="todoDatePickerHint" style="margin-top:8px;text-align:center;"></div>
+
+    <button type="button" class="btn btn-primary" style="width:100%;margin-top:16px;" onclick="closeDatePickerModal()">เสร็จสิ้น</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script type="module" src="scripts/admin.js?v=2"></script>

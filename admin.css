@@ -891,3 +891,175 @@
 }
 .table-pager-btn:hover:not(:disabled) { background: #eff6ff; border-color: #2563eb; color: #2563eb; }
 .table-pager-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ══════════════════════════════════════════════════
+   TO-DO LIST — คัดลอกจาก LadyVenice.sheets แล้วปรับสีให้เข้ากับธีม AwesomeAqua
+   (dusty-rose/dusty-rose-dark -> var(--royal-blue)/var(--bright-blue)
+    sage/sage-light            -> var(--light-blue)/var(--royal-blue)
+    gray-lighter/gray-light    -> #f1f5f9/var(--border))
+   ══════════════════════════════════════════════════ */
+
+/* FAB */
+.todo-fab {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: var(--royal-blue);
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 20px rgba(26,58,143,0.35);
+  z-index: 150;
+  transition: transform 0.15s, background 0.2s;
+}
+.todo-fab i { font-size: 24px; color: white; }
+.todo-fab:hover { transform: scale(1.06); background: var(--bright-blue); }
+.todo-fab:active { transform: scale(0.94); }
+
+@media (max-width: 640px) {
+  .todo-fab { bottom: calc(70px + env(safe-area-inset-bottom) + 16px); right: 18px; width: 52px; height: 52px; }
+}
+
+/* INPUT ROW */
+.todo-input-group { display: flex; flex-direction: column; gap: 8px; }
+.todo-input-actions { display: flex; align-items: center; gap: 8px; }
+
+.todo-time-input {
+  flex: 1;
+  padding: 10px 12px;
+  font-size: 0.82rem;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  color: var(--gray, #64748b);
+  cursor: pointer;
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-family: var(--font-body);
+  transition: border-color 0.15s, color 0.15s;
+}
+.todo-time-input:hover { border-color: var(--royal-blue); }
+.todo-time-input.has-value { color: var(--royal-blue); border-color: var(--royal-blue); font-weight: 500; }
+
+.btn-todo-add {
+  flex-shrink: 0;
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  border: none;
+  background: var(--royal-blue);
+  color: white;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+.btn-todo-add:hover { background: var(--bright-blue); }
+.btn-todo-add:active { transform: scale(0.92); }
+
+/* LIST + ITEM */
+.admin-list { display: flex; flex-direction: column; gap: 8px; }
+
+.todo-item {
+  background: #fff;
+  border-radius: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px;
+  transition: opacity 0.2s;
+}
+.todo-item.done { opacity: 0.45; }
+
+.todo-checkbox {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--royal-blue);
+  background: none;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s;
+}
+.todo-checkbox.checked { background: var(--royal-blue); border-color: var(--royal-blue); }
+.todo-checkbox.checked::after { content: '✓'; color: white; font-size: 12px; font-weight: 700; }
+
+.todo-content { flex: 1; min-width: 0; }
+.todo-text { font-size: 0.88rem; color: var(--black); font-weight: 400; word-break: break-word; }
+.todo-item.done .todo-text { text-decoration: line-through; color: var(--gray, #64748b); }
+
+.todo-time {
+  font-size: 0.72rem; color: var(--gray, #64748b);
+  margin-top: 2px;
+  display: flex; align-items: center; gap: 4px;
+}
+.todo-time i { font-size: 0.72rem; }
+
+/* ARCHIVE BUTTON + GROUP */
+.btn-archive {
+  font-size: 0.75rem;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--light-blue);
+  color: var(--royal-blue);
+  cursor: pointer;
+  font-family: var(--font-body);
+  display: flex; align-items: center; gap: 4px;
+}
+.btn-archive:hover { background: var(--royal-blue); color: white; }
+
+.archive-day-group { margin-bottom: 16px; }
+.archive-day-label {
+  font-size: 0.72rem; color: var(--gray, #64748b);
+  letter-spacing: 0.06em; text-transform: uppercase;
+  margin-bottom: 8px; font-weight: 600;
+}
+
+/* CUSTOM TIME PICKER */
+.time-picker-modal { text-align: center; }
+.time-picker-display {
+  text-align: center;
+  font-size: 2.1rem; font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--royal-blue);
+  margin-bottom: 16px;
+  font-variant-numeric: tabular-nums;
+}
+.time-picker-columns {
+  display: flex; align-items: stretch; justify-content: center;
+  gap: 4px;
+  background: #f1f5f9;
+  border-radius: 16px;
+  padding: 8px;
+  height: 220px;
+}
+.time-picker-col {
+  flex: 1; overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 90px 0;
+  -webkit-overflow-scrolling: touch;
+}
+.time-picker-col::-webkit-scrollbar { display: none; }
+.time-picker-col-sep {
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem; font-weight: 700;
+  color: var(--gray, #64748b);
+  width: 16px;
+}
+.time-picker-item {
+  scroll-snap-align: center;
+  flex-shrink: 0;
+  height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.05rem; font-weight: 500;
+  color: var(--gray, #64748b);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, font-weight 0.15s;
+  font-variant-numeric: tabular-nums;
+}
+.time-picker-item:hover { background: var(--light-blue); }
+.time-picker-item.selected {
+  color: var(--royal-blue);
+  font-weight: 700; font-size: 1.15rem;
+  background: var(--light-blue);
+}
+.time-picker-quick { display: flex; gap: 8px; justify-content: center; margin-top: 16px; }
