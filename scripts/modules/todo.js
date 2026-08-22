@@ -1,11 +1,4 @@
-// scripts/modules/todo.js
-// To-do List สำหรับหน้า admin — คัดลอก logic มาจากโปรเจกต์ LadyVenice.sheets (js/app.js)
-// แล้วปรับให้เข้ากับ pattern ของ AwesomeAqua: import supabase จาก '../../supabase.js',
-// ใช้ .modal-overlay/.modal เดิมของโปรเจกต์นี้แทน bottom-sheet, ใช้ Phosphor icon แทน lucide
-//
-// หมายเหตุ: ตัดพฤติกรรม "รอบเดือนเริ่มวันที่ 2" ของ LadyVenice ออก (เป็น business logic
-// เฉพาะของร้านนั้น ไม่เกี่ยวกับ AwesomeAqua) เปลี่ยนเป็นรอบปฏิทินปกติ (เดือนนี้ทั้งเดือน) แทน
-// ฟังก์ชันอื่นทั้งหมด (add/toggle/delete/render/archive/date-picker/time-picker) คงพฤติกรรมเดิมไว้ครบ
+
 
 import { supabase } from '../../supabase.js';
 import { adminEmpty } from '../shared/utils.js';
@@ -244,6 +237,52 @@ function setTimePickerValue(hhmm) {
 
 let _timePickerBuilt = false; // สร้าง DOM ของ hour/minute แค่ครั้งแรกพอ ครั้งต่อไป reuse ของเดิม
 
+// ความสูงของแต่ละแถว (.time-picker-item height 40px + gap 4px ใน .time-picker-col)
+const TIME_PICKER_ROW_STEP = 44;
+
+// จับ scroll wheel บน desktop แล้วบังคับให้เลื่อนทีละ 1 แถวต่อการหมุน 1 ครั้ง
+// (ปกติ deltaY ต่อการหมุน 1 ครั้งของเมาส์จะเยอะกว่าความสูงแถวมาก ทำให้ scroll-snap
+// กระโดดข้ามหลายแถวและเล็งเวลาไม่แม่นยำ จึงต้อง preventDefault แล้วคุมระยะเองแทน)
+function attachWheelStep(el) {
+  let acc = 0;
+  let locked = false;
+  el.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    if (locked) return;
+    acc += e.deltaY;
+    const threshold = 12; // trackpad ส่ง delta เล็กๆ ต่อเนื่อง สะสมถึงค่านี้ค่อยขยับ 1 แถว
+    if (Math.abs(acc) >= threshold) {
+      const dir = acc > 0 ? 1 : -1;
+      acc = 0;
+      locked = true;
+      el.scrollBy({ top: dir * TIME_PICKER_ROW_STEP, behavior: 'smooth' });
+      setTimeout(() => { locked = false; }, 160);
+    }
+  }, { passive: false });
+}
+
+// หลัง scroll หยุด (ทั้งจาก wheel หรือ trackpad/touch) หาแถวที่อยู่กึ่งกลางกรอบไฮไลต์
+// แล้วตั้งเป็นค่าที่เลือกอัตโนมัติ ให้ผลลัพธ์ตรงกับสิ่งที่ตาเห็นเสมอ ไม่ต้องคลิกซ้ำ
+function attachScrollSelect(el, type) {
+  let timer = null;
+  el.addEventListener('scroll', () => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      const rect = el.getBoundingClientRect();
+      const centerY = rect.top + rect.height / 2;
+      let closest = null, closestDist = Infinity;
+      el.querySelectorAll('.time-picker-item').forEach(item => {
+        const r = item.getBoundingClientRect();
+        const dist = Math.abs((r.top + r.height / 2) - centerY);
+        if (dist < closestDist) { closestDist = dist; closest = item; }
+      });
+      if (!closest) return;
+      if (type === 'hour') pickTimeHour(Number(closest.dataset.hour));
+      else pickTimeMinute(Number(closest.dataset.minute));
+    }, 120);
+  }, { passive: true });
+}
+
 function buildTimePickerColumns() {
   if (_timePickerBuilt) return; // กันสร้างซ้ำ ลดงาน DOM ทุกครั้งที่เปิด picker
   const hoursEl = document.getElementById('timePickerHours');
@@ -256,6 +295,11 @@ function buildTimePickerColumns() {
   minutesEl.innerHTML = Array.from({ length: 12 }, (_, i) => i * 5).map(m =>
     `<div class="time-picker-item" data-minute="${m}" onclick="pickTimeMinute(${m})">${String(m).padStart(2, '0')}</div>`
   ).join('');
+
+  attachWheelStep(hoursEl);
+  attachWheelStep(minutesEl);
+  attachScrollSelect(hoursEl, 'hour');
+  attachScrollSelect(minutesEl, 'minute');
 
   _timePickerBuilt = true;
 }

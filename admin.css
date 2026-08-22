@@ -878,6 +878,36 @@
   .todo-fab { bottom: calc(70px + env(safe-area-inset-bottom) + 16px); right: 18px; width: 52px; height: 52px; }
 }
 
+/* MODAL HEADER (เว้นระยะจากปุ่มปิด X ไม่ให้ทับกัน) */
+.todo-modal-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 1.25rem;
+  padding-right: 44px; /* กันชนกับ .modal-close ที่ลอยอยู่มุมขวาบน (32px + ระยะห่าง) */
+  gap: 10px;
+}
+.todo-modal-header .btn-archive { flex-shrink: 0; }
+
+/* FORM INPUT (ใช้ทั้งช่องกรอกงาน และ native date input ของ date-picker) */
+.form-input {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 0.9rem;
+  font-family: var(--font-body);
+  color: var(--black);
+  background: #f8fafc;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  outline: none;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+}
+.form-input::placeholder { color: var(--gray, #94a3b8); }
+.form-input:hover { border-color: #cbd5e1; }
+.form-input:focus {
+  border-color: var(--royal-blue);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(26,58,143,0.1);
+}
+
 /* INPUT ROW */
 .todo-input-group { display: flex; flex-direction: column; gap: 10px; }
 .todo-input-actions { display: flex; align-items: center; gap: 8px; }
