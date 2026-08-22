@@ -56,7 +56,9 @@ export async function loadTodos() {
   renderTodos();
 }
 
-// ── ADD ──
+// ── ADD ── (optimistic: insert().select() คืนแถวใหม่มาเลย ต่อ array ในเครื่อง
+// แล้ว render ทันทีโดยไม่ต้อง query ใหม่ทั้งตาราง — เร็วขึ้นมาก เพราะรอแค่ 1 round-trip
+// แทนที่จะเป็น insert 1 ครั้ง + select ทั้งตารางอีก 1 ครั้งแบบเดิม)
 async function addTodo() {
   const textEl = document.getElementById('todoText');
   const text = textEl.value.trim();
@@ -65,22 +67,42 @@ async function addTodo() {
   const time = document.getElementById('todoTime').value || '';
   const date = document.getElementById('todoDate').value || todayStr();
 
-  await supabase.from('todos').insert([{ text, time, date, done: false }]);
-
   textEl.value = '';
   setTimePickerValue('');
   setDatePickerValue(todayStr());
-  await loadTodos();
+
+  const { data, error } = await supabase
+    .from('todos')
+    .insert([{ text, time, date, done: false }])
+    .select()
+    .single();
+
+  if (!error && data) {
+    todos.push(data);
+    renderTodos();
+  } else {
+    // insert ไม่สำเร็จ ค่อย fallback ไป query ใหม่ให้ข้อมูลตรงกับ DB จริง
+    await loadTodos();
+  }
 }
 
+// ── TOGGLE (optimistic: สลับสถานะในเครื่อง + render ทันที ไม่รอ DB ตอบก่อน) ──
 async function toggleTodo(id, current) {
-  await supabase.from('todos').update({ done: current !== true }).eq('id', id);
-  await loadTodos();
+  const t = todos.find(x => x.id === id);
+  if (t) { t.done = current !== true; renderTodos(); }
+
+  const { error } = await supabase.from('todos').update({ done: current !== true }).eq('id', id);
+  if (error && t) { t.done = current === true; renderTodos(); } // ย้อนกลับถ้า DB ปฏิเสธ
 }
 
+// ── DELETE (optimistic: ลบออกจากเครื่องก่อน ค่อยยิงลบจริงเบื้องหลัง) ──
 async function deleteTodo(id) {
-  await supabase.from('todos').delete().eq('id', id);
-  await loadTodos();
+  const idx = todos.findIndex(x => x.id === id);
+  const removed = idx > -1 ? todos.splice(idx, 1)[0] : null;
+  renderTodos();
+
+  const { error } = await supabase.from('todos').delete().eq('id', id);
+  if (error && removed) { todos.splice(idx, 0, removed); renderTodos(); } // คืนกลับถ้าลบไม่สำเร็จ
 }
 
 // ── RENDER: รายการหลัก (เฉพาะรอบเดือนปัจจุบันขึ้นไป) ──
@@ -220,7 +242,10 @@ function setTimePickerValue(hhmm) {
   }
 }
 
+let _timePickerBuilt = false; // สร้าง DOM ของ hour/minute แค่ครั้งแรกพอ ครั้งต่อไป reuse ของเดิม
+
 function buildTimePickerColumns() {
+  if (_timePickerBuilt) return; // กันสร้างซ้ำ ลดงาน DOM ทุกครั้งที่เปิด picker
   const hoursEl = document.getElementById('timePickerHours');
   const minutesEl = document.getElementById('timePickerMinutes');
 
@@ -231,6 +256,8 @@ function buildTimePickerColumns() {
   minutesEl.innerHTML = Array.from({ length: 12 }, (_, i) => i * 5).map(m =>
     `<div class="time-picker-item" data-minute="${m}" onclick="pickTimeMinute(${m})">${String(m).padStart(2, '0')}</div>`
   ).join('');
+
+  _timePickerBuilt = true;
 }
 
 function refreshTimePickerHighlight() {
