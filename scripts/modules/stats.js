@@ -110,51 +110,61 @@ function renderFinanceKPI(financeData, year) {
   const fmt = n => '฿' + Math.round(n).toLocaleString('th-TH');
 
   const cards = [
-    { icon: 'ph-receipt',                label: 'ออเดอร์ทั้งปี',       val: totalOrders,               color: 'var(--royal-blue)', accent: true },
-    { icon: 'ph-trend-up',               label: 'รายรับรวม',          val: fmt(totalIncome),          color: '#059669' },
-    { icon: 'ph-trend-down',             label: 'รายจ่ายรวม',         val: fmt(totalExpense),         color: '#dc2626' },
-    { icon: 'ph-currency-circle-dollar', label: 'กำไรสุทธิ',          val: (profit >= 0 ? '+' : '') + fmt(profit), color: profit >= 0 ? '#059669' : '#dc2626' },
-    { icon: 'ph-calculator',             label: 'เฉลี่ย/เดือน',        val: fmt(avgPerMonth),          color: '#7c3aed' },
-    { icon: 'ph-crown-simple',           label: 'เดือนทำได้สูงสุด',    val: bestMonthLabel,            color: '#d97706', small: true },
+    { label: 'ออเดอร์ทั้งปี',       val: totalOrders,               accent: true },
+    { label: 'รายรับรวม',          val: fmt(totalIncome) },
+    { label: 'รายจ่ายรวม',         val: fmt(totalExpense) },
+    { label: 'กำไรสุทธิ',          val: (profit >= 0 ? '+' : '') + fmt(profit), color: profit >= 0 ? '#059669' : '#dc2626' },
+    { label: 'เฉลี่ย/เดือน',        val: fmt(avgPerMonth) },
+    { label: 'เดือนทำได้สูงสุด',    val: bestMonthLabel,            small: true },
   ];
 
   el.innerHTML = cards.map(k => `
-    <div class="stats-kpi-card ${k.accent ? 'stats-kpi-card-accent' : ''}">
-      <div class="stats-kpi-icon" style="color:${k.color}"><i class="ph ${k.icon}"></i></div>
-      <div class="stats-kpi-val ${k.small ? 'stats-kpi-val-small' : ''}">${k.val}</div>
+    <div class="stats-kpi-card ${k.accent ? 'stats-kpi-card--accent' : ''}">
       <div class="stats-kpi-label">${k.label}</div>
+      <div class="stats-kpi-val ${k.small ? 'stats-kpi-val-small' : ''}" ${k.color ? `style="color:${k.color}"` : ''}>${k.val}</div>
     </div>`).join('');
 }
 
 // ── กราฟรายรับ vs รายจ่าย (area + line) ─────────
 function renderFinanceChart(financeData, year) {
-  const el = document.getElementById('stats-fin-chart');
+  const el     = document.getElementById('stats-fin-chart');
+  const legEl  = document.getElementById('stats-fin-legend');
   if (!el) return;
 
   const months = _monthlyBreakdown(financeData, year);
   const hasAny = months.some(m => m.income > 0 || m.expense > 0);
-  if (!hasAny) { el.innerHTML = statsEmpty(`ยังไม่มีข้อมูลการเงินในปี ${year}`); return; }
+  if (!hasAny) {
+    el.innerHTML = statsEmpty(`ยังไม่มีข้อมูลการเงินในปี ${year}`);
+    if (legEl) legEl.innerHTML = '';
+    return;
+  }
 
-  const W = 760, H = 300;
-  const padL = 46, padR = 12, padT = 16, padB = 30;
+  if (legEl) {
+    legEl.innerHTML = `
+      <span class="stats-legend-item"><span class="stats-legend-swatch solid"></span> รายรับ</span>
+      <span class="stats-legend-item"><span class="stats-legend-swatch dash"></span> รายจ่าย</span>`;
+  }
+
+  const W = 760, H = 260;
+  const padL = 40, padR = 8, padT = 14, padB = 26;
   const plotW = W - padL - padR;
   const plotH = H - padT - padB;
 
   const maxRaw = Math.max(...months.map(m => Math.max(m.income, m.expense)), 1);
   const maxVal = _niceMax(maxRaw);
-  const steps  = 4;
+  const steps  = 3;
 
   const xFor = i => padL + (plotW / 11) * i;
   const yFor = v => padT + plotH - (v / maxVal) * plotH;
 
-  // ── grid lines + y labels ──
+  // ── grid lines + y labels (เส้นบางๆ เฉพาะแนวนอน ไม่มีเส้นขอบกรอบ ให้ดูโปร่งสบายตา) ──
   let gridSvg = '';
   for (let s = 0; s <= steps; s++) {
     const val = (maxVal / steps) * s;
     const y   = yFor(val);
     gridSvg += `
       <line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="#eef1f8" stroke-width="1"/>
-      <text x="${padL - 8}" y="${y + 4}" font-size="11" fill="#94a3b8" text-anchor="end">${val >= 1000 ? Math.round(val / 1000) + 'k' : Math.round(val)}</text>`;
+      <text x="${padL - 8}" y="${y + 4}" font-size="11" fill="#94a3b8" text-anchor="end">${val === 0 ? '0' : (val >= 1000 ? '฿' + Math.round(val / 1000) + 'k' : '฿' + Math.round(val))}</text>`;
   }
 
   // ── x labels ──
@@ -166,8 +176,8 @@ function renderFinanceChart(financeData, year) {
   const incomePts  = months.map((m, i) => ({ x: xFor(i), y: yFor(m.income) }));
   const expensePts = months.map((m, i) => ({ x: xFor(i), y: yFor(m.expense) }));
 
-  const incomeLine = _smoothPath(incomePts);
-  const incomeArea = `${incomeLine} L${incomePts[incomePts.length - 1].x},${padT + plotH} L${incomePts[0].x},${padT + plotH} Z`;
+  const incomeLine  = _smoothPath(incomePts);
+  const incomeArea  = `${incomeLine} L${incomePts[incomePts.length - 1].x},${padT + plotH} L${incomePts[0].x},${padT + plotH} Z`;
   const expenseLine = _smoothPath(expensePts);
 
   // ── clickable points (เฉพาะเดือนที่มีข้อมูล) ──
@@ -176,23 +186,19 @@ function renderFinanceChart(financeData, year) {
     if (m.income === 0 && m.expense === 0) return;
     const monthKey = `${year}-${String(i + 1).padStart(2, '0')}`;
     if (m.income > 0) {
-      pointsSvg += `<circle cx="${incomePts[i].x}" cy="${incomePts[i].y}" r="5" fill="#059669" stroke="#fff" stroke-width="2" class="stats-chart-dot" onclick="window.__statsOpenMonth('${monthKey}')"></circle>`;
+      pointsSvg += `<circle cx="${incomePts[i].x}" cy="${incomePts[i].y}" r="5" fill="var(--royal-blue,#1a3a8f)" stroke="#fff" stroke-width="2" class="stats-chart-dot" onclick="window.__statsOpenMonth('${monthKey}')"></circle>`;
     }
     if (m.expense > 0) {
-      pointsSvg += `<circle cx="${expensePts[i].x}" cy="${expensePts[i].y}" r="4" fill="#dc2626" stroke="#fff" stroke-width="2" class="stats-chart-dot" onclick="window.__statsOpenMonth('${monthKey}')"></circle>`;
+      pointsSvg += `<circle cx="${expensePts[i].x}" cy="${expensePts[i].y}" r="4" fill="#94a3b8" stroke="#fff" stroke-width="2" class="stats-chart-dot" onclick="window.__statsOpenMonth('${monthKey}')"></circle>`;
     }
   });
 
   el.innerHTML = `
-    <div class="stats-chart-legend">
-      <span><span class="dot" style="background:#059669;"></span> รายรับ</span>
-      <span><span class="dot dash" style="background:#dc2626;"></span> รายจ่าย</span>
-    </div>
-    <svg viewBox="0 0 ${W} ${H}" class="stats-fin-svg">
+    <svg viewBox="0 0 ${W} ${H}" class="stats-fin-svg" preserveAspectRatio="none">
       ${gridSvg}
-      <path d="${incomeArea}" fill="#059669" fill-opacity="0.12" stroke="none"></path>
-      <path d="${incomeLine}" fill="none" stroke="#059669" stroke-width="2.5"></path>
-      <path d="${expenseLine}" fill="none" stroke="#dc2626" stroke-width="2" stroke-dasharray="5,4"></path>
+      <path d="${incomeArea}" fill="var(--royal-blue,#1a3a8f)" fill-opacity="0.08" stroke="none"></path>
+      <path d="${incomeLine}" fill="none" stroke="var(--royal-blue,#1a3a8f)" stroke-width="2.5" stroke-linecap="round"></path>
+      <path d="${expenseLine}" fill="none" stroke="#94a3b8" stroke-width="1.75" stroke-dasharray="5,4" stroke-linecap="round"></path>
       ${pointsSvg}
       ${xLabelsSvg}
     </svg>`;
@@ -504,26 +510,10 @@ function _injectStatsStyle() {
   const style = document.createElement('style');
   style.id = 'statsExtraStyle';
   style.textContent = `
-    .stats-fin-toolbar {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 1rem;
-    }
-    .stats-fin-toolbar-title {
-      font-family: var(--font-display); font-size: 1.1rem; font-weight: 700;
-      color: var(--black); display: flex; align-items: center; gap: 0.4rem;
-    }
-    .stats-year-select {
-      padding: 0.5rem 0.9rem; border-radius: 10px; border: 1px solid var(--border);
-      font-family: var(--font-number, 'Jost', sans-serif); font-size: 0.9rem;
-      font-weight: 600; color: var(--black); background: #fff; cursor: pointer;
-    }
-    .stats-kpi-card-accent { border-color: var(--royal-blue); }
-    .stats-kpi-val-small { font-size: 1.05rem; }
-
-    .stats-hint { font-size: 0.72rem; font-weight: 500; color: var(--gray); margin-left: 0.4rem; }
-
-    .stats-chart-legend { display: flex; gap: 1rem; font-size: 0.75rem; margin-bottom: 0.75rem; color: var(--gray); }
-    .stats-chart-legend .dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; margin-right: 4px; }
+    .stats-chart-legend { display: flex; gap: 0.9rem; font-size: 0.75rem; color: var(--gray, #64748b); flex-shrink: 0; }
+    .stats-legend-item { display: flex; align-items: center; gap: 5px; }
+    .stats-legend-swatch { width: 14px; height: 0; border-top: 2.5px solid var(--royal-blue); display: inline-block; }
+    .stats-legend-swatch.dash { border-top: 1.75px dashed #94a3b8; }
     .stats-fin-svg { width: 100%; height: auto; display: block; }
     .stats-chart-dot { cursor: pointer; }
     .stats-chart-dot:hover { r: 7; }
@@ -596,7 +586,7 @@ function _injectStatsStyle() {
 
     @media (max-width: 640px) {
       .stats-mini-grid { grid-template-columns: 1fr; }
-      .stats-fin-toolbar { flex-wrap: wrap; gap: 0.6rem; }
+      .stats-chart-card-head { gap: 6px; }
     }
   `;
   document.head.appendChild(style);

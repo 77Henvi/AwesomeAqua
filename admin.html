@@ -301,17 +301,16 @@
     </div>
 
     <div class="admin-page" id="page-stats">
-      <div class="stats-fin-toolbar">
-        <div class="stats-fin-toolbar-title"><i class="ph ph-chart-line"></i> ภาพรวมการเงิน</div>
+      <div class="stats-year-row">
         <select id="statsYearSelect" class="stats-year-select"></select>
       </div>
 
       <div id="stats-fin-kpi" class="stats-kpi-grid"></div>
 
-      <div class="stats-section-card">
-        <div class="stats-section-title">
-          <i class="ph ph-chart-line"></i> รายรับ vs รายจ่าย
-          <span class="stats-hint">กดจุดเพื่อดูรายละเอียด</span>
+      <div class="stats-chart-card">
+        <div class="stats-chart-card-head">
+          <div class="stats-chart-card-title">รายรับ vs รายจ่าย <span class="stats-hint">· กดจุดเพื่อดูรายละเอียด</span></div>
+          <div class="stats-chart-legend" id="stats-fin-legend"></div>
         </div>
         <div id="stats-fin-chart"></div>
       </div>
