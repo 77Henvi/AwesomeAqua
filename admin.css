@@ -543,15 +543,58 @@
 .bnav-label { font-size: 0.68rem; font-weight: 500; }
 
 
-/* ── DESKTOP (≥ 1025px) ── */
+/* ── DESKTOP (≥ 1025px): sidebar navigation แทน topbar ── */
 @media (min-width: 1025px) {
-  .admin-body            { padding: 2rem 6%; }
+  .admin-dashboard {
+    display: flex !important; /* JS ตั้ง style.display='flex' อยู่แล้ว แต่กันไว้เผื่อ inline ไม่ทัน */
+    align-items: stretch;
+    min-height: 100vh;
+  }
+
+  .admin-topbar {
+    position: fixed; top: 0; left: 0; bottom: 0;
+    width: 232px; height: 100vh;
+    flex-direction: column; align-items: stretch; justify-content: flex-start;
+    padding: 1.5rem 1rem; gap: 0;
+    overflow-y: auto;
+  }
+
+  .admin-topbar-logo {
+    padding: 0 0.4rem; margin-bottom: 2rem;
+    font-size: 1.3rem;
+  }
+
+  .admin-nav-tabs {
+    flex-direction: column; align-items: stretch;
+    background: transparent; padding: 0; gap: 3px;
+    flex: 1; width: 100%;
+  }
+  .admin-nav-tab {
+    display: flex; align-items: center; gap: 10px;
+    width: 100%; text-align: left; justify-content: flex-start;
+    padding: 10px 14px; font-size: 0.88rem;
+  }
+  .admin-nav-tab i { font-size: 1.05rem; flex-shrink: 0; }
+
+  .admin-topbar-right {
+    flex-direction: column; align-items: stretch; gap: 0.6rem;
+    margin-top: 1rem; padding-top: 1rem;
+    border-top: 1px solid rgba(255,255,255,0.15);
+  }
+  .admin-topbar-right a { text-align: center; padding: 0.35rem 0; }
+  .admin-logout-btn { width: 100%; text-align: center; }
+
+  .admin-body {
+    flex: 1; min-width: 0;
+    margin-left: 232px;
+    padding: 2rem 3rem;
+    min-height: 100vh;
+  }
+
   .admin-stats           { grid-template-columns: repeat(4, 1fr); }
   .dash-two-col          { grid-template-columns: 1fr 1fr; gap: 1.5rem; }
   .finance-summary-grid  { grid-template-columns: repeat(3, 1fr); }
   .finance-lists         { grid-template-columns: 1fr 1fr; }
-  .admin-topbar          { padding: 0 6%; }
-  .admin-nav-tab         { padding: 5px 18px; font-size: 0.85rem; }
 }
 
 /* ── TABLET (641px – 1024px) ── */
