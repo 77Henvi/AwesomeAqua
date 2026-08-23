@@ -160,6 +160,28 @@
 .dash-mini-name { font-size: 0.88rem; font-weight: 500; }
 .dash-mini-sub  { font-size: 0.73rem; color: var(--gray); }
 
+/* ── QUICK รายรับ-รายจ่าย (หน้าหลัก) ── */
+.quick-fin-row { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+.quick-fin-row .form-input { flex: 1; min-width: 180px; }
+.quick-fin-amount { max-width: 160px; }
+.quick-fin-actions { display: flex; gap: 8px; margin-bottom: 1.1rem; }
+.btn-quick-fin {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 0.6rem 1rem; border-radius: 10px; font-size: 0.85rem; font-weight: 600;
+  font-family: var(--font-body); cursor: pointer; transition: 0.15s;
+  border: 1px solid var(--border); background: #fff; color: var(--gray);
+}
+.btn-quick-fin.expense { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+.btn-quick-fin.expense:hover { background: #dc2626; color: #fff; border-color: #dc2626; }
+.btn-quick-fin.income { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
+.btn-quick-fin.income:hover { background: #059669; color: #fff; border-color: #059669; }
+.quick-fin-today-head {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 0.78rem; font-weight: 600; color: var(--gray);
+  text-transform: uppercase; letter-spacing: 0.04em;
+  margin-bottom: 0.6rem;
+}
+
 /* ── COLLAPSIBLE ADD PANEL ── */
 .add-panel-toggle {
   display: flex; align-items: center; justify-content: space-between;

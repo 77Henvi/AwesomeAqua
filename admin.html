@@ -70,6 +70,22 @@
           </div>
         </div>
       </div>
+
+      <div class="admin-card">
+        <div class="admin-panel-title" style="font-size:1rem;margin-bottom:0.9rem;"><i class="ph ph-receipt"></i> บันทึกรายรับ-รายจ่ายด่วน</div>
+        <div class="quick-fin-row">
+          <input type="text" id="finItemName" class="form-input" placeholder="เช่น ค่าอาหารปลา, ขายปลาเทวดา...">
+          <input type="number" id="finItemAmount" class="form-input quick-fin-amount" placeholder="จำนวนเงิน">
+        </div>
+        <div class="quick-fin-actions">
+          <button class="btn-quick-fin expense" onclick="addFinance('expense')"><i class="ph ph-minus-circle"></i> บันทึกรายจ่าย</button>
+          <button class="btn-quick-fin income" onclick="addFinance('income')"><i class="ph ph-plus-circle"></i> บันทึกรายรับ</button>
+        </div>
+        <div class="quick-fin-today-head"><i class="ph ph-calendar-blank"></i> วันนี้ · <span id="todayLabel">—</span></div>
+        <div id="financeTodayList">
+          <div class="admin-empty-state"><div class="admin-empty-text">กำลังโหลด...</div></div>
+        </div>
+      </div>
     </div>
 
     <div class="admin-page" id="page-fish">
@@ -119,8 +135,8 @@
             </div>
             <div class="form-group" style="grid-column: 1 / -1;">
               <label>ยอดรวมรายจ่ายอัตโนมัติ</label>
-              <input type="text" id="totalFinanceDisplay" readonly placeholder="0 บาท" 
-                     style="background-color: rgba(255,255,255,0.05); color: #7eb3ff; font-weight: 600; cursor: not-allowed; border: 1px solid rgba(255,255,255,0.1);">
+              <input type="text" id="totalFinanceDisplay" readonly placeholder="0 บาท"
+                     style="background:var(--light-blue); color:var(--royal-blue); font-weight:600; cursor:not-allowed; border:1px solid var(--border);">
             </div>
             
             <div class="form-group">
@@ -277,28 +293,6 @@
       <div id="financePager"></div>
     </div>
 
-    <div class="admin-page" id="page-todos">
-      <div class="dash-two-col">
-        <div class="admin-card">
-          <div class="admin-panel-title"><i class="ph ph-receipt"></i> บันทึกรายรับ-รายจ่าย</div>
-          <div class="todo-input-row" style="flex-wrap: wrap;">
-            <input type="text" id="finItemName" placeholder="เช่น ค่าอาหารปลา, ขายปลาเทวดา..." style="flex: 1; min-width: 200px;">
-            <input type="number" id="finItemAmount" placeholder="จำนวนเงิน (บาท)" style="width: 120px;">
-          </div>
-          <div style="display: flex; gap: 10px; margin-bottom: 1rem;">
-            <button class="btn" style="flex:1; background: #fef2f2; color: #dc2626; border: 1px solid #fecaca;" onclick="addFinance('expense')">- บันทึกรายจ่าย</button>
-            <button class="btn" style="flex:1; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;" onclick="addFinance('income')">+ บันทึกรายรับ</button>
-          </div>
-        </div>
-
-        <div class="admin-card">
-          <div class="admin-panel-title"><i class="ph ph-calendar-blank"></i> — <span id="todayLabel" style="font-size:0.85rem;font-weight:400;color:var(--gray);">—</span></div>
-          <div id="financeTodayList">
-            <div class="admin-empty-state"><div class="admin-empty-icon"></div><div class="admin-empty-text">กำลังโหลด...</div></div>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <div class="admin-page" id="page-stats">
       <div class="stats-year-row">
