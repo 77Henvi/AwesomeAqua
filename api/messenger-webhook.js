@@ -70,6 +70,22 @@ const dbPatch = (path, body) =>
     body: JSON.stringify(body)
   });
 
+// เรียก Postgres RPC function (ใช้กับ record_fish_sale / record_fish_restock ที่ล็อกแถว
+// กันแข่งกันขายพร้อมกัน — ดู docs/PHASE0_ATOMIC_STOCK_SETUP.md)
+// คืนค่า { ok, data, error } แทนที่จะ throw ตรงๆ เพราะต้อง handle ทีละ item ในตะกร้าได้
+const dbRpc = async (fnName, args) => {
+  const res = await fetch(`${DB_URL}/rest/v1/rpc/${fnName}`, {
+    method: 'POST',
+    headers: { ...DB_HEADS, 'Content-Type': 'application/json' },
+    body: JSON.stringify(args)
+  });
+  if (!res.ok) {
+    const errBody = await res.json().catch(() => ({}));
+    return { ok: false, error: errBody.message || errBody.hint || `HTTP ${res.status}` };
+  }
+  return { ok: true, data: await res.json() };
+};
+
 const price = (f) => (!f.price_max || f.price_max === f.price_min)
   ? `฿${f.price_min}`
   : `฿${f.price_min} – ฿${f.price_max}`;
@@ -229,6 +245,8 @@ async function checkout(psid) {
     if (fish) items.push({ fish, qty: item.qty || 1 });
   }
 
+  // เช็คสต็อกเบื้องต้นจาก snapshot ที่ fetch มา (UX เร็ว กันลูกค้าเห็น error ทันทีถ้าสต็อกไม่พอชัดๆ)
+  // การเช็คจริงที่กันพลาดคือ record_fish_sale RPC ด้านล่าง (ล็อกแถวที่ DB ตอนหักสต็อกจริง)
   const outOfStock = items.filter(i => i.fish.stock < i.qty);
   if (outOfStock.length) {
     const names = outOfStock.map(i => `${i.fish.name_th} (เหลือ ${i.fish.stock} ตัว)`).join(', ');
@@ -245,33 +263,58 @@ async function checkout(psid) {
   }
 
   const today = new Date().toLocaleDateString('en-CA');
+
+  // หัก stock + บันทึกรายรับ ทีละตัวผ่าน RPC เดียวกับฝั่งแอดมิน (atomic, ล็อกแถวกันแข่งกันขาย)
+  // ถ้าสต็อกหลุดไประหว่างที่ลูกค้ากำลังกดยืนยัน (เช่นแอดมินขายพร้อมกันพอดี) รายการนั้นจะถูกข้าม
+  // ไม่ทำให้ทั้งออเดอร์พัง — แจ้งลูกค้าแยกว่ารายการไหนสำเร็จ/ไม่สำเร็จ
+  const succeeded = [];
+  const failed = [];
   for (const { fish, qty } of items) {
-    await dbInsert('finance', {
-      type: 'income',
-      name: `ขายปลา: ${fish.name_th} x${qty} ตัว (ออเดอร์ #${order.id.slice(0, 8)})`,
-      amount: unitPrice(fish) * qty,
-      date: today,
-      fish_id: fish.id,
-      order_id: order.id,
+    const { ok, error } = await dbRpc('record_fish_sale', {
+      p_fish_id: fish.id,
+      p_qty: qty,
+      p_amount: unitPrice(fish) * qty,
+      p_name: `ขายปลา: ${fish.name_th} x${qty} ตัว (ออเดอร์ #${order.id.slice(0, 8)})`,
+      p_date: today,
+      p_order_id: order.id,
     });
-    await dbPatch(`fish?id=eq.${fish.id}`, { stock: fish.stock - qty });
+    if (ok) {
+      succeeded.push({ fish, qty });
+    } else {
+      failed.push({ fish, qty, error });
+    }
+  }
+
+  if (!succeeded.length) {
+    // ไม่มีรายการไหนสำเร็จเลย — ยกเลิกออเดอร์ที่เพิ่งสร้างไปเพราะไม่มีอะไรจะขายจริง
+    await dbPatch(`orders?id=eq.${order.id}`, { status: 'cancelled' });
+    await sendText(psid, `😢 สต็อกไม่พอสำหรับทุกรายการในตะกร้าแล้วครับ (มีคนสั่งไปพร้อมกันพอดี) ลองเลือกใหม่อีกครั้งนะครับ`);
+    return;
+  }
+
+  const actualTotal = succeeded.reduce((sum, i) => sum + unitPrice(i.fish) * i.qty, 0);
+  if (actualTotal !== total) {
+    await dbPatch(`orders?id=eq.${order.id}`, { total_amount: actualTotal });
   }
 
   // ล้างตะกร้าหลังยืนยันสำเร็จ
   await dbUpsert('messenger_sessions', { user_id: psid, cart: [], updated_at: new Date().toISOString() });
 
-  const itemLines = items.map(i => `• ${i.fish.name_th} x${i.qty} ตัว`).join('\n');
+  const itemLines = succeeded.map(i => `• ${i.fish.name_th} x${i.qty} ตัว`).join('\n');
+  const failedLines = failed.length
+    ? `\n\n⚠️ รายการที่สต็อกไม่พอแล้ว (มีคนสั่งไปพร้อมกันพอดี):\n${failed.map(i => `• ${i.fish.name_th}`).join('\n')}`
+    : '';
 
   await sendText(psid,
-    `✅ ยืนยันคำสั่งซื้อแล้วครับ! (ออเดอร์ #${order.id.slice(0, 8)})\n\n${itemLines}\n\n` +
-    `💰 ยอดรวม: ฿${total.toLocaleString('th-TH')}\n\n` +
+    `✅ ยืนยันคำสั่งซื้อแล้วครับ! (ออเดอร์ #${order.id.slice(0, 8)})\n\n${itemLines}${failedLines}\n\n` +
+    `💰 ยอดรวม: ฿${actualTotal.toLocaleString('th-TH')}\n\n` +
     `📲 ช่องทางชำระเงิน:\n• พร้อมเพย์: 082-237-2512\n• ธนาคารกสิกร: 136-3-82691-8\n\n` +
     `โอนแล้วส่งสลิปมาในแชทนี้ได้เลยครับ 🙏`
   );
   await sendImage(psid, `${SITE}/images/qr-payment.png`);
 
   if (OWNER_ID) {
-    await sendText(OWNER_ID, `🔔 มีออเดอร์ใหม่! #${order.id.slice(0, 8)}\n${itemLines}\n💰 รวม ฿${total.toLocaleString('th-TH')}\n👤 PSID: ${psid}`);
+    await sendText(OWNER_ID, `🔔 มีออเดอร์ใหม่! #${order.id.slice(0, 8)}\n${itemLines}${failedLines}\n💰 รวม ฿${actualTotal.toLocaleString('th-TH')}\n👤 PSID: ${psid}`);
   }
 }
 

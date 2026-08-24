@@ -181,6 +181,7 @@ export async function confirmSale() {
 
   const qty = parseInt(document.getElementById('saleQty').value) || 0;
   if (qty <= 0) { showToast('⚠️ กรุณากรอกจำนวนที่ขาย'); return; }
+  // เช็คเบื้องต้นจาก cache ให้ UX เร็ว (ตัวเช็คจริงที่กันพลาดคือใน DB ผ่าน RPC ด้านล่าง)
   if (qty > fish.stock) { showToast(`⚠️ จำนวนเกินสต็อกที่มี (${fish.stock} ตัว)`); return; }
 
   const btn = document.getElementById('confirmSaleBtn');
@@ -192,29 +193,34 @@ export async function confirmSale() {
   const sizeLabel    = _hasSizeOptions(fish)
     ? ` (ไซส์ ${sizeChoice === 'max' ? fish.sizeMax : fish.sizeMin} นิ้ว)`
     : '';
-  const today     = new Date().toLocaleDateString('en-CA');
-  const totalIncome = qty * sellPrice;
-  const newStock  = fish.stock - qty;
+  const today        = new Date().toLocaleDateString('en-CA');
+  const totalIncome  = qty * sellPrice;
 
   try {
-    const { error: fishErr } = await supabase.from('fish')
-      .update({ stock: newStock })
-      .eq('id', fish.id);
+    // หัก stock + บันทึกรายรับ ใน transaction เดียวที่ฝั่ง DB (ล็อกแถวกันขายซ้อนพร้อมกัน)
+    // ดู docs/PHASE0_ATOMIC_STOCK_SETUP.md — ต้องรัน SQL สร้าง RPC นี้ก่อนใช้งานได้
+    const { data: newStock, error: rpcErr } = await supabase.rpc('record_fish_sale', {
+      p_fish_id: fish.id,
+      p_qty: qty,
+      p_amount: totalIncome,
+      p_name: `ขายปลา: ${fish.name_th || fish.name}${sizeLabel} x${qty} ตัว`,
+      p_date: today,
+    });
 
-    if (fishErr) throw fishErr;
-
-    const { error: finErr } = await supabase.from('finance').insert([{
-      type: 'income',
-      name: `ขายปลา: ${fish.name_th || fish.name}${sizeLabel} x${qty} ตัว`,
-      amount: totalIncome,
-      date: today,
-      fish_id: fish.id 
-    }]);
-
-    if (finErr) throw finErr;
+    if (rpcErr) {
+      // ข้อความ error จาก DB function กรณีสต็อกไม่พอ/ไม่เจอปลา (แปลงให้อ่านง่ายขึ้น)
+      if (rpcErr.message?.includes('INSUFFICIENT_STOCK')) {
+        showToast('⚠️ สต็อกไม่พอแล้ว (มีคนขายไปพร้อมกันหรือสต็อกเปลี่ยนไป) กรุณาเช็คสต็อกอีกครั้ง');
+      } else if (rpcErr.message?.includes('FISH_NOT_FOUND')) {
+        showToast('⚠️ ไม่พบปลาตัวนี้แล้ว (อาจถูกลบไปแล้ว)');
+      } else {
+        throw rpcErr;
+      }
+      return;
+    }
 
     showToast(`✅ ขาย ${fish.name_th || fish.name}${sizeLabel} x${qty} ตัว สำเร็จ (รับเงิน ฿${totalIncome.toLocaleString('th-TH')})`);
-    
+
     if (typeof window.loadFinanceFromDB === 'function') {
       window.loadFinanceFromDB();
     }
@@ -246,7 +252,7 @@ export async function confirmSale() {
         }
       }, 300);
     }
-    
+
   } catch (err) {
     console.error(err);
     showToast('❌ ผิดพลาด: ' + err.message);

@@ -41,35 +41,39 @@ export async function confirmRestock(fishData, onDone) {
   if (isNaN(cost)) { showToast('<i class="ph-fill ph-warning-circle" style="color:#f59e0b;"></i> กรุณากรอกต้นทุนให้ถูกต้อง'); return; }
 
   const f = fishData.find(x => x.id === id);
+  const wasOutOfStock = f?.stock === 0; // เช็คจาก cache ไว้ก่อนเรียก RPC เพื่อรู้ว่าต้องแจ้งเตือนลูกค้าที่รอไหม
   const btn = document.getElementById('btnConfirmRestock');
   btn.disabled = true; btn.textContent = 'กำลังบันทึก...';
 
   try {
-    const newStock = f.stock + qty;
-    // 1. อัปเดตสต็อก
-    const { error: stockErr } = await supabase.from('fish').update({ stock: newStock }).eq('id', id);
-    if (stockErr) { showToast('<i class="ph-fill ph-x-circle" style="color:#ef4444;"></i> ผิดพลาด: อัปเดตสต็อกไม่สำเร็จ'); return; }
+    const amount = qty * cost;
+
+    // เพิ่ม stock + บันทึกรายจ่าย (ถ้ามี) ใน transaction เดียวที่ฝั่ง DB
+    // ดู docs/PHASE0_ATOMIC_STOCK_SETUP.md — ต้องรัน SQL สร้าง RPC นี้ก่อนใช้งานได้
+    const { error: rpcErr } = await supabase.rpc('record_fish_restock', {
+      p_fish_id: id,
+      p_qty: qty,
+      p_amount: amount,
+      p_name: `เติมสต็อก: ${f?.name_th || f?.name || ''} x${qty} ตัว`,
+      p_date: date || new Date().toLocaleDateString('en-CA'),
+    });
+
+    if (rpcErr) {
+      if (rpcErr.message?.includes('FISH_NOT_FOUND')) {
+        showToast('<i class="ph-fill ph-x-circle" style="color:#ef4444;"></i> ไม่พบปลาตัวนี้แล้ว (อาจถูกลบไปแล้ว)');
+      } else {
+        showToast('<i class="ph-fill ph-x-circle" style="color:#ef4444;"></i> ผิดพลาด: เติมสต็อกไม่สำเร็จ');
+      }
+      return;
+    }
 
     // แจ้งลูกค้าที่กด "แจ้งเตือน" ไว้ตอนปลาหมดสต็อก (ไม่บล็อก flow หลักถ้าแจ้งไม่สำเร็จ)
-    if (f.stock === 0 && newStock > 0) {
+    if (wasOutOfStock) {
       fetch('/api/notify-restock', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ fish_id: id }),
       }).catch(() => {});
-    }
-
-    const amount = qty * cost;
-    // 2. บันทึกรายจ่าย
-    if (amount > 0) {
-      const { error: finErr } = await supabase.from('finance').insert({
-        type: 'expense',
-        name: `เติมสต็อก: ${f.name_th || f.name} x${qty} ตัว`,
-        amount: amount,
-        date: date || new Date().toLocaleDateString('en-CA'),
-        fish_id: id
-      });
-      if (finErr) { showToast('<i class="ph-fill ph-warning-circle" style="color:#f59e0b;"></i> เติมสต็อกสำเร็จ แต่บันทึกรายจ่ายไม่สำเร็จ'); }
     }
 
     showToast('<i class="ph-fill ph-check-circle" style="color:#10b981;"></i> เติมสต็อกเรียบร้อย');
