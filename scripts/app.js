@@ -3,7 +3,7 @@ import { openFishDetail, closeFishModal,
          closeFishModalOutside,
          openComingSoonDetail, closeCsModal,
          closeCsModalOutside }                     from './modules/fishModal.js';
-import { goSlide }                                 from './modules/slideshow.js';
+import { goSlide, injectHeroBubbles }              from './modules/slideshow.js';
 import { injectFishBackgrounds }                   from './modules/fishBackground.js';
 import { setFishChip, filterFish,  
         renderFishGrid, getCurrentFilter }         from './modules/render.js';
@@ -86,4 +86,5 @@ window.toggleLanguage = toggleLanguage;
 // ── Init ──
 initLanguage();
 injectFishBackgrounds();
+injectHeroBubbles();
 loadFishFromDB();
