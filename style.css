@@ -198,6 +198,14 @@
     from { transform: translateX(0); }
     to   { transform: translateX(-50%); }
   }
+  /* ไล่สีให้ขอบล่างสุดของ hero กลืนเข้ากับพื้นขาวของ section ถัดไปแบบนุ่มนวล
+     (เดิมคลื่นตัดเป็นเส้นแข็งพอดีขอบ section ดูสะดุดตา) — วางทับบนคลื่นอีกที (z-index สูงกว่า) */
+  .hero::after {
+    content: '';
+    position: absolute; left: 0; right: 0; bottom: 0; height: 90px;
+    z-index: 3; pointer-events: none;
+    background: linear-gradient(to bottom, transparent 0%, var(--white) 100%);
+  }
   /* ฟองอากาศลอยขึ้น — สร้าง element ด้วย JS (ดู injectHeroBubbles ใน slideshow.js) */
   .hero-bubbles { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
   .hero-bubble {
