@@ -18,6 +18,14 @@
     --radius-md: 12px;   /* ปุ่มหลัก, ช่องค้นหา, การ์ดย่อย */
     --radius-lg: 16px;   /* การ์ดหลัก, modal */
     --radius-pill: 999px; /* chip, badge ทรงแคปซูล */
+  
+    /* ── Ocean palette (เพิ่มใหม่สำหรับ Hero โทนมืดใต้น้ำ — ใช้เฉพาะใน .hero เท่านั้น
+       ไม่กระทบสี royal-blue/bright-blue เดิมที่ใช้ทั่วทั้งเว็บ) ── */
+    --ocean-deepest: #1C4EA7;
+    --ocean-deep:    #024D60;
+    --ocean-teal:    #2CACAD;
+    --ocean-sky:     #75E2E0;
+    --ocean-mist:    #D9F5F0;
   }
   
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -56,7 +64,7 @@
     color: #ffffff; letter-spacing: -0.5px;
     transition: color 0.4s;
   }
-  .logo span { color: #7eb3ff; transition: color 0.4s; }
+  .logo span { color: var(--ocean-sky); transition: color 0.4s; }
   nav.scrolled .logo      { color: var(--royal-blue); }
   nav.scrolled .logo span { color: var(--bright-blue); }
   
@@ -159,17 +167,53 @@
     position: absolute; inset: 0;
     background: linear-gradient(
       to right,
-      rgba(5,12,40,0.72) 0%,
-      rgba(5,12,40,0.40) 60%,
-      rgba(5,12,40,0.20) 100%
+      rgba(2,30,40,0.80) 0%,
+      rgba(2,58,74,0.55) 55%,
+      rgba(28,78,167,0.35) 100%
     );
+  }
+  /* แสงกระเพื่อมใต้น้ำ — ไล่เฉดเบาๆ เคลื่อนไหวช้าๆ ให้ hero มีชีวิตชีวาโดยไม่บดบังรูปปลา */
+  .hero-caustic {
+    position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background:
+      radial-gradient(ellipse at 25% 20%, rgba(117,226,224,0.10), transparent 55%),
+      radial-gradient(ellipse at 78% 65%, rgba(44,172,173,0.12), transparent 50%);
+    animation: causticShift 12s ease-in-out infinite alternate;
+  }
+  @keyframes causticShift {
+    from { opacity: 0.6; transform: scale(1) translateY(0); }
+    to   { opacity: 1;   transform: scale(1.08) translateY(-10px); }
+  }
+  /* คลื่นน้ำที่ขอบล่างของ Hero — ไล่สีต่อเนื่องเข้ากับ .stats ด้านล่าง (ocean-deep) */
+  .hero-waves {
+    position: absolute; left: 0; right: 0; bottom: -2px; height: 120px;
+    z-index: 1; pointer-events: none; overflow: hidden;
+  }
+  .hero-waves svg { position: absolute; bottom: 0; width: 200%; height: 100%; }
+  .hero-wave-1 { animation: waveMove 16s linear infinite; opacity: 0.5; }
+  .hero-wave-2 { animation: waveMove 10s linear infinite reverse; opacity: 0.35; }
+  @keyframes waveMove {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  /* ฟองอากาศลอยขึ้น — สร้าง element ด้วย JS (ดู injectHeroBubbles ใน slideshow.js) */
+  .hero-bubbles { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+  .hero-bubble {
+    position: absolute; bottom: -30px; border-radius: 50%;
+    background: rgba(117,226,224,0.28);
+    animation: bubbleRise linear infinite;
+  }
+  @keyframes bubbleRise {
+    0%   { transform: translateY(0) translateX(0); opacity: 0; }
+    10%  { opacity: 0.65; }
+    100% { transform: translateY(-100vh) translateX(18px); opacity: 0; }
   }
   .hero-content { max-width: 580px; z-index: 2; position: relative; }
   .hero-tag {
     display: inline-flex; align-items: center; gap: 0.4rem;
-    background: rgba(255,255,255,0.15);
+    background: rgba(44,172,173,0.18);
     backdrop-filter: blur(6px);
-    color: #fff; border: 1px solid rgba(255,255,255,0.3);
+    color: var(--ocean-sky); border: 1px solid rgba(117,226,224,0.35);
     padding: 0.35rem 1rem; border-radius: 100px;
     font-size: 0.82rem; font-weight: 500;
     margin-bottom: 1.5rem; letter-spacing: 0.5px;
@@ -181,13 +225,20 @@
     margin-bottom: 1.25rem; font-weight: 700;
     text-shadow: 0 2px 20px rgba(0,0,0,0.3);
   }
-  .hero h1 span { color: #7eb3ff; }
+  .hero h1 span { color: var(--ocean-sky); }
   .hero p {
     color: rgba(255,255,255,0.82);
     font-size: 1.05rem; line-height: 1.7;
     margin-bottom: 2rem;
   }
   .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; }
+  /* ปุ่ม primary เฉพาะใน hero ให้ใช้โทน ocean-teal (เด่นบนพื้นมืดกว่า royal-blue เดิม)
+     ไม่กระทบ .btn-primary ส่วนอื่นของเว็บที่ยังใช้ royal-blue ตามปกติ */
+  .hero .btn-primary {
+    background: var(--ocean-teal); color: #04222b;
+    box-shadow: 0 8px 24px rgba(44,172,173,0.35);
+  }
+  .hero .btn-primary:hover { background: var(--ocean-sky); }
   
   .slide-dots {
     display: flex; gap: 0.5rem; margin-top: 2rem;
@@ -201,8 +252,10 @@
   
   
   /* ── STATS ── */
+  /* เปลี่ยนจาก royal-blue เดิมเป็น ocean-deep ให้กลืนต่อเนื่องกับสี wave ที่ขอบล่างของ hero
+     (ดู .hero-wave-1/.hero-wave-2 ใน HERO block ด้านบน — ใช้สีเดียวกันจงใจ) */
   .stats {
-    background: var(--royal-blue); color: white;
+    background: var(--ocean-deep); color: white;
     display: grid; grid-template-columns: repeat(3, 1fr);
     text-align: center; padding: 1.75rem 5%;
   }
@@ -214,6 +267,7 @@
   .stat-num {
     font-family: var(--font-body); 
     font-size: 1.75rem; font-weight: 700; display: block;
+    color: var(--ocean-sky);
   }
   .stat-label { font-size: 0.78rem; opacity: 0.7; margin-top: 0.2rem; }
   
@@ -974,27 +1028,6 @@
   .form-group input[type="file"] { padding: 0.5rem; font-size: 0.82rem; cursor: pointer; }
   .form-actions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.25rem; flex-wrap: wrap; }
   
-  /* Fish Value Profile (สี/ทรง/พฤติกรรมกิน/เกรดพรีเมียม) ในฟอร์มเพิ่ม/แก้ไขปลา */
-  .fish-value-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 8px; margin-bottom: 8px;
-  }
-  .fish-value-premium-row {
-    display: flex; align-items: center; gap: 8px;
-    font-size: 0.85rem; font-weight: 500; color: var(--black);
-    text-transform: none; letter-spacing: normal;
-  }
-  .fish-value-premium-row input[type="checkbox"] { width: auto; flex-shrink: 0; accent-color: var(--royal-blue); }
-  
-  /* Price history viewer */
-  .price-hist-entry { padding: 0.8rem 0; border-bottom: 1px solid var(--border); }
-  .price-hist-entry:last-child { border-bottom: none; }
-  .price-hist-date { font-size: 0.75rem; color: var(--gray); font-weight: 600; margin-bottom: 0.4rem; }
-  .price-hist-row { display: flex; justify-content: space-between; font-size: 0.85rem; padding: 2px 0; }
-  .price-hist-label { color: var(--gray); }
-  .price-hist-change { font-family: var(--font-number); }
-  .price-hist-change b { color: var(--royal-blue); }
-  
   /* Admin table */
   .fish-table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
   .fish-table-wrap table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
@@ -1191,7 +1224,11 @@
     .hero { text-align: center; }
     .hero-btns { justify-content: center; }
     .slide-dots { justify-content: center; }
-    .hero-overlay { background: rgba(5,12,40,0.6); }
+    .hero-overlay { background: rgba(2,30,40,0.72); }
+    /* มือถือ: ลดชั้นตกแต่งที่กินแรงเรนเดอร์ — ปิด wave ชั้นที่ 2 และ caustic shimmer,
+       คงไว้แค่ wave หลัก 1 ชั้น + ฟองอากาศ (เบากว่ามาก) */
+    .hero-wave-2 { display: none; }
+    .hero-caustic { animation: none; opacity: 0.5; }
   
     .stats { grid-template-columns: 1fr; }
     .stat { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.15); }
