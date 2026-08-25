@@ -155,6 +155,19 @@
                 <option value="ผู้เชี่ยวชาญ">ผู้เชี่ยวชาญ</option>
               </select>
             </div>
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label>คุณค่าปลา (Fish Value Profile) <span style="font-weight:400;color:var(--gray);">— ใช้อธิบายเหตุผลตั้งราคา ไม่ใช่ tag การตลาด</span></label>
+              <div class="fish-value-grid">
+                <input type="text" id="newColor" class="form-input" placeholder="สี/ลาย เช่น แดง-ขาว">
+                <input type="text" id="newBodyShape" class="form-input" placeholder="ทรง เช่น หางพัด">
+                <input type="text" id="newFeedingBehavior" class="form-input" placeholder="พฤติกรรมกิน เช่น กินง่าย">
+              </div>
+              <label class="fish-value-premium-row">
+                <input type="checkbox" id="newIsPremium">
+                <span>เกรดพรีเมียม</span>
+                <input type="text" id="newPremiumFactors" class="form-input" placeholder="เหตุผล เช่น สายเลือด, ลายพิเศษ, ฟอร์มสวย (คั่นด้วยจุลภาค)" style="flex:1;">
+              </label>
+            </div>
             <div class="form-group">
               <label>ช่วงราคา</label>
               <div class="price-preview" id="pricePreview">—</div>
@@ -315,7 +328,7 @@
       </div>
 
       <div class="stats-mini-title-row"><i class="ph ph-chart-line-up"></i> วิเคราะห์เชิงลึก</div>
-      <div class="stats-mini-grid">
+      <div class="stats-mini-grid stats-mini-grid-3">
         <div class="stats-mini-card">
           <div class="stats-section-title small"><i class="ph ph-crown-simple"></i> ปลาขายดี (ปีที่เลือก)</div>
           <div id="stats-best-sellers"></div>
@@ -323,6 +336,13 @@
         <div class="stats-mini-card">
           <div class="stats-section-title small"><i class="ph ph-package"></i> แนะนำรีสต็อคก่อน</div>
           <div id="stats-restock-suggest"></div>
+        </div>
+        <div class="stats-mini-card">
+          <div class="stats-section-title small">
+            <i class="ph ph-warning-octagon"></i> สต็อกค้าง (Dead Stock)
+            <span class="stats-hint">· ไม่ขยับ 45+ วัน</span>
+          </div>
+          <div id="stats-dead-stock"></div>
         </div>
       </div>
 
@@ -487,6 +507,19 @@
           <option value="ผู้เชี่ยวชาญ">ผู้เชี่ยวชาญ</option>
         </select>
       </div>
+      <div class="form-group" style="grid-column: 1 / -1;">
+        <label>คุณค่าปลา (Fish Value Profile) <span style="font-weight:400;color:var(--gray);">— ใช้อธิบายเหตุผลตั้งราคา ไม่ใช่ tag การตลาด</span></label>
+        <div class="fish-value-grid">
+          <input type="text" id="editColor" class="form-input" placeholder="สี/ลาย เช่น แดง-ขาว">
+          <input type="text" id="editBodyShape" class="form-input" placeholder="ทรง เช่น หางพัด">
+          <input type="text" id="editFeedingBehavior" class="form-input" placeholder="พฤติกรรมกิน เช่น กินง่าย">
+        </div>
+        <label class="fish-value-premium-row">
+          <input type="checkbox" id="editIsPremium">
+          <span>เกรดพรีเมียม</span>
+          <input type="text" id="editPremiumFactors" class="form-input" placeholder="เหตุผล เช่น สายเลือด, ลายพิเศษ, ฟอร์มสวย (คั่นด้วยจุลภาค)" style="flex:1;">
+        </label>
+      </div>
       <div class="form-group">
         <label>เปลี่ยนรูป</label>
         <input type="file" id="editImageFile" accept="image/*" onchange="previewEditImage(this)">
@@ -532,11 +565,24 @@
       <textarea id="editDesc_en"></textarea>
     </div>
     
-    <div class="form-actions" style="margin-top:1.5rem">
-      <button class="btn btn-outline" onclick="closeEditModal()">ยกเลิก</button>
-      <button class="btn btn-primary" id="submitEditFishBtn "onclick="saveEdit()">บันทึกการแก้ไข</button> 
+    <div class="form-actions" style="margin-top:1.5rem; justify-content:space-between;">
+      <button class="btn btn-outline" type="button" onclick="viewPriceHistory()"><i class="ph ph-clock-counter-clockwise"></i> ประวัติราคา</button>
+      <div style="display:flex; gap:0.75rem;">
+        <button class="btn btn-outline" onclick="closeEditModal()">ยกเลิก</button>
+        <button class="btn btn-primary" id="submitEditFishBtn "onclick="saveEdit()">บันทึกการแก้ไข</button>
+      </div>
     </div>
 
+  </div>
+</div>
+
+<div class="modal-overlay" id="priceHistoryModal" onclick="if(event.target===this)closePriceHistoryModal()">
+  <div class="modal" style="max-width:440px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+      <div class="modal-logo" style="font-size:1.1rem;"><i class="ph ph-clock-counter-clockwise"></i> ประวัติการเปลี่ยนราคา</div>
+      <button class="modal-close" onclick="closePriceHistoryModal()"><i class="ph ph-x"></i></button>
+    </div>
+    <div id="priceHistoryList" style="max-height:400px;overflow-y:auto;"></div>
   </div>
 </div>
 

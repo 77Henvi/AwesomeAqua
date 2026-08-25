@@ -42,12 +42,13 @@ export function updateAddFishTotal() {
 //   CLEAR FORM (ฟอร์มเพิ่มปลาใหม่)
 // ════════════════════════════════════════════
 export function clearForm() {
-  ['newName_th', 'newName_en', 'newSpecies', 'newPriceMin', 'newPriceMax', 'newStock', 'newSizeMin', 'newSizeMax', 'newDesc_th', 'newDesc_en', 'newCost', 'receiveDate', 'newSalePrice']
+  ['newName_th', 'newName_en', 'newSpecies', 'newPriceMin', 'newPriceMax', 'newStock', 'newSizeMin', 'newSizeMax', 'newDesc_th', 'newDesc_en', 'newCost', 'receiveDate', 'newSalePrice', 'newColor', 'newBodyShape', 'newFeedingBehavior', 'newPremiumFactors']
     .forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
   document.getElementById('newImageFile').value = '';
+  document.getElementById('newIsPremium').checked = false;
 
   const display = document.getElementById('totalFinanceDisplay');
   if (display) display.value = '';
@@ -96,6 +97,13 @@ export async function addFish(onDone) {
   const desc_en  = document.getElementById('newDesc_en').value;
   const sizeMin  = parseFloat(document.getElementById('newSizeMin').value) || null;
   const sizeMax  = parseFloat(document.getElementById('newSizeMax').value) || null;
+  const color    = document.getElementById('newColor').value.trim() || null;
+  const bodyShape = document.getElementById('newBodyShape').value.trim() || null;
+  const feedingBehavior = document.getElementById('newFeedingBehavior').value.trim() || null;
+  const isPremium = document.getElementById('newIsPremium').checked;
+  const premiumFactors = document.getElementById('newPremiumFactors').value.trim()
+    ? document.getElementById('newPremiumFactors').value.split(',').map(s => s.trim()).filter(Boolean)
+    : null;
   const file     = document.getElementById('newImageFile').files[0];
 
   let imageUrl = null;
@@ -121,7 +129,9 @@ export async function addFish(onDone) {
     size_min:  sizeMin,
     size_max:  sizeMax,
     cost:      cost,
-    sale_price: salePrice
+    sale_price: salePrice,
+    color, body_shape: bodyShape, feeding_behavior: feedingBehavior,
+    is_premium: isPremium, premium_factors: premiumFactors
   }).select();
 
   if (fishError || !newFishData) {
@@ -173,6 +183,11 @@ export function openEditModal(id, fishData) {
   document.getElementById('editDesc_en').value  = f.desc_en || '';
   document.getElementById('editSizeMin').value  = f.sizeMin || '';
   document.getElementById('editSizeMax').value  = f.sizeMax || '';
+  document.getElementById('editColor').value           = f.color || '';
+  document.getElementById('editBodyShape').value       = f.body_shape || '';
+  document.getElementById('editFeedingBehavior').value = f.feeding_behavior || '';
+  document.getElementById('editIsPremium').checked     = !!f.is_premium;
+  document.getElementById('editPremiumFactors').value  = Array.isArray(f.premium_factors) ? f.premium_factors.join(', ') : '';
 
   if (document.getElementById('editCost')) document.getElementById('editCost').value = f.cost || '';
   if (document.getElementById('editSalePrice')) document.getElementById('editSalePrice').value = f.sale_price || '';
@@ -225,6 +240,13 @@ export async function saveEdit(fishData, onDone) {
   const finalCost = elCost ? (parseFloat(elCost.value) || 0) : (oldData?.cost || 0);
   const finalSale = elSale ? (parseFloat(elSale.value) || 0) : (oldData?.sale_price || 0);
 
+  const color            = document.getElementById('editColor').value.trim() || null;
+  const bodyShape        = document.getElementById('editBodyShape').value.trim() || null;
+  const feedingBehavior  = document.getElementById('editFeedingBehavior').value.trim() || null;
+  const isPremium        = document.getElementById('editIsPremium').checked;
+  const premiumFactorsRaw = document.getElementById('editPremiumFactors').value.trim();
+  const premiumFactors   = premiumFactorsRaw ? premiumFactorsRaw.split(',').map(s => s.trim()).filter(Boolean) : null;
+
   const { error } = await supabase.from('fish').update({
     name_th:   document.getElementById('editName_th').value,
     name_en:   document.getElementById('editName_en').value,
@@ -241,7 +263,9 @@ export async function saveEdit(fishData, onDone) {
     size_min:  parseFloat(document.getElementById('editSizeMin').value) || null,
     size_max:  parseFloat(document.getElementById('editSizeMax').value) || null,
     cost:      finalCost,
-    sale_price: finalSale
+    sale_price: finalSale,
+    color: color, body_shape: bodyShape, feeding_behavior: feedingBehavior,
+    is_premium: isPremium, premium_factors: premiumFactors
   }).eq('id', id);
 
   if (error) { showToast('<i class="ph-fill ph-x-circle" style="color:#ef4444; font-size:1.1em; vertical-align:-2px;"></i> บันทึกไม่ได้'); return; }
@@ -280,4 +304,52 @@ export function toggleSyncTag(element, mode) {
     if (thTag) thTag.classList.remove('selected');
     if (enTag) enTag.classList.remove('selected');
   }
+}
+
+// ════════════════════════════════════════════
+//   PRICE HISTORY VIEWER
+//   บันทึกโดย DB trigger อัตโนมัติทุกครั้งที่ price_min/price_max/cost เปลี่ยน
+//   (ดู docs/PHASE1_VALUE_PROFILE_AUDIT_SETUP.md) — ที่นี่แค่ดึงมาแสดง
+// ════════════════════════════════════════════
+export async function viewPriceHistory() {
+  const fishId = document.getElementById('editFishId').value;
+  const listEl = document.getElementById('priceHistoryList');
+  if (!fishId || !listEl) return;
+
+  document.getElementById('priceHistoryModal').classList.add('open');
+  listEl.innerHTML = '<div class="admin-empty-state"><div class="admin-empty-text">กำลังโหลด...</div></div>';
+
+  const { data, error } = await supabase
+    .from('price_history')
+    .select('*')
+    .eq('fish_id', fishId)
+    .order('changed_at', { ascending: false });
+
+  if (error) {
+    listEl.innerHTML = '<div class="admin-empty-state"><div class="admin-empty-text">โหลดประวัติราคาไม่สำเร็จ</div></div>';
+    return;
+  }
+  if (!data || !data.length) {
+    listEl.innerHTML = '<div class="admin-empty-state"><div class="admin-empty-icon">📜</div><div class="admin-empty-text">ยังไม่เคยมีการเปลี่ยนราคา/ต้นทุนของปลาตัวนี้</div></div>';
+    return;
+  }
+
+  const row = (label, oldV, newV) => {
+    if (oldV === newV) return '';
+    const o = oldV == null ? '—' : Number(oldV).toLocaleString('th-TH');
+    const n = newV == null ? '—' : Number(newV).toLocaleString('th-TH');
+    return `<div class="price-hist-row"><span class="price-hist-label">${label}</span><span class="price-hist-change">${o} → <b>${n}</b></span></div>`;
+  };
+
+  listEl.innerHTML = data.map(h => `
+    <div class="price-hist-entry">
+      <div class="price-hist-date">${new Date(h.changed_at).toLocaleString('th-TH', { dateStyle: 'medium', timeStyle: 'short' })}</div>
+      ${row('ราคาต่ำสุด', h.old_price_min, h.new_price_min)}
+      ${row('ราคาสูงสุด', h.old_price_max, h.new_price_max)}
+      ${row('ต้นทุน', h.old_cost, h.new_cost)}
+    </div>`).join('');
+}
+
+export function closePriceHistoryModal() {
+  document.getElementById('priceHistoryModal').classList.remove('open');
 }

@@ -20,7 +20,8 @@ import { openRestockModal as _openRestockModal, closeRestockModal,
          calcRestockTotal, confirmRestock as _confirmRestock } from './modules/restock.js';
 import { addFish as _addFish, updateAddFishTotal, clearForm, handleComingSoon,
          openEditModal as _openEditModal, closeEditModal,
-         saveEdit as _saveEdit, toggleSyncTag } from './modules/fishForm.js';
+         saveEdit as _saveEdit, toggleSyncTag,
+         viewPriceHistory, closePriceHistoryModal } from './modules/fishForm.js';
 import { loadTodos, bindTodoWindowFunctions } from './modules/todo.js';
 
 // ── Expose ไว้บน window ──
@@ -42,6 +43,8 @@ window.hardDeleteFish   = hardDeleteFish;
 window.saveEdit         = saveEdit;
 window.openEditModal    = openEditModal;
 window.closeEditModal   = closeEditModal;
+window.viewPriceHistory       = viewPriceHistory;
+window.closePriceHistoryModal = closePriceHistoryModal;
 window.clearForm        = clearForm;
 window.toggleTag        = toggleTag;
 window.toggleSyncTag    = toggleSyncTag; 
@@ -154,7 +157,13 @@ async function loadFishFromDB() {
     tags_en:  f.tags_en || [],
     sizeMin:  f.size_min || null,
     sizeMax:  f.size_max || null,
-    is_archived: f.is_archived || false
+    is_archived: f.is_archived || false,
+    createdAt: f.created_at || null,
+    color:            f.color || null,
+    body_shape:       f.body_shape || null,
+    feeding_behavior: f.feeding_behavior || null,
+    is_premium:       f.is_premium || false,
+    premium_factors:  f.premium_factors || null
   }));
 
   renderAll();

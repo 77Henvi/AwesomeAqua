@@ -30,6 +30,7 @@ export function renderStats(fishData, financeData) {
   renderStatsPriceDist(_fishData);
   renderStatsTopFish(_fishData);
   renderStatsLevelDist(_fishData);
+  renderDeadStock(_fishData, financeData); // ไม่อิงปีที่เลือก ดูภาพรวม ณ ปัจจุบันเสมอ
 }
 
 // ── ปีที่มีข้อมูล + ปีปัจจุบัน ─────────────────
@@ -419,6 +420,16 @@ function _revenueByFish(financeData, year) {
   return map;
 }
 
+// ── วันที่ขายล่าสุดของปลาแต่ละตัว (ทุกปีรวมกัน ใช้เช็คของค้าง ไม่อิงปีที่เลือกบนกราฟ) ──
+function _lastSaleDateByFish(financeData) {
+  const map = {}; // { fish_id: 'YYYY-MM-DD' ล่าสุด }
+  financeData.forEach(f => {
+    if (f.type !== 'income' || !f.fish_id || !f.date) return;
+    if (!map[f.fish_id] || f.date > map[f.fish_id]) map[f.fish_id] = f.date;
+  });
+  return map;
+}
+
 // ── ปลาขายดี (เรียงตามรายรับสะสมในปีที่เลือก) ────
 function renderBestSellers(fishData, financeData, year) {
   const el = document.getElementById('stats-best-sellers');
@@ -470,6 +481,47 @@ function renderRestockSuggest(fishData, financeData, year) {
         <div class="stats-top-species">เหลือ ${x.f.stock} ตัว · ขายได้ ฿${x.revenue.toLocaleString('th-TH')}</div>
       </div>
       <div class="stats-top-price" style="color:${x.f.stock === 0 ? '#dc2626' : '#d97706'}">${x.f.stock === 0 ? 'หมดแล้ว' : `เหลือ ${x.f.stock}`}</div>
+    </div>`).join('');
+}
+
+// ── สต็อกค้าง (Dead Stock): มีสต็อกอยู่แต่ไม่ขยับมานาน = เงินทุนจมอยู่เฉยๆ ────
+// ไม่อิงปีที่เลือกบนกราฟด้านบน เพราะเป็นภาพ ณ วันนี้เสมอ ไม่ใช่สรุปรายปี
+const DEAD_STOCK_DAYS = 45; // ไม่ขยับเกินกี่วันถึงนับว่า "ค้าง" — ปรับได้ตามจริงของร้าน
+function renderDeadStock(fishData, financeData) {
+  const el = document.getElementById('stats-dead-stock');
+  if (!el) return;
+
+  const lastSale = _lastSaleDateByFish(financeData);
+  const todayMs  = Date.now();
+  const msPerDay = 86400000;
+
+  const rows = fishData
+    .filter(f => f.stock > 0)
+    .map(f => {
+      // อ้างอิงวันที่ขายล่าสุด ถ้าไม่เคยขายเลยใช้วันที่เพิ่มปลาเข้าระบบแทน
+      const refDate = lastSale[f.id] || (f.createdAt ? f.createdAt.slice(0, 10) : null);
+      const days = refDate ? Math.floor((todayMs - new Date(refDate + 'T00:00:00').getTime()) / msPerDay) : null;
+      return { f, days, tiedUpValue: f.stock * (f.cost || 0) };
+    })
+    .filter(x => x.days === null || x.days >= DEAD_STOCK_DAYS)
+    .sort((a, b) => (b.days ?? 9999) - (a.days ?? 9999))
+    .slice(0, 8);
+
+  if (!rows.length) {
+    el.innerHTML = statsEmpty(`ไม่มีปลาที่ค้างสต็อกเกิน ${DEAD_STOCK_DAYS} วัน 🎉`);
+    return;
+  }
+
+  el.innerHTML = rows.map(x => `
+    <div class="stats-top-row">
+      <div class="stats-top-info">
+        <div class="stats-top-name">${x.f.emoji || '🐟'} ${x.f.name}</div>
+        <div class="stats-top-species">
+          เหลือ ${x.f.stock} ตัว
+          ${x.tiedUpValue > 0 ? ` · เงินจม ฿${x.tiedUpValue.toLocaleString('th-TH')}` : ''}
+        </div>
+      </div>
+      <div class="stats-top-price" style="color:#dc2626;">${x.days === null ? 'ไม่ทราบวันที่' : `ค้าง ${x.days} วัน`}</div>
     </div>`).join('');
 }
 
@@ -540,6 +592,10 @@ function _injectStatsStyle() {
       color: var(--black); margin: 1.75rem 0 0.75rem; display: flex; align-items: center; gap: 0.4rem;
     }
     .stats-mini-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+    .stats-mini-grid-3 { grid-template-columns: repeat(2, 1fr); } /* มือถือ/แท็บเล็ต 2 คอลัมน์ก่อน */
+    @media (min-width: 900px) {
+      .stats-mini-grid-3 { grid-template-columns: repeat(3, 1fr); }
+    }
     .stats-mini-card {
       background: white; border: 1px solid var(--border);
       border-radius: 14px; padding: 1.1rem;
