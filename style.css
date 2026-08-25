@@ -147,8 +147,8 @@
   /* ── HERO ── */
   .hero {
     min-height: 100vh;
-    display: flex; align-items: center;
-    padding: 100px 5% 60px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 100px 5% 140px; /* เผื่อพื้นที่ล่างให้การ์ดกระจกที่ลอยทับ ไม่บังปุ่ม CTA */
     position: relative; overflow: hidden;
   }
   .hero-slideshow { position: absolute; inset: 0; z-index: 0; }
@@ -165,11 +165,13 @@
   }
   .hero-overlay {
     position: absolute; inset: 0;
+    /* ไล่เฉดจากบน-ล่างแทนซ้าย-ขวาเดิม ให้เข้ากับ layout จัดกลางแบบใหม่ (มืดขึ้นตรงกลาง-ล่างเพื่อให้ตัวหนังสือชัด) */
     background: linear-gradient(
-      to right,
-      rgba(2,30,40,0.80) 0%,
-      rgba(2,58,74,0.55) 55%,
-      rgba(28,78,167,0.35) 100%
+      180deg,
+      rgba(2,30,40,0.55) 0%,
+      rgba(2,30,40,0.45) 35%,
+      rgba(2,30,40,0.72) 75%,
+      rgba(2,30,40,0.88) 100%
     );
   }
   /* แสงกระเพื่อมใต้น้ำ — ไล่เฉดเบาๆ เคลื่อนไหวช้าๆ ให้ hero มีชีวิตชีวาโดยไม่บดบังรูปปลา */
@@ -184,10 +186,10 @@
     from { opacity: 0.6; transform: scale(1) translateY(0); }
     to   { opacity: 1;   transform: scale(1.08) translateY(-10px); }
   }
-  /* คลื่นน้ำที่ขอบล่างของ Hero — ไล่สีต่อเนื่องเข้ากับ .stats ด้านล่าง (ocean-deep) */
+  /* คลื่นน้ำที่ขอบล่างของ Hero — ไล่สีต่อเนื่องเข้ากับพื้นเว็บถัดไป */
   .hero-waves {
     position: absolute; left: 0; right: 0; bottom: -2px; height: 120px;
-    z-index: 1; pointer-events: none; overflow: hidden;
+    z-index: 2; pointer-events: none; overflow: hidden;
   }
   .hero-waves svg { position: absolute; bottom: 0; width: 200%; height: 100%; }
   .hero-wave-1 { animation: waveMove 16s linear infinite; opacity: 0.5; }
@@ -208,7 +210,14 @@
     10%  { opacity: 0.65; }
     100% { transform: translateY(-100vh) translateX(18px); opacity: 0; }
   }
-  .hero-content { max-width: 580px; z-index: 2; position: relative; }
+  
+  .hero-content { max-width: 580px; z-index: 3; position: relative; }
+  /* จัดกลางแบบ mockup (SeaGuard) — headline ใหญ่ ทุกอย่างกึ่งกลางแนวนอน */
+  .hero-content--center {
+    max-width: 720px;
+    text-align: center;
+    display: flex; flex-direction: column; align-items: center;
+  }
   .hero-tag {
     display: inline-flex; align-items: center; gap: 0.4rem;
     background: rgba(44,172,173,0.18);
@@ -225,23 +234,34 @@
     margin-bottom: 1.25rem; font-weight: 700;
     text-shadow: 0 2px 20px rgba(0,0,0,0.3);
   }
+  /* headline ใหญ่ขึ้นแบบ mockup เฉพาะ layout จัดกลาง */
+  .hero-content--center h1 {
+    font-size: clamp(3.2rem, 7vw, 5.6rem);
+    letter-spacing: -0.01em;
+  }
   .hero h1 span { color: var(--ocean-sky); }
   .hero p {
     color: rgba(255,255,255,0.82);
     font-size: 1.05rem; line-height: 1.7;
     margin-bottom: 2rem;
   }
+  .hero-content--center p { max-width: 480px; }
   .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .hero-content--center .hero-btns { justify-content: center; }
   /* ปุ่ม primary เฉพาะใน hero ให้ใช้โทน ocean-teal (เด่นบนพื้นมืดกว่า royal-blue เดิม)
      ไม่กระทบ .btn-primary ส่วนอื่นของเว็บที่ยังใช้ royal-blue ตามปกติ */
   .hero .btn-primary {
     background: var(--ocean-teal); color: #04222b;
     box-shadow: 0 8px 24px rgba(44,172,173,0.35);
+    padding: 0.85rem 2rem; border-radius: var(--radius-pill);
+    font-weight: 600;
   }
   .hero .btn-primary:hover { background: var(--ocean-sky); }
   
+  /* dots ย้ายมาเป็น absolute มุมล่างซ้ายของ hero (แยกจาก hero-content ที่ตอนนี้จัดกลางแล้ว) */
   .slide-dots {
-    display: flex; gap: 0.5rem; margin-top: 2rem;
+    position: absolute; left: 5%; bottom: 28px; z-index: 3;
+    display: flex; gap: 0.5rem;
   }
   .dot {
     width: 8px; height: 8px; border-radius: 50%;
@@ -251,17 +271,29 @@
   .dot.active { background: #fff; width: 24px; border-radius: 4px; }
   
   
-  /* ── STATS ── */
-  /* เปลี่ยนจาก royal-blue เดิมเป็น ocean-deep ให้กลืนต่อเนื่องกับสี wave ที่ขอบล่างของ hero
-     (ดู .hero-wave-1/.hero-wave-2 ใน HERO block ด้านบน — ใช้สีเดียวกันจงใจ) */
-  .stats {
-    background: var(--ocean-deep); color: white;
+  /* ── STATS: การ์ดกระจก (glass) ลอยทับขอบล่างของ Hero แบบ SeaGuard ref ── */
+  .stats-float {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    transform: translateY(50%);
+    z-index: 4;
+    display: flex; justify-content: center;
+    padding: 0 5%;
+  }
+  .stats-glass {
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.22);
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 12px 40px rgba(2,30,40,0.35);
     display: grid; grid-template-columns: repeat(3, 1fr);
-    text-align: center; padding: 1.75rem 5%;
+    text-align: center;
+    padding: 1.5rem 2rem;
+    max-width: 720px; width: 100%;
+    color: white;
   }
   .stat {
-    padding: 0.75rem 1rem;
-    border-right: 1px solid rgba(255,255,255,0.15);
+    padding: 0.5rem 1rem;
+    border-right: 1px solid rgba(255,255,255,0.18);
   }
   .stat:last-child { border-right: none; }
   .stat-num {
@@ -269,7 +301,13 @@
     font-size: 1.75rem; font-weight: 700; display: block;
     color: var(--ocean-sky);
   }
-  .stat-label { font-size: 0.78rem; opacity: 0.7; margin-top: 0.2rem; }
+  .stat-label { font-size: 0.78rem; opacity: 0.75; margin-top: 0.2rem; }
+  
+  /* พื้นที่เว้นให้การ์ดกระจกที่ล้ำออกมาครึ่งหนึ่ง ไม่ให้ไปทับเนื้อหา section ถัดไป */
+  .stats-float-spacer { height: 70px; }
+  @media (max-width: 768px) {
+    .stats-float-spacer { height: 130px; } /* การ์ดสต็อกซ้อนกัน 3 แถวบนมือถือ เลยสูงกว่า ต้องเผื่อเยอะกว่า */
+  }
   
   
   /* ── SECTIONS ── */
@@ -770,7 +808,6 @@
   
   #fish { position: relative; }
   .about-values { position: relative; }
-  .stats { position: relative; }
   .about-contact-info { position: relative; }
   
   .fish-bg__fish { position: absolute; display: block; user-select: none; }
@@ -1222,16 +1259,23 @@
     .hamburger { display: flex; }
   
     .hero { text-align: center; }
+    .hero-content--center { max-width: 100%; padding: 0 4px; }
     .hero-btns { justify-content: center; }
-    .slide-dots { justify-content: center; }
-    .hero-overlay { background: rgba(2,30,40,0.72); }
+    /* dots เป็น position:absolute แล้ว justify-content ใช้ไม่ได้ผล ต้องจัดกลางด้วย left+transform แทน */
+    .slide-dots { left: 50%; transform: translateX(-50%); bottom: 16px; }
+    .hero-overlay { background: rgba(2,30,40,0.78); }
     /* มือถือ: ลดชั้นตกแต่งที่กินแรงเรนเดอร์ — ปิด wave ชั้นที่ 2 และ caustic shimmer,
        คงไว้แค่ wave หลัก 1 ชั้น + ฟองอากาศ (เบากว่ามาก) */
     .hero-wave-2 { display: none; }
     .hero-caustic { animation: none; opacity: 0.5; }
   
-    .stats { grid-template-columns: 1fr; }
-    .stat { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.15); }
+    /* การ์ดสต็อกกระจก: เรียงเป็น 1 คอลัมน์บนมือถือ + ลด blur (backdrop-filter หนักบนมือถือ) */
+    .stats-glass {
+      grid-template-columns: 1fr; gap: 4px;
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      padding: 1rem 1.5rem;
+    }
+    .stat { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.15); padding: 0.6rem 0.5rem; }
     .stat:last-child { border-bottom: none; }
   
     .fish-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
@@ -1250,7 +1294,10 @@
   
   @media (max-width: 480px) {
     .hero h1 { font-size: 2.2rem; }
-    .stats { padding: 1.5rem 5%; }
+    /* .hero-content--center h1 (2 classes) specificity สูงกว่า .hero h1 (1 class) ข้างบน
+       ต้อง override ตรงๆ ไม่งั้น headline จัดกลางจะไม่ย่อขนาดตาม breakpoint นี้ */
+    .hero-content--center h1 { font-size: 2.2rem; }
+    .stats-glass { padding: 1rem; }
     .stat-num { font-size: 1.5rem; }
     .fish-grid { grid-template-columns: 1fr 1fr; padding: 0.5rem 0; }
     .section-title { font-size: 1.5rem; }

@@ -85,44 +85,52 @@
     <div class="hero-overlay"></div>
     <div class="hero-caustic"></div>
     <div class="hero-bubbles" id="heroBubbles"></div>
-    <div class="hero-waves">
-      <svg class="hero-wave-2" viewBox="0 0 2400 200" preserveAspectRatio="none"><path d="M0,110 C 300,40 600,160 900,90 C 1200,20 1500,150 1800,90 C 2100,30 2300,120 2400,90 L2400,200 L0,200 Z" fill="#1C4EA7"/></svg>
-      <svg class="hero-wave-1" viewBox="0 0 2400 200" preserveAspectRatio="none"><path d="M0,90 C 300,150 600,40 900,110 C 1200,170 1500,40 1800,110 C 2100,160 2300,80 2400,110 L2400,200 L0,200 Z" fill="#024D60"/></svg>
-    </div>
   </div>
-  <div class="hero-content">
+  <div class="hero-content hero-content--center">
     <div class="hero-tag"><i class="ph ph-fish"></i> <span data-i18n="heroTag">จำหน่ายปลาสวยงามและความรู้</span></div>
     <h1 data-i18n="heroTitle">ปลาสวยงาม<br/><span>คัดสรรพิเศษ</span><br/>ส่งตรงถึงบ้าน</h1>
     <p data-i18n="heroDesc">คัดสรรปลาสวยงามคุณภาพดี พร้อมความรู้การดูแลรักษาปลาที่ถูกต้อง</p>
     <div class="hero-btns">
       <button class="btn btn-primary" onclick="scrollToSection('#fish')" data-i18n="heroCta">ดูปลาทั้งหมด</button>
     </div>
-    <!-- Dots ย้ายมาเป็น absolute ที่มุมล่างขวา hero -->
-    <div class="slide-dots">
-      <span class="dot active" onclick="goSlide(0)"></span>
-      <span class="dot"        onclick="goSlide(1)"></span>
-      <span class="dot"        onclick="goSlide(2)"></span>
-      <span class="dot"        onclick="goSlide(3)"></span>
+  </div>
+
+  <!-- ========== STATS — การ์ดกระจกลอยทับขอบล่างของ Hero (ย้ายมาจากเดิมที่เคยเป็น strip
+       แยกด้านล่าง section) — data-i18n ทุกตัวเหมือนเดิมทุกประการ ไม่กระทบ i18n.js ── -->
+  <div class="stats-float fade-up">
+    <div class="stats-glass">
+      <div class="stat">
+        <span class="stat-num">20+</span>
+        <span class="stat-label" data-i18n="statTypesLabel">ชนิดปลาในร้าน</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num" data-i18n="statExpNum">3 ปี</span>
+        <span class="stat-label" data-i18n="statExpLabel">ประสบการณ์</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">100%</span>
+        <span class="stat-label" data-i18n="statQualityLabel">คัดสรรคุณภาพ</span>
+      </div>
     </div>
+  </div>
+
+  <!-- Dots ย้ายมาไว้มุมล่างซ้ายของ Hero โดยตรง (เดิมอยู่ใน hero-content ที่ตอนนี้จัดกลางแล้ว) -->
+  <div class="slide-dots">
+    <span class="dot active" onclick="goSlide(0)"></span>
+    <span class="dot"        onclick="goSlide(1)"></span>
+    <span class="dot"        onclick="goSlide(2)"></span>
+    <span class="dot"        onclick="goSlide(3)"></span>
+  </div>
+
+  <div class="hero-waves">
+    <svg class="hero-wave-2" viewBox="0 0 2400 200" preserveAspectRatio="none"><path d="M0,110 C 300,40 600,160 900,90 C 1200,20 1500,150 1800,90 C 2100,30 2300,120 2400,90 L2400,200 L0,200 Z" fill="#1C4EA7"/></svg>
+    <svg class="hero-wave-1" viewBox="0 0 2400 200" preserveAspectRatio="none"><path d="M0,90 C 300,150 600,40 900,110 C 1200,170 1500,40 1800,110 C 2100,160 2300,80 2400,110 L2400,200 L0,200 Z" fill="#024D60"/></svg>
   </div>
 </section>
 
 
-<!-- ========== STATS — redesign เป็น strip บาง ========== -->
-<div class="stats fade-up">
-  <div class="stat">
-    <span class="stat-num">20+</span>
-    <span class="stat-label" data-i18n="statTypesLabel">ชนิดปลาในร้าน</span>
-  </div>
-  <div class="stat">
-    <span class="stat-num" data-i18n="statExpNum">3 ปี</span>
-    <span class="stat-label" data-i18n="statExpLabel">ประสบการณ์</span>
-  </div>
-  <div class="stat">
-    <span class="stat-num">100%</span>
-    <span class="stat-label" data-i18n="statQualityLabel">คัดสรรคุณภาพ</span>
-  </div>
-</div>
+<!-- ========== ADDED SPACER — เผื่อพื้นที่ให้การ์ดกระจกที่ลอยทับขอบล่าง ไม่ให้ทับเนื้อหา section ถัดไป ========== -->
+<div class="stats-float-spacer"></div>
 
 <!-- ========== COMING SOON SECTION ========== -->
 <section id="comingSoonSection" style="display:none; background: linear-gradient(180deg,#f8faff 0%,#eef2ff 100%); padding-top: 0;">
