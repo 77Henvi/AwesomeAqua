@@ -188,7 +188,7 @@
   }
   /* คลื่นน้ำที่ขอบล่างของ Hero — ไล่สีต่อเนื่องเข้ากับพื้นเว็บถัดไป */
   .hero-waves {
-    position: absolute; left: 0; right: 0; bottom: -2px; height: 120px;
+    position: absolute; left: 0; right: 0; bottom: -2px; height: 190px;
     z-index: 2; pointer-events: none; overflow: hidden;
   }
   .hero-waves svg { position: absolute; bottom: 0; width: 200%; height: 100%; }
@@ -199,12 +199,14 @@
     to   { transform: translateX(-50%); }
   }
   /* ไล่สีให้ขอบล่างสุดของ hero กลืนเข้ากับพื้นขาวของ section ถัดไปแบบนุ่มนวล
-     (เดิมคลื่นตัดเป็นเส้นแข็งพอดีขอบ section ดูสะดุดตา) — วางทับบนคลื่นอีกที (z-index สูงกว่า) */
+     (เดิมคลื่นตัดเป็นเส้นแข็งพอดีขอบ section ดูสะดุดตา) — วางทับบนคลื่นอีกที (z-index สูงกว่า)
+     stop แรกขยับมาที่ 55% แทน 0% เพื่อให้ยอดคลื่นด้านบนยังเห็นชัด ไม่โดน fade กินตั้งแต่ยอด
+     เอาไว้จางแค่ช่วงโคนคลื่นจริงๆ ที่ติดกับขอบ section ถัดไป */
   .hero::after {
     content: '';
-    position: absolute; left: 0; right: 0; bottom: 0; height: 90px;
+    position: absolute; left: 0; right: 0; bottom: 0; height: 70px;
     z-index: 3; pointer-events: none;
-    background: linear-gradient(to bottom, transparent 0%, var(--white) 100%);
+    background: linear-gradient(to bottom, transparent 0%, transparent 55%, var(--white) 100%);
   }
   /* ฟองอากาศลอยขึ้น — สร้าง element ด้วย JS (ดู injectHeroBubbles ใน slideshow.js) */
   .hero-bubbles { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
