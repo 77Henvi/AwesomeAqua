@@ -659,17 +659,26 @@
   
   /* ── ABOUT HERO ── */
   .about-hero {
-    background: linear-gradient(135deg, var(--royal-blue) 0%, var(--bright-blue) 100%);
+    background: linear-gradient(135deg, var(--ocean-deep) 0%, var(--ocean-deepest) 100%);
     padding: 5rem 5%;
     display: flex; align-items: center; justify-content: space-between;
     gap: 3rem; flex-wrap: wrap;
+    position: relative; overflow: hidden;
   }
-  .about-hero-content { max-width: 480px; }
-  .about-hero-content .section-tag { color: rgba(255,255,255,0.7); }
+  /* แสงกระเพื่อมเบาๆ ให้เข้าธีมเดียวกับ Hero (นิ่ง ไม่มี animation หนักเหมือน hero
+     เพื่อไม่ให้ section รองแย่งความสนใจจาก hero หลัก) */
+  .about-hero::before {
+    content: '';
+    position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse at 15% 15%, rgba(117,226,224,0.14), transparent 55%);
+  }
+  .about-hero-content { max-width: 480px; position: relative; z-index: 1; }
+  .about-hero-content .section-tag { color: var(--ocean-sky); }
+  .about-hero-content .section-tag::before { background: var(--ocean-teal); }
   
   
   /* ── VIDEO SHOWCASE ── */
-  .video-showcase { display: flex; align-items: center; justify-content: center; position: relative; }
+  .video-showcase { display: flex; align-items: center; justify-content: center; position: relative; z-index: 1; }
   .fish-video-wrap {
     width: 280px; border-radius: 20px; overflow: hidden;
     box-shadow: 0 30px 80px rgba(0,0,0,0.5);
@@ -677,7 +686,7 @@
   }
   .fish-video-wrap::before {
     content: ''; position: absolute; inset: -2px; border-radius: 22px;
-    background: linear-gradient(135deg, rgba(126,179,255,0.6), rgba(255,255,255,0.1));
+    background: linear-gradient(135deg, rgba(117,226,224,0.65), rgba(44,172,173,0.15));
     z-index: -1; filter: blur(12px);
     animation: glowPulse 3s ease-in-out infinite;
   }
@@ -688,31 +697,46 @@
   .fish-video-wrap video { width: 100%; height: 100%; object-fit: cover; display: block; }
   .video-glow {
     position: absolute; inset: 0;
-    background: linear-gradient(to top, rgba(26,58,143,0.3), transparent 40%);
+    background: linear-gradient(to top, rgba(2,77,96,0.35), transparent 40%);
     pointer-events: none;
   }
   
   
   /* ── ABOUT VALUES ── */
-  /* อัปเกรด: เปลี่ยนสีพื้นหลัง Value Card เป็น Light Gray ให้กลมกลืนกับ About */
+  /* อัปเกรด: ไล่เฉดจากขาวลง ocean-mist บางๆ ให้ต่อเนื่องจาก about-hero มืดด้านบน
+     แทนสีเทาแบนราบเดิม (#f8faff) ที่ตัดกับธีม ocean ทั้งเว็บ */
   .about-values {
     display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    background: #f8faff; position: relative;
+    background: linear-gradient(180deg, #ffffff 0%, var(--ocean-mist) 100%);
+    position: relative;
+    padding: 1px; gap: 1px; /* เผยพื้นหลัง gradient เป็นเส้นบางๆ แทน border แข็งเดิม */
   }
   .about-value-card {
     padding: 2.5rem 2rem;
-    border-right: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
+    background: #fff;
     transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
   }
   /* อัปเกรด: เพิ่ม Hover ให้นุ่มลึก และมีสีขาวตัดให้ Card ลอยขึ้น */
   .about-value-card:hover { 
     background: var(--white); 
     transform: translateY(-4px); 
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 16px 32px rgba(2,77,96,0.12);
+    z-index: 2; position: relative;
   }
-  .about-value-icon { font-size: 2rem; margin-bottom: 1rem; color: var(--royal-blue); }
-  .about-value-icon i { font-size: 2rem; line-height: 1; }
+  /* ไอคอนใส่ในวงกลมนุ่มๆ แทนไอคอนลอยเปล่าเดิม — ดูมีน้ำหนัก/พรีเมียมขึ้น */
+  .about-value-icon {
+    width: 56px; height: 56px; margin-bottom: 1.1rem;
+    border-radius: 50%;
+    background: var(--ocean-mist);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--ocean-deep);
+    transition: background 0.25s, transform 0.25s;
+  }
+  .about-value-card:hover .about-value-icon {
+    background: var(--ocean-teal); color: #fff;
+    transform: scale(1.08) rotate(-4deg);
+  }
+  .about-value-icon i { font-size: 1.5rem; line-height: 1; }
   .about-value-card h3 {
     font-family: var(--font-display);
     font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem;
@@ -722,13 +746,14 @@
   
   /* ── CONTACT SECTION ── */
   .about-contact-section {
-    background: linear-gradient(135deg, var(--royal-blue), var(--bright-blue));
+    background: linear-gradient(135deg, var(--ocean-deep), var(--ocean-deepest));
     padding: 4rem 5%;
     display: flex; flex-direction: column;
     align-items: center; gap: 2.5rem;
     border-top: none;
   }
-  .about-contact-section .section-tag { color: rgba(255,255,255,0.65); text-align: center; justify-content: center; }
+  .about-contact-section .section-tag { color: var(--ocean-sky); text-align: center; justify-content: center; }
+  .about-contact-section .section-tag::before { background: var(--ocean-teal); }
   .about-contact-section .section-title { color: white; text-align: center; margin-bottom: 0; }
   
   .contact-social-cards {
@@ -815,6 +840,9 @@
   .fish-bg.fish-bg--dark {
     color: var(--white); 
   }
+  /* about-values เปลี่ยนพื้นหลังเป็นโทน ocean-mist แล้ว ปลาสีน้ำเงินเข้ม royal-blue เดิม
+     จะดูเข้ม/แข็งเกินไปบนพื้นอ่อนแบบนี้ — override เฉพาะจุดนี้ให้ใช้ ocean-teal แทน */
+  .about-values .fish-bg { color: var(--ocean-teal); }
   
   #fish { position: relative; }
   .about-values { position: relative; }
