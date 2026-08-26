@@ -38,6 +38,7 @@
       <button class="admin-nav-tab"        id="nav-stats"   onclick="switchTab('stats')"><i class="ph ph-chart-bar"></i> สถิติ</button>
       <button class="admin-nav-tab"        id="nav-ads"     onclick="switchTab('ads')"><i class="ph ph-megaphone"></i> โฆษณา</button>
       <button class="admin-nav-tab"        id="nav-orders"  onclick="switchTab('orders')"><i class="ph ph-receipt"></i> ออเดอร์</button>
+      <button class="admin-nav-tab"        id="nav-customers" onclick="switchTab('customers')"><i class="ph ph-users-three"></i> ลูกค้า</button>
       <button class="admin-nav-tab"        id="nav-admins"  onclick="switchTab('admins')"><i class="ph ph-users"></i> แอดมิน</button>
     </div>
     <div class="admin-topbar-right">
@@ -416,6 +417,23 @@
       <div id="orders-list"></div>
     </div>
 
+    <div class="admin-page" id="page-customers">
+      <div class="stats-fin-toolbar">
+        <div class="stats-fin-toolbar-title"><i class="ph ph-users-three"></i> ลูกค้า</div>
+      </div>
+
+      <div class="filter-chips" style="margin-bottom:1.25rem;">
+        <button class="filter-chip customer-filter-chip active" onclick="setCustomerSegmentFilter('all', this)">ทั้งหมด</button>
+        <button class="filter-chip customer-filter-chip" onclick="setCustomerSegmentFilter('new', this)">ลูกค้าใหม่</button>
+        <button class="filter-chip customer-filter-chip" onclick="setCustomerSegmentFilter('regular', this)">ขาประจำ</button>
+        <button class="filter-chip customer-filter-chip" onclick="setCustomerSegmentFilter('vip', this)">VIP</button>
+        <button class="filter-chip customer-filter-chip" onclick="setCustomerSegmentFilter('specialist', this)">สายเฉพาะทาง</button>
+        <button class="filter-chip customer-filter-chip" onclick="setCustomerSegmentFilter('dormant', this)">หายไปนาน</button>
+      </div>
+
+      <div id="customers-list"></div>
+    </div>
+
     <div class="admin-page" id="page-admins">
       <div class="admin-card" id="admin-users-add-form" style="margin-bottom:1.25rem;display:none;">
         <div class="admin-panel-title"><i class="ph ph-user-plus"></i> เพิ่มแอดมินใหม่</div>
@@ -583,6 +601,69 @@
       <button class="modal-close" onclick="closePriceHistoryModal()"><i class="ph ph-x"></i></button>
     </div>
     <div id="priceHistoryList" style="max-height:400px;overflow-y:auto;"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="lostReasonModal" onclick="if(event.target===this)closeLostReasonModal()">
+  <div class="modal" style="max-width:380px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+      <div class="modal-logo" style="font-size:1.1rem;"><i class="ph ph-x-circle"></i> ยกเลิกออเดอร์</div>
+      <button class="modal-close" onclick="closeLostReasonModal()"><i class="ph ph-x"></i></button>
+    </div>
+    <div class="form-group">
+      <label>เหตุผลที่ออเดอร์นี้ไม่สำเร็จ</label>
+      <select id="lostReasonSelect">
+        <option value="no_stock">สต็อกไม่พอ/หมด</option>
+        <option value="price_too_high">ราคาสูงเกินไป</option>
+        <option value="fish_not_ready">ปลายังไม่พร้อมส่ง</option>
+        <option value="changed_mind">ลูกค้าเปลี่ยนใจ</option>
+        <option value="shipping_cost">ค่าส่งแพงเกินไป</option>
+        <option value="chose_another_fish">เลือกซื้อปลาตัวอื่นแทน</option>
+        <option value="budget">งบไม่พอ</option>
+        <option value="other">อื่นๆ</option>
+      </select>
+    </div>
+    <div class="form-actions" style="margin-top:1rem;">
+      <button class="btn btn-outline" onclick="closeLostReasonModal()">กลับ</button>
+      <button class="btn btn-primary" style="background:#dc2626;" onclick="confirmCancelWithReason()">ยืนยันยกเลิก</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="customerModal" onclick="if(event.target===this)closeCustomerModal()">
+  <div class="modal" style="max-width:440px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+      <div class="modal-logo" style="font-size:1.1rem;"><i class="ph ph-user"></i> ข้อมูลลูกค้า</div>
+      <button class="modal-close" onclick="closeCustomerModal()"><i class="ph ph-x"></i></button>
+    </div>
+    <div id="custModalStatsLine" style="font-size:0.8rem;color:var(--gray);margin-bottom:1rem;"></div>
+    <input type="hidden" id="custModalId">
+
+    <div class="form-group">
+      <label>ชื่อ</label>
+      <input type="text" id="custModalName" class="form-input" placeholder="ชื่อลูกค้า">
+    </div>
+    <div class="form-group" style="margin-top:0.75rem;">
+      <label>ประเภทลูกค้า</label>
+      <input type="text" id="custModalType" class="form-input" placeholder="เช่น นักสะสม, มือใหม่">
+    </div>
+    <div class="form-group" style="margin-top:0.75rem;">
+      <label>งบประมาณโดยประมาณ (บาท)</label>
+      <input type="number" id="custModalBudget" class="form-input" placeholder="เช่น 5000">
+    </div>
+    <div class="form-group" style="margin-top:0.75rem;">
+      <label>ช่องทางติดต่ออื่น</label>
+      <input type="text" id="custModalContact" class="form-input" placeholder="เบอร์โทร/ไลน์ (ถ้ามี)">
+    </div>
+    <div class="form-group" style="margin-top:0.75rem;">
+      <label>โน้ต</label>
+      <textarea id="custModalNotes" placeholder="บันทึกเพิ่มเติมเกี่ยวกับลูกค้า"></textarea>
+    </div>
+
+    <div class="form-actions" style="margin-top:1.25rem;">
+      <button class="btn btn-outline" onclick="closeCustomerModal()">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="saveCustomer()">บันทึก</button>
+    </div>
   </div>
 </div>
 

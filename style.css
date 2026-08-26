@@ -1330,3 +1330,39 @@
     .form-actions { justify-content: stretch; }
     .form-actions .btn { flex: 1; text-align: center; }
   }
+/* ── Fish Value Profile (สี/ทรง/พฤติกรรมกิน/เกรดพรีเมียม) ในฟอร์มเพิ่ม/แก้ไขปลา ── */
+/* หมายเหตุ: ย้ายกลับมาต่อท้ายไฟล์นี้เพราะ style.css เวอร์ชันล่าสุดถูกเขียนใหม่ทั้งไฟล์
+   (ธีม Ocean/Hero ใต้น้ำ) ตอนรวมโค้ดจาก git ทำให้ CSS ชุดนี้ที่เคยเพิ่มไว้หายไป */
+.fish-value-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 8px; margin-bottom: 8px;
+}
+.fish-value-premium-row {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.85rem; font-weight: 500; color: var(--black);
+  text-transform: none; letter-spacing: normal;
+}
+.fish-value-premium-row input[type="checkbox"] { width: auto; flex-shrink: 0; accent-color: var(--royal-blue); }
+
+/* ── Price history viewer ── */
+.price-hist-entry { padding: 0.8rem 0; border-bottom: 1px solid var(--border); }
+.price-hist-entry:last-child { border-bottom: none; }
+.price-hist-date { font-size: 0.75rem; color: var(--gray); font-weight: 600; margin-bottom: 0.4rem; }
+.price-hist-row { display: flex; justify-content: space-between; font-size: 0.85rem; padding: 2px 0; }
+.price-hist-label { color: var(--gray); }
+.price-hist-change { font-family: var(--font-number); }
+.price-hist-change b { color: var(--royal-blue); }
+
+/* ── Customers page (CRM แบบเบา) ── */
+.customer-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  background: white; border: 1px solid var(--border); border-radius: 12px;
+  padding: 0.9rem 1.1rem; margin-bottom: 0.6rem; cursor: pointer; transition: 0.15s;
+}
+.customer-row:hover { box-shadow: 0 4px 14px rgba(26,58,143,0.08); transform: translateY(-1px); }
+.customer-row-name { font-weight: 600; font-size: 0.92rem; margin-bottom: 2px; }
+.customer-row-sub { font-size: 0.78rem; color: var(--gray); }
+.customer-segment-badge {
+  font-size: 0.72rem; font-weight: 600; padding: 4px 10px; border-radius: 999px;
+  white-space: nowrap; flex-shrink: 0;
+}

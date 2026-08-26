@@ -86,6 +86,29 @@ const dbRpc = async (fnName, args) => {
   return { ok: true, data: await res.json() };
 };
 
+// ── ดึงชื่อโปรไฟล์ Facebook แบบ best-effort (ไม่บล็อกถ้าเรียกไม่สำเร็จ) ──
+const fetchProfileName = async (psid) => {
+  try {
+    const res = await fetch(`https://graph.facebook.com/v21.0/${psid}?fields=first_name,last_name&access_token=${TOKEN}`);
+    const data = await res.json();
+    if (data.first_name || data.last_name) {
+      return [data.first_name, data.last_name].filter(Boolean).join(' ');
+    }
+  } catch (_) { /* เงียบไว้ ไม่ใช่ path หลัก ไม่ให้กระทบ checkout */ }
+  return null;
+};
+
+// ── หาลูกค้าจาก psid ถ้าไม่เคยมีให้สร้างใหม่ (ผูก CRM แบบเบาๆ เข้ากับ Messenger) ──
+// ดู docs/PHASE2_CRM_LOST_SALE_SETUP.md — ต้องรัน SQL สร้างตาราง customers ก่อนใช้งานได้
+const getOrCreateCustomer = async (psid) => {
+  const existing = await dbGet(`customers?psid=eq.${psid}&select=id`);
+  if (existing?.id) return existing.id;
+
+  const name = await fetchProfileName(psid);
+  const created = await dbInsert('customers', { psid, name });
+  return created?.id || null;
+};
+
 const price = (f) => (!f.price_max || f.price_max === f.price_min)
   ? `฿${f.price_min}`
   : `฿${f.price_min} – ฿${f.price_max}`;
@@ -256,7 +279,8 @@ async function checkout(psid) {
 
   const total = items.reduce((sum, i) => sum + unitPrice(i.fish) * i.qty, 0);
 
-  const order = await dbInsert('orders', { psid, status: 'pending', total_amount: total });
+  const customerId = await getOrCreateCustomer(psid);
+  const order = await dbInsert('orders', { psid, status: 'pending', total_amount: total, customer_id: customerId });
   if (!order?.id) {
     await sendText(psid, 'เกิดข้อผิดพลาดในการสร้างออเดอร์ กรุณาลองใหม่อีกครั้งครับ 🙏');
     return;

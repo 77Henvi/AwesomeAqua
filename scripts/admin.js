@@ -6,7 +6,8 @@ import { toggleTag }                      from './shared/tags.js';
 import { renderStats }                   from './modules/stats.js';
 import { initAds }                       from './modules/ads.js';
 import { renderAdminUsers, addAdminUser, removeAdminUser } from './modules/adminUsers.js';
-import { loadOrders, setOrderStatusFilter, updateOrderStatus } from './modules/orders.js';
+import { loadOrders, setOrderStatusFilter, updateOrderStatus, askCancelReason, closeLostReasonModal, confirmCancelWithReason } from './modules/orders.js';
+import { loadCustomers, setCustomerSegmentFilter, openCustomerModal, closeCustomerModal, saveCustomer } from './modules/customers.js';
 import { calcPricePreview, profitCell }  from './modules/profit.js';
 import { openSaleModal }                 from './modules/sale.js';
 import { loadFinanceFromDB, getFinanceData, getProfitMap,
@@ -67,6 +68,13 @@ window.confirmRestock   = confirmRestock;
 window.switchTab        = switchTab;
 window.setOrderStatusFilter = setOrderStatusFilter;
 window.updateOrderStatus    = updateOrderStatus;
+window.askCancelReason        = askCancelReason;
+window.closeLostReasonModal   = closeLostReasonModal;
+window.confirmCancelWithReason = confirmCancelWithReason;
+window.setCustomerSegmentFilter = setCustomerSegmentFilter;
+window.openCustomerModal        = openCustomerModal;
+window.closeCustomerModal       = closeCustomerModal;
+window.saveCustomer             = saveCustomer;
 window.addAdminUser     = addAdminUser;
 window.removeAdminUser  = removeAdminUser;
 window.renderFishTable  = renderFishTable; // แก้บั๊กเดิม: ช่องค้นหาปลา (oninput) เรียกฟังก์ชันนี้แต่ไม่เคยถูก bind ไว้เลย
@@ -440,6 +448,7 @@ function switchTab(tab) {
   if (tab === 'ads')     initAds();
   if (tab === 'admins')  renderAdminUsers();
   if (tab === 'orders')  loadOrders();
+  if (tab === 'customers') loadCustomers();
 }
 
 function toggleAddPanel(forceOpen) {
