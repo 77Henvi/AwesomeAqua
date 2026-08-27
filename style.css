@@ -342,6 +342,10 @@
     letter-spacing: -0.01em;
   }
   .section-sub { color: var(--gray); font-size: 1rem; line-height: 1.7; max-width: 520px; }
+  /* แคตตาล็อกปลา: ปรับ accent ของ section-tag ให้เข้าธีม ocean เดียวกับ Hero/About
+     (ไม่แตะ .section-tag ตัวหลักเพราะใช้ร่วมหลาย section อื่นที่ยังไม่ redesign) */
+  #fish .section-tag { color: var(--ocean-deep); }
+  #fish .section-tag::before { background: var(--ocean-teal); }
   .section-header {
     display: flex; justify-content: space-between;
     align-items: flex-end; flex-wrap: wrap; gap: 1rem;
@@ -352,9 +356,9 @@
   .fish-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 1rem; padding: 1rem 0;
+    gap: 1.35rem; padding: 1rem 0;
   }
-  /* อัปเกรด: เพิ่ม Hover Interactive ให้นุ่มนวลขึ้น */
+  /* อัปเกรด: เพิ่ม Hover Interactive ให้นุ่มนวลขึ้น + เงาโทน ocean แทนเงาดำเรียบๆ เดิม */
   .fish-card {
     border: 1px solid var(--border);
     border-radius: var(--radius-lg); overflow: hidden;
@@ -362,12 +366,12 @@
     background: var(--white); cursor: pointer;
   }
   .fish-card:hover {
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
-    transform: translateY(-4px);
-    border-color: #c5d3ff;
+    box-shadow: 0 16px 32px rgba(2,77,96,0.14);
+    transform: translateY(-5px);
+    border-color: var(--ocean-teal);
   }
   .fish-card:focus-visible {
-    outline: 3px solid var(--bright-blue);
+    outline: 3px solid var(--ocean-teal);
     outline-offset: 2px;
   }
   .fish-img {
@@ -375,7 +379,7 @@
     width: 100%;
     aspect-ratio: 4 / 3;
     display: flex; align-items: center; justify-content: center;
-    background: linear-gradient(135deg, #f0f4ff, #e4ecff);
+    background: linear-gradient(135deg, var(--ocean-mist), #eaf7f5);
   }
   .fish-img img {
     width: 100%; height: 100%;
@@ -390,7 +394,7 @@
   }
   .fish-species { font-size: 0.8rem; color: var(--gray); font-style: italic; margin-bottom: 0.75rem; }
   .fish-meta { display: flex; justify-content: space-between; align-items: center; }
-  .fish-price { font-size: 1.1rem; font-weight: 700; color: var(--royal-blue); }
+  .fish-price { font-size: 1.15rem; font-weight: 700; color: var(--ocean-deep); }
   .fish-stock { font-size: 0.78rem; color: var(--gray); }
   .fish-stock.low { color: #dc2626; }
   
@@ -522,12 +526,12 @@
   
   
   /* ── COMING SOON CARDS ── */
-  .fish-card--coming { cursor: default; border-color: #d1d9f0; background: #fafbff; }
+  .fish-card--coming { cursor: default; border-color: #bfe4e0; background: #f7fdfc; }
   .fish-img--coming {
     position: relative;
     aspect-ratio: 4/3;
     display: flex; align-items: center; justify-content: center;
-    background: linear-gradient(135deg, #e8eeff, #d4ddff);
+    background: linear-gradient(135deg, var(--ocean-mist), #c9ebe6);
   }
   .fish-img--coming img { width: 100%; height: 100%; object-fit: cover; opacity: 0.28; }
   .fish-img--coming span.coming-emoji { opacity: 0.35; font-size: 5rem; }
@@ -535,7 +539,7 @@
   .coming-tape-wrapper {
     position: absolute; top: 50%; left: -25%; width: 150%;
     transform: translateY(-50%) rotate(-10deg);
-    background: rgba(26,58,143,0.9);
+    background: rgba(2,77,96,0.92);
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     z-index: 3; pointer-events: none; overflow: hidden; display: flex;
   }
@@ -554,17 +558,17 @@
   }
   
   .fish-info--coming { padding: 1.25rem; opacity: 0.7; }
-  .fish-info--coming .fish-name { color: #4b5e9e; }
-  .tag--dim { background: #eaecf7; color: #7080b0; }
+  .fish-info--coming .fish-name { color: var(--ocean-deep); }
+  .tag--dim { background: #e5f5f3; color: #3f8580; }
   .coming-badge {
     display: inline-flex; align-items: center; gap: 0.35rem;
-    background: #e8eeff; color: #1a3a8f;
-    border: 1px dashed #b0c0ee; border-radius: 8px;
+    background: var(--ocean-mist); color: var(--ocean-deep);
+    border: 1px dashed #9dd6cf; border-radius: 8px;
     padding: 0.5rem 0.75rem; font-size: 0.78rem; font-weight: 500;
     width: 100%; justify-content: center; margin-top: 0.5rem;
     cursor: pointer; transition: background 0.2s;
   }
-  .coming-badge:hover { background: #d4ddff; }
+  .coming-badge:hover { background: #c9ebe6; }
   
   /* Coming soon modal */
   .cs-hero { position: relative; overflow: hidden; }
@@ -607,10 +611,11 @@
   
   /* Out-of-stock */
   .out-badge {
-    position: absolute; top: 0.6rem; left: 0;
-    background: rgba(239,68,68,0.9); color: white;
-    font-size: 0.68rem; font-weight: 600;
-    padding: 0.2rem 0.65rem 0.2rem 0.85rem;
+    position: absolute; top: 0.75rem; left: 0;
+    background: rgba(220,38,38,0.92); color: white;
+    font-size: 0.7rem; font-weight: 600;
+    padding: 0.28rem 0.75rem 0.28rem 0.9rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     clip-path: polygon(0 0, 100% 0, calc(100% - 6px) 50%, 100% 100%, 0 100%);
   }
   .fish-card--out .fish-img { opacity: 0.75; }
@@ -1158,25 +1163,25 @@
   
   .search-bar input {
     width: 100%;
-    padding: 0.8rem 1rem 0.8rem 2.75rem;
-    border: 1px solid var(--border);
+    padding: 0.85rem 1rem 0.85rem 2.85rem;
+    border: 1.5px solid var(--border);
     background: var(--white);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-pill);
     font-family: inherit;
     font-size: 0.92rem;
     color: var(--black);
-    box-shadow: 0 1px 2px rgba(13,13,13,0.03);
+    box-shadow: 0 1px 3px rgba(2,77,96,0.04);
     transition: border-color 0.2s, box-shadow 0.2s;
   }
   
   .search-bar input::placeholder { color: #9ca3af; }
   
-  .search-bar input:hover { border-color: #d1d5db; }
+  .search-bar input:hover { border-color: var(--ocean-teal); }
   
   .search-bar input:focus {
     outline: none;
-    border-color: var(--bright-blue);
-    box-shadow: 0 0 0 3px rgba(34,85,204,0.12);
+    border-color: var(--ocean-teal);
+    box-shadow: 0 0 0 4px rgba(44,172,173,0.14);
   }
   
   .filter-chips {
@@ -1199,19 +1204,19 @@
   }
   
   .chip:hover {
-    border-color: var(--bright-blue);
-    color: var(--bright-blue);
+    border-color: var(--ocean-teal);
+    color: var(--ocean-deep);
     transform: translateY(-1px);
   }
   
   .chip.active {
-    background: var(--royal-blue);
-    color: white;
-    border-color: var(--royal-blue);
+    background: var(--ocean-teal);
+    color: #04222b;
+    border-color: var(--ocean-teal);
     font-weight: 600;
-    box-shadow: 0 4px 10px rgba(26,58,143,0.25);
+    box-shadow: 0 4px 12px rgba(44,172,173,0.35);
   }
-  .chip.active:hover { transform: none; color: white; }
+  .chip.active:hover { transform: none; color: #04222b; }
   
   /* --- Wishlist Button --- */
   .fish-card-img-wrap {
@@ -1233,6 +1238,7 @@
     justify-content: center;
     cursor: pointer;
     z-index: 10;
+    box-shadow: 0 2px 8px rgba(2,77,96,0.15);
     transition: transform 0.2s ease, color 0.2s ease;
     color: var(--font-body);
   }
@@ -1272,7 +1278,9 @@
     width: 100%;
     aspect-ratio: 4 / 3; /* ล็อคสัดส่วนรูปภาพให้เท่ากันทุกการ์ด (สามารถเปลี่ยนเป็น 1 / 1 ถ้าอยากได้รูปจัตุรัส) */
     overflow: hidden;
-    border-radius: 12px 12px 0 0; /* ทำให้ขอบมนรับกับตัวการ์ด */
+    /* แก้บั๊ก: เดิม hardcode 12px แต่การ์ดรอบนอกใช้ var(--radius-lg)=16px ทำให้เกิดมุมขาวโผล่
+       เล็กๆ ที่ 4 มุมด้านบน (รัศมีรูปเล็กกว่ารัศมีการ์ด) ตอนนี้ใช้ตัวแปรเดียวกันให้ตรงกันเป๊ะ */
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   }
   
   .fish-card-img-wrap img {
