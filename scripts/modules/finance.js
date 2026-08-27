@@ -32,20 +32,31 @@ export async function loadFinanceFromDB(onDone) {
     .select('*')
     .order('created_at', { ascending: false });
 
-  if (!error) {
-    financeData = data;
-
-    // คำนวณกำไรสะสม Group By fish_id แบบยิงครั้งเดียว
-    profitMap = {};
-    financeData.forEach(r => {
-      if (!r.fish_id) return;
-      profitMap[r.fish_id] = (profitMap[r.fish_id] || 0) + (r.type === 'income' ? r.amount : -r.amount);
-    });
-
-    renderTodayFinance();
-    renderFinancePage();
-    onDone?.();
+  if (error) {
+    // เดิมโค้ดจุดนี้ไม่มี error handling เลย (มีแต่ if (!error)) พอ query พลาด
+    // (เช่น session หมดอายุ → 401) เลยเงียบไปดื้อๆ หน้าจอโชว์ยอด/ประวัติว่างเปล่าทั้งที่ข้อมูลใน DB ยังอยู่ครบ
+    console.error('โหลดข้อมูลการเงินไม่ได้:', error);
+    if (error.code === '401' || error.status === 401 || /jwt|401/i.test(error.message || '')) {
+      showToast('<i class="ph-fill ph-warning-circle" style="color:#f59e0b;"></i> เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่');
+      if (typeof window.adminLogout === 'function') await window.adminLogout(true); // เด้งกลับหน้า login ให้เอง
+      return;
+    }
+    showToast('<i class="ph-fill ph-x-circle" style="color:#ef4444;"></i> โหลดข้อมูลการเงินไม่ได้ ลองรีเฟรชหน้าใหม่');
+    return; // สำคัญ: ไม่แตะ financeData/profitMap เดิม กันของเก่าที่เคยโหลดไว้หายไปเงียบๆ ตอน error
   }
+
+  financeData = data;
+
+  // คำนวณกำไรสะสม Group By fish_id แบบยิงครั้งเดียว
+  profitMap = {};
+  financeData.forEach(r => {
+    if (!r.fish_id) return;
+    profitMap[r.fish_id] = (profitMap[r.fish_id] || 0) + (r.type === 'income' ? r.amount : -r.amount);
+  });
+
+  renderTodayFinance();
+  renderFinancePage();
+  onDone?.();
 }
 
 // ════════════════════════════════════════════
