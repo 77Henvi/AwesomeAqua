@@ -5,10 +5,27 @@ const FISH_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" wi
   </g>
 </svg>`;
 
+// ── ฟองอากาศตกแต่ง (ใช้ pattern เดียวกับ hero-bubble แต่แยก class เพื่อไม่ชนกับ CSS ของ hero) ──
+function buildBubbles(count) {
+  const frag = document.createDocumentFragment();
+  for (let i = 0; i < count; i++) {
+    const b = document.createElement('div');
+    const size = 3 + Math.random() * 7;
+    b.className = 'fish-bg__bubble';
+    b.style.width = `${size}px`;
+    b.style.height = `${size}px`;
+    b.style.left = `${Math.random() * 100}%`;
+    b.style.animationDuration = `${8 + Math.random() * 9}s`;
+    b.style.animationDelay = `${Math.random() * 9}s`;
+    frag.appendChild(b);
+  }
+  return frag;
+}
+
 export function injectFishBackgrounds() {
   const targets = [
     { selector: '#fish',                 dark: false },
-    { selector: '.stats',                dark: true  },
+    { selector: '.stats-float',          dark: true  }, // เดิมชื่อ .stats ก่อนรีดีไซน์ hero — แก้ให้ตรงกับ DOM ปัจจุบัน
     { selector: '.about-values',         dark: false },
     { selector: '.about-contact-info',   dark: false },
     { selector: '.about-contact-visual', dark: true  },
@@ -22,12 +39,16 @@ export function injectFishBackgrounds() {
     const wrap = document.createElement('div');
     wrap.className = 'fish-bg' + (dark ? ' fish-bg--dark' : '');
 
-    for (let i = 1; i <= 6; i++) {
+    // ปลา: เพิ่มจาก 6 เป็น 10 ตัว ให้ดูมีชีวิตชีวาขึ้น
+    for (let i = 1; i <= 10; i++) {
       const fish = document.createElement('div');
       fish.className = `fish-bg__fish fish-bg__fish--${i}`;
       fish.innerHTML = FISH_SVG;
       wrap.appendChild(fish);
     }
+
+    // ฟองอากาศ: เพิ่มใหม่ทั้งหมด
+    wrap.appendChild(buildBubbles(12));
 
     el.insertBefore(wrap, el.firstChild);
   });

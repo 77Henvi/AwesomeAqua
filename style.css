@@ -10,8 +10,8 @@
     --black: #0d0d0d;
     --gray: #6b7280;
     --border: #e5e7eb;
-    --font-display: 'Playfair Display', 'Cormorant Garamond', serif;
-    --font-body: 'Jost', sans-serif;
+    --font-display: 'Playfair Display', 'Noto Serif Thai', 'Cormorant Garamond', serif;
+    --font-body: 'Jost', 'Noto Sans Thai', sans-serif;
   
     /* ── Radius scale (ให้ทั้งเว็บใช้ชุดค่าเดียวกัน แทนการเดาตัวเลขมั่วๆ) ── */
     --radius-sm: 8px;    /* input, badge เล็ก, ปุ่มย่อย */
@@ -213,9 +213,12 @@
   .hero-bubble {
     position: absolute; bottom: -30px; border-radius: 50%;
     background: rgba(117,226,224,0.28);
-    animation: bubbleRise linear infinite;
+    animation: heroBubbleRise linear infinite;
   }
-  @keyframes bubbleRise {
+  /* ตั้งชื่อเฉพาะ heroBubbleRise (เดิมชื่อ bubbleRise ชนกับ keyframe ของ .loader-bubble
+     ที่มีอยู่ก่อนแล้วในไฟล์นี้ — CSS ใช้ keyframe ตัวหลังสุดทับตัวแรกเสมอเมื่อชื่อซ้ำกัน
+     ทำให้ฟองของ hero เคยวิ่งด้วย animation ของ loader โดยไม่ตั้งใจ) */
+  @keyframes heroBubbleRise {
     0%   { transform: translateY(0) translateX(0); opacity: 0; }
     10%  { opacity: 0.65; }
     100% { transform: translateY(-100vh) translateX(18px); opacity: 0; }
@@ -856,18 +859,41 @@
   .fish-bg__fish { position: absolute; display: block; user-select: none; }
   @keyframes fishLTR { 0% { left: -8%; } 100% { left: 108%; } }
   @keyframes fishRTL { 0% { left: 108%; } 100% { left: -8%; } }
-  .fish-bg__fish--1 { top: 10%; width: 2.2rem; opacity: 0.10; animation: fishLTR 30s linear infinite -4s; }
-  .fish-bg__fish--2 { top: 34%; width: 1.6rem; opacity: 0.08; transform: scaleX(-1); animation: fishRTL 24s linear infinite -9s; }
-  .fish-bg__fish--3 { top: 55%; width: 2.8rem; opacity: 0.09; animation: fishLTR 38s linear infinite -16s; }
-  .fish-bg__fish--4 { top: 75%; width: 1.8rem; opacity: 0.07; transform: scaleX(-1); animation: fishRTL 20s linear infinite -2s; }
-  .fish-bg__fish--5 { top: 20%; width: 1.3rem; opacity: 0.07; animation: fishLTR 28s linear infinite -20s; }
-  .fish-bg__fish--6 { top: 84%; width: 2.4rem; opacity: 0.08; transform: scaleX(-1); animation: fishRTL 33s linear infinite -11s; }
-  .fish-bg--dark .fish-bg__fish--1 { opacity: 0.14; }
-  .fish-bg--dark .fish-bg__fish--2 { opacity: 0.11; }
-  .fish-bg--dark .fish-bg__fish--3 { opacity: 0.13; }
-  .fish-bg--dark .fish-bg__fish--4 { opacity: 0.10; }
-  .fish-bg--dark .fish-bg__fish--5 { opacity: 0.09; }
-  .fish-bg--dark .fish-bg__fish--6 { opacity: 0.12; }
+  /* opacity เพิ่มขึ้นจากเดิมทุกตัว (~1.8-2 เท่า) + เพิ่มปลาจาก 6 เป็น 10 ตัว
+     ให้ดูมีชีวิตชีวาขึ้นตามที่ขอ ยังคงเป็น decorative เบาๆ ไม่แย่งความสนใจจากเนื้อหาหลัก */
+  .fish-bg__fish--1  { top: 8%;  width: 2.3rem; opacity: 0.20; animation: fishLTR 30s linear infinite -4s; }
+  .fish-bg__fish--2  { top: 30%; width: 1.7rem; opacity: 0.16; transform: scaleX(-1); animation: fishRTL 24s linear infinite -9s; }
+  .fish-bg__fish--3  { top: 50%; width: 2.9rem; opacity: 0.18; animation: fishLTR 38s linear infinite -16s; }
+  .fish-bg__fish--4  { top: 70%; width: 1.9rem; opacity: 0.15; transform: scaleX(-1); animation: fishRTL 20s linear infinite -2s; }
+  .fish-bg__fish--5  { top: 18%; width: 1.4rem; opacity: 0.14; animation: fishLTR 28s linear infinite -20s; }
+  .fish-bg__fish--6  { top: 82%; width: 2.5rem; opacity: 0.17; transform: scaleX(-1); animation: fishRTL 33s linear infinite -11s; }
+  .fish-bg__fish--7  { top: 40%; width: 1.6rem; opacity: 0.15; animation: fishLTR 26s linear infinite -7s; }
+  .fish-bg__fish--8  { top: 62%; width: 2.1rem; opacity: 0.16; transform: scaleX(-1); animation: fishRTL 35s linear infinite -14s; }
+  .fish-bg__fish--9  { top: 92%; width: 1.5rem; opacity: 0.13; animation: fishLTR 22s linear infinite -18s; }
+  .fish-bg__fish--10 { top: 4%;  width: 2rem;   opacity: 0.14; transform: scaleX(-1); animation: fishRTL 31s linear infinite -6s; }
+  .fish-bg--dark .fish-bg__fish--1  { opacity: 0.26; }
+  .fish-bg--dark .fish-bg__fish--2  { opacity: 0.22; }
+  .fish-bg--dark .fish-bg__fish--3  { opacity: 0.24; }
+  .fish-bg--dark .fish-bg__fish--4  { opacity: 0.20; }
+  .fish-bg--dark .fish-bg__fish--5  { opacity: 0.18; }
+  .fish-bg--dark .fish-bg__fish--6  { opacity: 0.23; }
+  .fish-bg--dark .fish-bg__fish--7  { opacity: 0.19; }
+  .fish-bg--dark .fish-bg__fish--8  { opacity: 0.21; }
+  .fish-bg--dark .fish-bg__fish--9  { opacity: 0.17; }
+  .fish-bg--dark .fish-bg__fish--10 { opacity: 0.19; }
+
+  /* ── ฟองอากาศตกแต่งเพิ่มเติมใน fish-bg (คนละชุดกับ hero-bubble ของ Hero section) ── */
+  .fish-bg__bubble {
+    position: absolute; bottom: -20px; border-radius: 50%;
+    background: currentColor; opacity: 0.12;
+    animation: bgBubbleRise linear infinite;
+  }
+  .fish-bg--dark .fish-bg__bubble { opacity: 0.20; }
+  @keyframes bgBubbleRise {
+    0%   { transform: translateY(0) translateX(0); opacity: 0; }
+    12%  { opacity: 1; }
+    100% { transform: translateY(-100%) translateX(14px); opacity: 0; }
+  }
   
   
   /* ── LOADING SCREEN ── */
