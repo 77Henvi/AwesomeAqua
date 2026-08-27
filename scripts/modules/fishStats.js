@@ -200,7 +200,9 @@ function _renderChart() {
   }
 
   const W = 640, H = 240;
-  const padL = 46, padR = 10, padT = 16, padB = 26;
+  const isNarrow = window.innerWidth < 480; // จอมือถือแคบ — ตัวหนังสือ SVG ต้องใหญ่ขึ้นสัมพัทธ์ ไม่งั้นตัวเลขจิ๋วอ่านไม่ออก
+  const fontSize   = isNarrow ? 15 : 11;
+  const padL = isNarrow ? 54 : 46, padR = 10, padT = 16, padB = isNarrow ? 30 : 26;
   const plotW = W - padL - padR;
   const plotH = H - padT - padB;
 
@@ -222,7 +224,7 @@ function _renderChart() {
     const label = val === 0 ? '0' : (Math.abs(val) >= 1000 ? (val < 0 ? '-' : '') + '฿' + Math.round(Math.abs(val) / 1000) + 'k' : '฿' + Math.round(val));
     gridSvg += `
       <line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="#eef1f8" stroke-width="1"/>
-      <text x="${padL - 8}" y="${y + 4}" font-size="11" fill="#94a3b8" text-anchor="end">${label}</text>`;
+      <text x="${padL - 8}" y="${y + 4}" font-size="${fontSize}" fill="#94a3b8" text-anchor="end">${label}</text>`;
   }
   // เส้นศูนย์เข้มขึ้นหน่อยถ้ามีค่าติดลบ (ให้แยกโซนกำไร/ขาดทุนชัดเจน)
   if (minVal < 0) {
@@ -230,10 +232,11 @@ function _renderChart() {
     gridSvg += `<line x1="${padL}" y1="${y0}" x2="${W - padR}" y2="${y0}" stroke="#cbd5e1" stroke-width="1.25"/>`;
   }
 
-  // ── x labels ──
+  // ── x labels (จอแคบ: โชว์แค่เดือนคี่ กันตัวหนังสือทับกัน) ──
   let xLabelsSvg = '';
   MONTH_SHORT.forEach((m, i) => {
-    xLabelsSvg += `<text x="${xFor(i)}" y="${H - 6}" font-size="11" fill="#94a3b8" text-anchor="middle">${m}</text>`;
+    if (isNarrow && i % 2 !== 0) return;
+    xLabelsSvg += `<text x="${xFor(i)}" y="${H - 6}" font-size="${fontSize}" fill="#94a3b8" text-anchor="middle">${m}</text>`;
   });
 
   const profitPts = months.map((m, i) => ({ x: xFor(i), y: yFor(m.profit) }));

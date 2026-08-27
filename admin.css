@@ -613,6 +613,7 @@
   .form-grid             { grid-template-columns: repeat(2, 1fr); }
   /* table action buttons ไม่ต้องใหญ่ */
   .action-btn            { padding: 0.25rem 0.6rem; font-size: 0.75rem; }
+  .row-actions            { gap: 4px; }
 }
 
 /* ── MOBILE (≤ 640px) ── */
@@ -650,6 +651,16 @@
   /* table: ซ่อน col species ย่อ padding */
   .fish-table-wrap th,
   .fish-table-wrap td    { padding: 0.6rem 0.6rem; }
+
+  /* ปุ่มจัดการในตาราง (สถิติ/ขาย/แก้ไข/เลิกขาย) — จอแคบมากพอที่จะโชว์ label เต็มไม่ไหวแล้ว
+     เหลือแค่ไอคอนกลมๆ พอกดง่ายด้วยนิ้ว (ยังกด title="" hover ดูชื่อเต็มได้บนแท็บเล็ต/เมาส์) */
+  .row-actions            { gap: 6px; }
+  .row-actions .action-btn {
+    padding: 0.4rem; width: 34px; height: 34px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 1rem; border-radius: 50%;
+  }
+  .row-actions .action-btn-label { display: none; }
 
   /* form */
   .form-grid             { grid-template-columns: 1fr; }

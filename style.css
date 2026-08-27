@@ -1162,6 +1162,11 @@
   .action-edit:hover  { background: var(--royal-blue); color: white; }
   .action-delete { background: #fef2f2; color: #dc2626; }
   .action-delete:hover { background: #dc2626; color: white; }
+
+  /* กล่องปุ่มจัดการในตารางปลา (ขาย/แก้ไข/สถิติ/เลิกขาย) — ห่อบรรทัดอัตโนมัติแทนการยืดตารางกว้างขึ้นเรื่อยๆ
+     ทำให้ tablet/mobile เห็นปุ่มครบไม่ล้นจอ (ดู .action-btn-label ที่ซ่อนบนมือถือใน admin.css) */
+  .row-actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .row-actions .action-btn { margin-right: 0; white-space: nowrap; }
   
   /* --- Filter & Search Bar --- */
   .store-filter-section {

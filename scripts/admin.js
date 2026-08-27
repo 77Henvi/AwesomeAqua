@@ -406,15 +406,17 @@ function renderFishTable() {
         <td><span class="admin-stock-badge ${sc}">${st}</span></td>
         <td><span class="admin-level-badge ${lvCls}">${f.level}</span></td>
         <td>
-          <button class="action-btn" style="background:#7c3aed;color:#fff;border:none;" onclick="openFishStatsModal('${f.id}')" title="ดูสถิติกำไร/ต้นทุนรายเดือน"><i class="ph ph-chart-line-up"></i> สถิติ</button>
-          ${f.is_archived ? `
-            <button class="action-btn" style="background:#2563eb;color:#fff;border:none;" onclick="restoreFish('${f.id}')"><i class="ph ph-arrow-counter-clockwise"></i> เปิดขายอีกครั้ง</button>
-            <button class="action-btn action-delete" onclick="hardDeleteFish('${f.id}')" title="ลบถาวร"><i class="ph ph-trash"></i></button>
-          ` : `
-            <button class="action-btn" style="background:#059669;color:#fff;border:none;" onclick="openSale('${f.id}')"><i class="ph ph-shopping-cart-simple"></i> ขาย</button>
-            <button class="action-btn action-edit"   onclick="openEditModal('${f.id}')"><i class="ph ph-pencil-simple"></i> แก้ไข</button>
-            <button class="action-btn action-delete" onclick="archiveFish('${f.id}')"><i class="ph ph-archive"></i> เลิกขาย</button>
-          `}
+          <div class="row-actions">
+            <button class="action-btn" style="background:#7c3aed;color:#fff;border:none;" onclick="openFishStatsModal('${f.id}')" title="ดูสถิติกำไร/ต้นทุนรายเดือน"><i class="ph ph-chart-line-up"></i> <span class="action-btn-label">สถิติ</span></button>
+            ${f.is_archived ? `
+              <button class="action-btn" style="background:#2563eb;color:#fff;border:none;" onclick="restoreFish('${f.id}')"><i class="ph ph-arrow-counter-clockwise"></i> <span class="action-btn-label">เปิดขายอีกครั้ง</span></button>
+              <button class="action-btn action-delete" onclick="hardDeleteFish('${f.id}')" title="ลบถาวร"><i class="ph ph-trash"></i></button>
+            ` : `
+              <button class="action-btn" style="background:#059669;color:#fff;border:none;" onclick="openSale('${f.id}')"><i class="ph ph-shopping-cart-simple"></i> <span class="action-btn-label">ขาย</span></button>
+              <button class="action-btn action-edit"   onclick="openEditModal('${f.id}')"><i class="ph ph-pencil-simple"></i> <span class="action-btn-label">แก้ไข</span></button>
+              <button class="action-btn action-delete" onclick="archiveFish('${f.id}')"><i class="ph ph-archive"></i> <span class="action-btn-label">เลิกขาย</span></button>
+            `}
+          </div>
         </td>
       </tr>`;
   }).join('');
