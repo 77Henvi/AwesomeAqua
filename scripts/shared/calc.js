@@ -63,3 +63,37 @@ export const LOW_STOCK_THRESHOLD = 3;
 export function isLowStock(stock) {
   return stock <= LOW_STOCK_THRESHOLD;
 }
+
+// ── สถิติกำไร/ต้นทุนรายตัว (ใช้ใน modules/fishStats.js) ────────
+
+/**
+ * ดึงจำนวนตัวที่ขายจากข้อความชื่อรายการ finance เช่น "ขายปลา: ... x3 ตัว" (รูปแบบที่ sale.js สร้างตอนบันทึกการขาย)
+ * ถ้า parse ไม่ได้ (รายการเก่า/แก้ไขเองในระบบการเงิน) นับเป็น 1 รายการแทน กันตกหล่น
+ */
+export function extractSaleQty(name) {
+  const m = /x(\d+)\s*ตัว/.exec(name || '');
+  return m ? parseInt(m[1], 10) : 1;
+}
+
+/**
+ * สรุปรายรับ/ต้นทุน/จำนวนขาย รายเดือน (12 เดือน) ของปีที่ระบุ จาก finance records ของปลาตัวเดียว
+ * @param {Array} records finance records ที่กรองเฉพาะ fish_id ของปลาตัวนั้นแล้ว
+ * @param {number} year
+ * @returns {Array<{income:number, cost:number, qty:number}>} ยาว 12 ช่อง (index 0 = มกราคม)
+ */
+export function monthlyFishBreakdown(records, year) {
+  const months = Array.from({ length: 12 }, () => ({ income: 0, cost: 0, qty: 0 }));
+  (records || []).forEach(r => {
+    const d = r.date || '';
+    if (!d.startsWith(String(year))) return;
+    const mo = parseInt(d.slice(5, 7), 10) - 1;
+    if (mo < 0 || mo > 11) return;
+    if (r.type === 'income') {
+      months[mo].income += r.amount || 0;
+      months[mo].qty += extractSaleQty(r.name);
+    } else {
+      months[mo].cost += r.amount || 0;
+    }
+  });
+  return months;
+}

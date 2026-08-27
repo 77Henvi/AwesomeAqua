@@ -24,6 +24,7 @@ import { addFish as _addFish, updateAddFishTotal, clearForm, handleComingSoon,
          saveEdit as _saveEdit, toggleSyncTag,
          viewPriceHistory, closePriceHistoryModal } from './modules/fishForm.js';
 import { loadTodos, bindTodoWindowFunctions } from './modules/todo.js';
+import { openFishStatsModal as _openFishStatsModal, closeFishStatsModal } from './modules/fishStats.js';
 
 // ── Expose ไว้บน window ──
 window.hideLoader = function() {
@@ -54,6 +55,8 @@ window.previewEditImage = previewEditImage;
 window.handleComingSoon = handleComingSoon;
 window.openSaleModal    = openSaleModal;
 window.openSale         = openSale;
+window.openFishStatsModal  = openFishStatsModal;
+window.closeFishStatsModal = closeFishStatsModal;
 
 bindFinanceWindowFunctions(); // ผูก onFinMonthChange, setFinFilter, openFinanceModal ฯลฯ (ดู modules/finance.js)
 bindTodoWindowFunctions();    // ผูก openTodoModal, addTodo, toggleTodo ฯลฯ (ดู modules/todo.js)
@@ -377,6 +380,7 @@ function renderFishTable() {
         <td><span class="admin-stock-badge ${sc}">${st}</span></td>
         <td><span class="admin-level-badge ${lvCls}">${f.level}</span></td>
         <td>
+          <button class="action-btn" style="background:#7c3aed;color:#fff;border:none;" onclick="openFishStatsModal('${f.id}')" title="ดูสถิติกำไร/ต้นทุนรายเดือน"><i class="ph ph-chart-line-up"></i> สถิติ</button>
           ${f.is_archived ? `
             <button class="action-btn" style="background:#2563eb;color:#fff;border:none;" onclick="restoreFish('${f.id}')"><i class="ph ph-arrow-counter-clockwise"></i> เปิดขายอีกครั้ง</button>
             <button class="action-btn action-delete" onclick="hardDeleteFish('${f.id}')" title="ลบถาวร"><i class="ph ph-trash"></i></button>
@@ -426,6 +430,13 @@ function openSale(id) {
     loadFishFromDB();
     refreshFinance();
   });
+}
+
+// ════════════════════════════════════════════
+//   สถิติรายตัว (กราฟกำไร/ต้นทุนรายเดือน — logic จริงอยู่ที่ modules/fishStats.js)
+// ════════════════════════════════════════════
+function openFishStatsModal(id) {
+  _openFishStatsModal(id, fishData, getFinanceData());
 }
 
 // ════════════════════════════════════════════
