@@ -114,11 +114,27 @@ async function adminLogin() {
   showDashboard();
 }
 
-async function adminLogout() {
-  if (!confirm('ต้องการออกจากระบบ?')) return;
-  await supabase.auth.signOut();
-  document.getElementById('adminDashboard').style.display = 'none';
-  document.getElementById('loginScreen').style.display    = 'flex';
+async function adminLogout(skipConfirm = false) {
+  if (!skipConfirm && !confirm('ต้องการออกจากระบบ?')) return;
+
+  // ไม่ใช้ try/catch เฉยๆ เพราะถ้า session เสีย/หมดอายุอยู่แล้ว signOut() อาจ throw
+  // ตอนพยายามคุยกับ server เพื่อ revoke token — ต้องสลับกลับหน้า login เสมอไม่ว่าจะสำเร็จหรือไม่
+  try {
+    await supabase.auth.signOut();
+  } catch (e) {
+    console.warn('signOut ล้มเหลว (session อาจเสีย/หมดอายุอยู่แล้ว) — เคลียร์ต่อฝั่ง client แทน', e);
+  } finally {
+    // กันไว้อีกชั้น เผื่อ signOut() ไม่ throw แต่ก็ไม่เคลียร์ token ออกจาก localStorage จริงๆ
+    // (เช่น เน็ตหลุดระหว่าง revoke) — ลบ key ของ supabase auth ทิ้งเองด้วยเลย
+    try {
+      Object.keys(localStorage)
+        .filter(k => k.startsWith('sb-') && k.endsWith('-auth-token'))
+        .forEach(k => localStorage.removeItem(k));
+    } catch (e) { /* localStorage เข้าไม่ได้ก็ไม่เป็นไร ข้ามไป */ }
+
+    document.getElementById('adminDashboard').style.display = 'none';
+    document.getElementById('loginScreen').style.display    = 'flex';
+  }
 }
 
 function showDashboard() {
@@ -147,7 +163,17 @@ async function loadFishFromDB() {
     .select('*')
     .order('created_at', { ascending: false });
 
-  if (error) { showToast('<i class="ph-fill ph-x-circle" style="color:#ef4444; font-size:1.1em; vertical-align:-2px;"></i> โหลดข้อมูลไม่ได้'); return; }
+  if (error) {
+    // 401/PGRST301 = token หมดอายุ/ใช้ไม่ได้แล้ว (เจอบ่อยตอนเปิดค้างไว้นาน) — เด้งกลับไปหน้า login
+    // ให้เอง แทนที่จะปล่อยให้ค้างอยู่ที่หน้า dashboard ที่โหลดข้อมูลไม่ได้ตลอดไป
+    if (error.code === '401' || error.status === 401 || /jwt|401/i.test(error.message || '')) {
+      showToast('<i class="ph-fill ph-warning-circle" style="color:#f59e0b;"></i> เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่');
+      await adminLogout(true); // true = ข้าม confirm() เพราะไม่ใช่การกดออกเองของผู้ใช้
+      return;
+    }
+    showToast('<i class="ph-fill ph-x-circle" style="color:#ef4444; font-size:1.1em; vertical-align:-2px;"></i> โหลดข้อมูลไม่ได้');
+    return;
+  }
 
   fishData = data.map(f => ({
     id:       f.id,
