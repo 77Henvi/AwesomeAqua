@@ -132,14 +132,12 @@ async function adminLogout(skipConfirm = false) {
         .forEach(k => localStorage.removeItem(k));
     } catch (e) { /* localStorage เข้าไม่ได้ก็ไม่เป็นไร ข้ามไป */ }
 
-    document.getElementById('adminDashboard').style.display = 'none';
-    document.getElementById('loginScreen').style.display    = 'flex';
+    document.body.classList.remove('logged-in');
   }
 }
 
 function showDashboard() {
-  document.getElementById('loginScreen').style.display    = 'none';
-  document.getElementById('adminDashboard').style.display = 'block';
+  document.body.classList.add('logged-in');
   _setDateHeaders();
   loadFishFromDB();
   refreshFinance();
@@ -536,11 +534,14 @@ function _empty(icon, text) {
 //   INIT
 // ════════════════════════════════════════════
 (async () => {
+  // สำคัญ: ต้องเริ่มจาก "ไม่ login" เสมอก่อนเช็ค session จริง — กันเคส CSS/media query
+  // ไปบังคับโชว์ .admin-dashboard ทับหน้า login ไว้ (ดู body.logged-in ใน admin.css)
+  document.body.classList.remove('logged-in');
+
   const { data: { session } } = await supabase.auth.getSession();
   if (session) {
-    showDashboard(); 
+    showDashboard();
   } else {
     hideLoader();
-    document.getElementById('loginScreen').style.display = 'flex';
   }
 })();

@@ -37,8 +37,14 @@
   margin-top: 0.75rem; display: none;
 }
 
-/* ── DASHBOARD WRAPPER ── */
+/* ── DASHBOARD WRAPPER ──
+   สำคัญ: ต้อง "ซ่อนเป็นค่าเริ่มต้นเสมอ" และให้แสดงได้ก็ต่อเมื่อ body มี class .logged-in เท่านั้น
+   (ห้ามมี !important ในสื่อ media query ไหนมาบังคับ display ทับ state การล็อกอินเด็ดขาด —
+    เคยเป็นบั๊กมาก่อน: จอ desktop ≥1025px มี !important บังคับ .admin-dashboard ให้โชว์เสมอ
+    ทำให้เลื่อนดูหน้าแอดมินได้ทั้งที่ยังไม่ได้ใส่รหัสผ่านเลย) */
 .admin-dashboard { display: none; }
+body.logged-in .admin-login-screen { display: none; }
+body.logged-in .admin-dashboard    { display: block; }
 
 /* ── TOPBAR ── */
 .admin-topbar {
@@ -545,8 +551,8 @@
 
 /* ── DESKTOP (≥ 1025px): sidebar navigation แทน topbar ── */
 @media (min-width: 1025px) {
-  .admin-dashboard {
-    display: flex !important; /* JS ตั้ง style.display='flex' อยู่แล้ว แต่กันไว้เผื่อ inline ไม่ทัน */
+  body.logged-in .admin-dashboard {
+    display: flex; /* scope ไว้ใต้ body.logged-in แล้ว ไม่ต้องใช้ !important ทับ state login อีกต่อไป */
     align-items: stretch;
     min-height: 100vh;
   }
