@@ -19,13 +19,15 @@ export function openFishDetail(id) {
   // ── แปลคำศัพท์ UI ในป๊อปอัป ──
   const txtPrice = isEn ? 'Price' : 'ราคา';
   const txtStock = isEn ? 'Stock' : 'สต็อก';
-  const txtOut = isEn ? '❌ Out of stock' : '❌ หมดแล้ว';
-  const txtLow = isEn ? `⚠️ Only ${f.stock} left` : `⚠️ เหลือ ${f.stock} ตัว`;
-  const txtIn = isEn ? `✅ ${f.stock} in stock` : `✅ ${f.stock} ตัว`;
-  const txtDescTitle = isEn ? '📖 Details' : '📖 รายละเอียด';
+  const txtOut = isEn ? '<i class="ph ph-x-circle"></i> Out of stock' : '<i class="ph ph-x-circle"></i> หมดแล้ว';
+  const txtLow = isEn ? `<i class="ph ph-warning"></i> Only ${f.stock} left` : `<i class="ph ph-warning"></i> เหลือ ${f.stock} ตัว`;
+  const txtIn = isEn ? `<i class="ph ph-check-circle"></i> ${f.stock} in stock` : `<i class="ph ph-check-circle"></i> ${f.stock} ตัว`;
+  const txtDescTitle = isEn ? '<i class="ph ph-book-open"></i> Details' : '<i class="ph ph-book-open"></i> รายละเอียด';
   const txtOrder = isEn ? 'Order via Messenger' : 'สั่งซื้อผ่าน Messenger';
   const txtDisabled = isEn ? 'Out of stock' : 'หมดสต็อก';
   const txtOutRibbon = isEn ? 'Out of stock' : 'หมดสต็อก';
+  const fallbackIcon = `<i class="ph ph-fish"></i>`;
+  const fallbackIconEsc = `<i class=&quot;ph ph-fish&quot;></i>`;
 
   // ── แปลระดับความยาก ──
   const levelColor = { 'มือใหม่': '#22c55e', 'ปานกลาง': '#f59e0b', 'ผู้เชี่ยวชาญ': '#ef4444' };
@@ -40,8 +42,8 @@ export function openFishDetail(id) {
   document.getElementById('fishDetailContent').innerHTML = `
     <div class="fd-hero">
       ${f.image
-        ? `<img src="${f.image}" alt="${displayName}" class="fd-hero-img" onerror="this.outerHTML='<div class=fd-hero-emoji>${f.emoji||'🐟'}</div>'">`
-        : `<div class="fd-hero-emoji">${f.emoji || '🐟'}</div>`
+        ? `<img src="${f.image}" alt="${displayName}" class="fd-hero-img" onerror="this.outerHTML='<div class=fd-hero-emoji>${f.emoji||fallbackIconEsc}</div>'">`
+        : `<div class="fd-hero-emoji">${f.emoji || fallbackIcon}</div>`
       }
       ${outOfStock ? `<div class="fd-out-ribbon">${txtOutRibbon}</div>` : ''}
       <div class="fd-hero-grad"></div>
@@ -105,10 +107,12 @@ export function openComingSoonDetail(id) {
   const displayTags = isEn && f.tags_en?.length ? f.tags_en : f.tags_th;
 
   // ── แปลคำศัพท์ UI ในป๊อปอัป Coming Soon ──
-  const txtBadge = isEn ? '✨ Coming Soon' : '✨ เร็วๆ นี้';
-  const txtDescTitle = isEn ? '📖 About this fish' : '📖 เกี่ยวกับปลาชนิดนี้';
+  const txtBadge = isEn ? '<i class="ph ph-sparkle"></i> Coming Soon' : '<i class="ph ph-sparkle"></i> เร็วๆ นี้';
+  const txtDescTitle = isEn ? '<i class="ph ph-book-open"></i> About this fish' : '<i class="ph ph-book-open"></i> เกี่ยวกับปลาชนิดนี้';
   const txtLine = isEn ? 'Inquire via Messenger' : 'สอบถามผ่าน Messenger';
-  const txtGotIt = isEn ? '🔔 Got it' : '🔔 รับทราบ';
+  const txtGotIt = isEn ? '<i class="ph ph-bell"></i> Got it' : '<i class="ph ph-bell"></i> รับทราบ';
+  const fallbackIcon = `<i class="ph ph-fish"></i>`;
+  const fallbackIconEsc = `<i class=&quot;ph ph-fish&quot;></i>`;
 
   // ── แปลระดับความยาก ──
   const levelColor = { 'มือใหม่': '#22c55e', 'ปานกลาง': '#f59e0b', 'ผู้เชี่ยวชาญ': '#ef4444' };
@@ -123,8 +127,8 @@ export function openComingSoonDetail(id) {
   document.getElementById('csModalContent').innerHTML = `
     <div class="fd-hero cs-hero">
       ${f.image
-        ? `<img src="${f.image}" alt="${displayName}" class="fd-hero-img cs-hero-img" onerror="this.outerHTML='<div class=fd-hero-emoji>${f.emoji||'🐟'}</div>'">`
-        : `<div class="fd-hero-emoji">${f.emoji || '🐟'}</div>`
+        ? `<img src="${f.image}" alt="${displayName}" class="fd-hero-img cs-hero-img" onerror="this.outerHTML='<div class=fd-hero-emoji>${f.emoji||fallbackIconEsc}</div>'">`
+        : `<div class="fd-hero-emoji">${f.emoji || fallbackIcon}</div>`
       }
       <div class="coming-badge-center">${txtBadge}</div>
       <div class="fd-hero-grad"></div>

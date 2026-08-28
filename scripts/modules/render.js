@@ -46,10 +46,14 @@ function _availableCard(f) {
   const txtUnit = isEn ? 'pcs' : 'ตัว';
   const txtOrder = isEn ? 'Order' : 'สั่งซื้อ';
   const txtOut = isEn ? 'Out of stock' : 'หมดสต็อก';
-  const txtEmpty = isEn ? '❌ Out' : '❌ หมด';
+  const txtEmpty = isEn ? '<i class="ph ph-x-circle"></i> Out' : '<i class="ph ph-x-circle"></i> หมด';
 
   const liked = isWishlisted(f.id);
   const heartIcon = liked ? `<i class="ph-fill ph-heart"></i>` : `<i class="ph ph-heart"></i>`;
+  const fallbackIcon = `<i class="ph ph-fish"></i>`;
+  // ใช้เฉพาะใน onerror="..." ที่ซ้อน quote 3 ชั้น (attribute > JS string > HTML tag)
+  // ถ้าใส่ fallbackIcon (มี " ตรงๆ) ตรงนี้ จะตัด attribute onerror="..." ก่อนกำหนด ทำให้ HTML พัง
+  const fallbackIconEsc = `<i class=&quot;ph ph-fish&quot;></i>`;
 
   return `
     <div class="fish-card ${outOfStock ? 'fish-card--out' : ''}" role="button" tabindex="0" aria-label="ดูรายละเอียด ${displayName}"
@@ -60,8 +64,8 @@ function _availableCard(f) {
             ${heartIcon}
           </button>
         ${f.image
-          ? `<img src="${f.image}" alt="${displayName}" loading="lazy" onerror="this.parentElement.innerHTML='<span>${f.emoji || '🐟'}</span>'">`
-          : `<span>${f.emoji || '🐟'}</span>`
+          ? `<img src="${f.image}" alt="${displayName}" loading="lazy" onerror="this.parentElement.innerHTML='<span>${f.emoji || fallbackIconEsc}</span>'">`
+          : `<span>${f.emoji || fallbackIcon}</span>`
         }
         ${outOfStock ? `<div class="out-badge">${txtOut}</div>` : ''}
       </div>
@@ -74,7 +78,7 @@ function _availableCard(f) {
             ฿${f.priceMin.toLocaleString()}${f.priceMax ? ' – ' + f.priceMax.toLocaleString() : ''}
           </div>
           <div class="fish-stock ${f.stock > 0 && f.stock <= 5 ? 'low' : ''}">
-            ${f.stock === 0 ? txtEmpty : f.stock <= 5 ? `⚠️ ${f.stock} ${txtUnit}` : `✅ ${f.stock} ${txtUnit}`}
+            ${f.stock === 0 ? txtEmpty : f.stock <= 5 ? `<i class="ph ph-warning"></i> ${f.stock} ${txtUnit}` : `<i class="ph ph-check-circle"></i> ${f.stock} ${txtUnit}`}
           </div>
         </div>
         
@@ -97,11 +101,14 @@ function _comingSoonCard(f) {
   const displayName = isEn && f.name_en ? f.name_en : f.name_th;
   const displayTags = isEn && f.tags_en?.length ? f.tags_en : f.tags_th;
   
-  const txtBadge = isEn ? '🔔 View Details' : '🔔 กดดูรายละเอียด';
-  const txtTape = isEn ? '✦ COMING SOON ✦ ' : '✦ COMING SOON ✦ เร็วๆ นี้ ✦ ';
+  const txtBadge = isEn ? '<i class="ph ph-bell"></i> View Details' : '<i class="ph ph-bell"></i> กดดูรายละเอียด';
+  const tapeSep = '<i class="ph ph-sparkle"></i>';
+  const txtTape = isEn ? `${tapeSep} COMING SOON ${tapeSep} ` : `${tapeSep} COMING SOON ${tapeSep} เร็วๆ นี้ ${tapeSep} `;
   
   const liked = isWishlisted(f.id);
   const heartIcon = liked ? `<i class="ph-fill ph-heart"></i>` : `<i class="ph ph-heart"></i>`;
+  const fallbackIcon = `<i class="ph ph-fish"></i>`;
+  const fallbackIconEsc = `<i class=&quot;ph ph-fish&quot;></i>`;
 
   return `
     <div class="fish-card fish-card--coming" role="button" tabindex="0" aria-label="ดูรายละเอียด ${displayName} (เร็วๆ นี้)"
@@ -112,8 +119,8 @@ function _comingSoonCard(f) {
             ${heartIcon}
           </button>
         ${f.image
-          ? `<img src="${f.image}" alt="${displayName}" loading="lazy" onerror="this.parentElement.innerHTML='<span class=coming-emoji>${f.emoji || '🐟'}</span>'">`
-          : `<span class="coming-emoji">${f.emoji || '🐟'}</span>`
+          ? `<img src="${f.image}" alt="${displayName}" loading="lazy" onerror="this.parentElement.innerHTML='<span class=coming-emoji>${f.emoji || fallbackIconEsc}</span>'">`
+          : `<span class="coming-emoji">${f.emoji || fallbackIcon}</span>`
         }
         
         <div class="coming-tape-wrapper">
@@ -248,13 +255,15 @@ window.addEventListener('languageChanged', () => {
   }
 
   const chipTexts = isEn 
-    ? ['All', 'Freshwater', 'Marine', 'Beginner', 'Colorful', '❤️ Wishlist']
-    : ['ทั้งหมด', 'น้ำจืด', 'ทะเล', 'มือใหม่', 'สีสวย', '❤️ ถูกใจ'];
+    ? ['All', 'Freshwater', 'Marine', 'Beginner', 'Colorful', '<i class="ph ph-heart"></i> Wishlist']
+    : ['ทั้งหมด', 'น้ำจืด', 'ทะเล', 'มือใหม่', 'สีสวย', '<i class="ph ph-heart"></i> ถูกใจ'];
 
   const chips = document.querySelectorAll('.filter-chips .chip');
   chips.forEach((chip, index) => {
     if (chipTexts[index]) {
-      chip.textContent = chipTexts[index];
+      // ใช้ innerHTML แทน textContent เดิม เพราะ chip "ถูกใจ" มี <i> icon อยู่ในข้อความ
+      // (ถ้าใช้ textContent เหมือนเดิม icon จะโดนลบทิ้งทุกครั้งที่สลับภาษา)
+      chip.innerHTML = chipTexts[index];
     }
   });
 });
