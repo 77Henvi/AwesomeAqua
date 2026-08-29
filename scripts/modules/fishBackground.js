@@ -29,6 +29,7 @@ export function injectFishBackgrounds() {
     { selector: '.about-values',         dark: false },
     { selector: '.about-contact-info',   dark: false },
     { selector: '.about-contact-visual', dark: true  },
+    { selector: 'footer',                dark: true  }, // เพิ่มใหม่: ปิดท้ายหน้าเว็บด้วยปลา/ฟองแบบเดียวกับส่วนอื่น
   ];
 
   targets.forEach(({ selector, dark }) => {

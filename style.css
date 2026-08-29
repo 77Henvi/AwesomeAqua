@@ -65,8 +65,8 @@
     transition: color 0.4s;
   }
   .logo span { color: var(--ocean-sky); transition: color 0.4s; }
-  nav.scrolled .logo      { color: var(--royal-blue); }
-  nav.scrolled .logo span { color: var(--bright-blue); }
+  nav.scrolled .logo      { color: var(--ocean-deep); }
+  nav.scrolled .logo span { color: var(--ocean-teal); }
   
   .nav-links { display: flex; gap: 2.5rem; list-style: none; align-items: center; }
   .nav-links a {
@@ -84,8 +84,8 @@
   .nav-links a:hover { color: #ffffff; }
   .nav-links a:hover::after { transform: scaleX(1); }
   nav.scrolled .nav-links a       { color: var(--gray); }
-  nav.scrolled .nav-links a:hover { color: var(--royal-blue); }
-  nav.scrolled .nav-links a::after { background: var(--royal-blue); }
+  nav.scrolled .nav-links a:hover { color: var(--ocean-deep); }
+  nav.scrolled .nav-links a::after { background: var(--ocean-teal); }
   
   .nav-actions { display: flex; align-items: center; }
   
@@ -639,20 +639,31 @@
   
   /* ── FOOTER — redesign ── */
   /* อัปเกรด: เปลี่ยนสี Footer ให้เป็น Dark Navy สมูทขึ้น */
+  /* footer ใช้ ocean-deepest (เข้มสุดในกลุ่มสี ocean) ให้ความรู้สึก "ก้นทะเล" ปิดท้ายหน้าเว็บ
+     แทนสีเทาเข้ม generic (#0f172a) เดิมที่ไม่เข้าธีม ocean เลย */
   footer {
-    background: #0f172a; color: rgba(255,255,255,0.6);
+    background: var(--ocean-deepest); color: rgba(255,255,255,0.65);
     padding: 3rem 5%; font-size: 0.85rem;
+    position: relative; overflow: hidden;
   }
+  /* เส้นแบ่งบนสุดของ footer เป็นคลื่นนุ่มๆ (ไม่มี animation) ให้เชื่อมความรู้สึกกับ Hero
+     ด้านบนสุดของหน้าเว็บ — ใช้ SVG แบบ static ไม่กระทบ performance */
+  .footer-wave {
+    position: absolute; top: -1px; left: 0; right: 0; height: 40px;
+    line-height: 0; z-index: 1;
+  }
+  .footer-wave svg { width: 100%; height: 100%; display: block; }
   .footer-inner {
     max-width: 960px; margin: 0 auto;
     display: flex; flex-direction: column; align-items: center;
     gap: 1.25rem; text-align: center;
+    position: relative; z-index: 2;
   }
   .footer-logo {
     font-family: var(--font-display);
     color: white; font-size: 1.35rem; font-weight: 700;
   }
-  .footer-logo span { color: #7eb3ff; }
+  .footer-logo span { color: var(--ocean-sky); }
   .footer-links {
     display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center;
   }
@@ -660,9 +671,9 @@
     color: rgba(255,255,255,0.55); text-decoration: none;
     font-size: 0.82rem; transition: color 0.2s;
   }
-  .footer-links a:hover { color: white; }
+  .footer-links a:hover { color: var(--ocean-sky); }
   .footer-line-btn { font-size: 0.875rem; padding: 0.6rem 1.5rem; }
-  .footer-copy { font-size: 0.72rem; opacity: 0.35; }
+  .footer-copy { font-size: 0.72rem; opacity: 0.4; }
   
   
   /* ── ABOUT HERO ── */
@@ -1037,24 +1048,24 @@
   /* สถานะที่ถูกเลือก (หน้า Navbar สีใส) */
   .lang-opt.active {
     background: white;
-    color: var(--royal-blue);
+    color: var(--ocean-deep);
   }
   
   /* ── สถานะตอน Scroll Navbar (พื้นหลังขาว) ── */
   nav.scrolled .lang-toggle-btn {
-    background: var(--light-blue);
+    background: var(--ocean-mist);
     border-color: var(--border);
     color: var(--gray);
   }
   nav.scrolled .lang-toggle-btn:hover {
-    background: #dce4ff;
+    background: #c9ebe6;
   }
   nav.scrolled .lang-opt {
     color: var(--gray);
   }
   nav.scrolled .lang-opt.active {
-    background: var(--royal-blue);
-    color: white;
+    background: var(--ocean-teal);
+    color: #04222b;
   }
   
   /* ── สถานะใน Mobile Dropdown Menu ── */
@@ -1067,7 +1078,7 @@
     justify-content: flex-start; /* ให้ปุ่มชิดซ้าย */
   }
   .nav-mobile-menu .lang-toggle-btn {
-    background: var(--light-blue);
+    background: var(--ocean-mist);
     border-color: var(--border);
     color: var(--gray);
   }
@@ -1075,8 +1086,8 @@
     color: var(--gray);
   }
   .nav-mobile-menu .lang-opt.active {
-    background: var(--royal-blue);
-    color: white;
+    background: var(--ocean-teal);
+    color: #04222b;
   }
   
   /* ── MOBILE MENU ── */
