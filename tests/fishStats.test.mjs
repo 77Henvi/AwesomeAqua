@@ -4,7 +4,7 @@
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { extractSaleQty, monthlyFishBreakdown } from '../scripts/shared/calc.js';
+import { extractSaleQty, monthlyFishBreakdown, extractSaleSize, monthlyFishSizeBreakdown } from '../scripts/shared/calc.js';
 
 // ── extractSaleQty ─────────────────────────────
 test('extractSaleQty: ดึงจำนวนตัวจากชื่อรายการขายปกติ', () => {
@@ -62,4 +62,52 @@ test('monthlyFishBreakdown: record ที่ไม่มี date หรือ da
   assert.doesNotThrow(() => monthlyFishBreakdown(records, 2026));
   const months = monthlyFishBreakdown(records, 2026);
   months.forEach(m => assert.deepEqual(m, { income: 0, cost: 0, qty: 0 }));
+});
+
+// ── extractSaleSize ─────────────────────────────
+test('extractSaleSize: ดึงไซส์จากชื่อรายการขายที่มีไซส์', () => {
+  assert.equal(extractSaleSize('ขายปลา: ฟรอนโตซ่า บุรุนดี (ไซส์ 5 นิ้ว) x12 ตัว'), '5');
+  assert.equal(extractSaleSize('ขายปลา: A (ไซส์ 4 นิ้ว) x4 ตัว'), '4');
+});
+
+test('extractSaleSize: ปลาที่ไม่มีตัวเลือกไซส์ → คืน null', () => {
+  assert.equal(extractSaleSize('ขายปลา: A x3 ตัว'), null);
+  assert.equal(extractSaleSize(''), null);
+  assert.equal(extractSaleSize(undefined), null);
+});
+
+// ── monthlyFishSizeBreakdown ────────────────────
+test('monthlyFishSizeBreakdown: แยกกลุ่มตามไซส์ถูกต้อง พร้อมคำนวณกำไรต่อตัว/รวม', () => {
+  const records = [
+    // มกราคม: ไซส์ 4" ขาย 4 ตัว รวม 2400 (ต้นทุนของเดือนคือ 400 สำหรับ 4 ตัว → ต้นทุนเฉลี่ย/ตัว = 100)
+    { type: 'income',  amount: 2400, date: '2026-01-10', name: 'ขายปลา: A (ไซส์ 4 นิ้ว) x4 ตัว' },
+    { type: 'expense', amount: 400,  date: '2026-01-05', name: 'เติมสต็อก: A x4 ตัว' },
+  ];
+  const months = monthlyFishSizeBreakdown(records, 2026);
+  assert.equal(months.length, 12);
+
+  const jan = months[0];
+  assert.equal(jan.length, 1);
+  assert.deepEqual(jan[0], {
+    size: '4', qty: 4, revenue: 2400,
+    profitPerUnit: 500, // (2400/4) - (400/4) = 600 - 100 = 500
+    totalProfit: 2000,
+  });
+});
+
+test('monthlyFishSizeBreakdown: หลายไซส์ในเดือนเดียวกัน แยกกลุ่มไม่ปนกัน', () => {
+  const records = [
+    { type: 'income', amount: 1200, date: '2026-02-03', name: 'ขายปลา: A (ไซส์ 3 นิ้ว) x2 ตัว' },
+    { type: 'income', amount: 2000, date: '2026-02-11', name: 'ขายปลา: A (ไซส์ 5 นิ้ว) x2 ตัว' },
+  ];
+  const feb = monthlyFishSizeBreakdown(records, 2026)[1];
+  assert.equal(feb.length, 2);
+  const bySize = Object.fromEntries(feb.map(g => [g.size, g]));
+  assert.equal(bySize['3'].qty, 2);
+  assert.equal(bySize['5'].qty, 2);
+});
+
+test('monthlyFishSizeBreakdown: เดือนไม่มีข้อมูล → คืน array ว่าง', () => {
+  const months = monthlyFishSizeBreakdown([], 2026);
+  months.forEach(m => assert.deepEqual(m, []));
 });

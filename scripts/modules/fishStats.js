@@ -1,7 +1,7 @@
 // scripts/modules/fishStats.js
 // Modal "สถิติปลารายตัว" — ดูกราฟกำไร/ต้นทุนย้อนหลังเป็นรายเดือนของปลาแต่ละตัว
 // เปิดจากตารางปลาใน admin.js (ปุ่ม "สถิติ") ใช้ finance records ที่ผูกกับ fish_id
-import { niceMax, smoothPath, monthlyFishBreakdown } from '../shared/calc.js';
+import { niceMax, smoothPath, monthlyFishBreakdown, monthlyFishSizeBreakdown } from '../shared/calc.js';
 
 const MONTH_SHORT = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 const MONTH_FULL  = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
@@ -10,6 +10,7 @@ const MONTH_FULL  = ['มกราคม','กุมภาพันธ์','ม�
 let _fish        = null;
 let _records      = []; // finance records เฉพาะของปลาตัวนี้ (ทุกปี)
 let _selectedYear = null;
+let _sizeBreakdownByMonth = []; // ผลลัพธ์ monthlyFishSizeBreakdown ของปีที่กำลังแสดง ใช้ตอนคลิกจุดกำไรเพื่อโชว์รายละเอียด
 
 // ════════════════════════════════════════════
 //   ENTRY POINT
@@ -91,10 +92,17 @@ function _ensureModal() {
         <div id="fsYearNav" class="fs-year-nav"></div>
       </div>
       <div id="fsChartLegend" class="fs-chart-legend"></div>
-      <div id="fsChart" class="fs-chart-wrap"></div>
+      <div id="fsChartOuter" class="fs-chart-outer">
+        <div id="fsChart" class="fs-chart-wrap"></div>
+        <div id="fsPointPopover" class="fs-point-popover"></div>
+      </div>
     </div>`;
   document.body.appendChild(wrap);
-  wrap.addEventListener('click', e => { if (e.target === wrap) closeFishStatsModal(); });
+  wrap.addEventListener('click', e => {
+    if (e.target === wrap) closeFishStatsModal();
+    // คลิกที่อื่นในโมดัล (นอกจุดบนกราฟ) ให้ปิด popover รายละเอียดไซส์/กำไรที่เปิดค้างอยู่
+    document.getElementById('fsPointPopover')?.classList.remove('open');
+  });
 
   window.closeFishStatsModal = closeFishStatsModal;
   window.__fishStatsChangeYear = (delta) => {
@@ -107,6 +115,7 @@ function _ensureModal() {
     _renderChart();
     _renderKpis();
   };
+  window.__fishStatsShowPoint = _showPointDetail;
 }
 
 // ════════════════════════════════════════════
@@ -181,10 +190,13 @@ function _renderChart() {
   const legEl = document.getElementById('fsChartLegend');
   if (!el) return;
 
+  document.getElementById('fsPointPopover')?.classList.remove('open'); // ปิด popover ค้างจากปีก่อนหน้า
+
   const months = monthlyFishBreakdown(_records, _selectedYear).map(m => ({
     ...m,
     profit: m.income - m.cost,
   }));
+  _sizeBreakdownByMonth = monthlyFishSizeBreakdown(_records, _selectedYear);
 
   const hasAny = months.some(m => m.income > 0 || m.cost > 0);
   if (!hasAny) {
@@ -250,7 +262,8 @@ function _renderChart() {
   months.forEach((m, i) => {
     if (m.income === 0 && m.cost === 0) return;
     const monthLabel = `${MONTH_FULL[i]} ${_selectedYear}`;
-    pointsSvg += `<circle cx="${profitPts[i].x}" cy="${profitPts[i].y}" r="5" fill="${m.profit >= 0 ? '#059669' : '#dc2626'}" stroke="#fff" stroke-width="2" class="fs-chart-dot"><title>${monthLabel}\nกำไร ${(m.profit >= 0 ? '+' : '')}฿${m.profit.toLocaleString('th-TH')}</title></circle>`;
+    // จุดกำไร (apex) — คลิกเพื่อดูรายละเอียดแยกไซส์: จำนวน/กำไรต่อตัว/รวม (โชว์ผ่าน popover, ดู _showPointDetail)
+    pointsSvg += `<circle cx="${profitPts[i].x}" cy="${profitPts[i].y}" r="5" fill="${m.profit >= 0 ? '#059669' : '#dc2626'}" stroke="#fff" stroke-width="2" class="fs-chart-dot" onclick="window.__fishStatsShowPoint(${i}, event)"><title>${monthLabel}\nกำไร ${(m.profit >= 0 ? '+' : '')}฿${m.profit.toLocaleString('th-TH')} (คลิกดูรายละเอียด)</title></circle>`;
     if (m.cost > 0) {
       pointsSvg += `<circle cx="${costPts[i].x}" cy="${costPts[i].y}" r="4" fill="#94a3b8" stroke="#fff" stroke-width="2" class="fs-chart-dot"><title>${monthLabel}\nต้นทุน ฿${m.cost.toLocaleString('th-TH')}</title></circle>`;
     }
@@ -264,6 +277,49 @@ function _renderChart() {
       ${pointsSvg}
       ${xLabelsSvg}
     </svg>`;
+}
+
+// ════════════════════════════════════════════
+//   POINT DETAIL POPOVER (คลิกจุด apex กำไร → โชว์แยกไซส์/จำนวน/กำไรต่อตัว)
+// ════════════════════════════════════════════
+function _showPointDetail(monthIdx, evt) {
+  const box = document.getElementById('fsPointPopover');
+  const outer = document.getElementById('fsChartOuter');
+  if (!box || !outer) return;
+
+  const groups = (_sizeBreakdownByMonth[monthIdx] || []).filter(g => g.qty > 0);
+  if (!groups.length) { box.classList.remove('open'); return; }
+
+  const name = _fish ? (_fish.name_th || _fish.name || '') : '';
+  const monthLabel = `${MONTH_FULL[monthIdx]} ${_selectedYear}`;
+
+  const rows = groups.map(g => {
+    const sizeLabel = g.size ? `ไซส์ ${g.size}"` : 'ไม่ระบุไซส์';
+    const perUnit   = (g.profitPerUnit >= 0 ? '+' : '') + '฿' + g.profitPerUnit.toLocaleString('th-TH');
+    const total     = (g.totalProfit  >= 0 ? '+' : '') + '฿' + g.totalProfit.toLocaleString('th-TH');
+    return `
+      <div class="fs-point-row">
+        <span class="fs-point-size">📏 ${name} ${sizeLabel}</span>
+        <span class="fs-point-detail">จำนวน ${g.qty} ตัว · กำไรต่อตัว ${perUnit}</span>
+        <span class="fs-point-total">รวมเป็น ${total}</span>
+      </div>`;
+  }).join('');
+
+  box.innerHTML = `<div class="fs-point-month">${monthLabel}</div>${rows}`;
+  box.classList.add('open');
+
+  // ── ตำแหน่ง popover ใกล้จุดที่คลิก (อิงพิกัดเมาส์บนจอเทียบกับกรอบกราฟ ไม่ใช่พิกัดภายใน svg) ──
+  const outerRect = outer.getBoundingClientRect();
+  const boxRect   = box.getBoundingClientRect();
+  let left = evt.clientX - outerRect.left - boxRect.width / 2;
+  left = Math.max(4, Math.min(left, outerRect.width - boxRect.width - 4));
+  let top = evt.clientY - outerRect.top - boxRect.height - 14;
+  if (top < 0) top = evt.clientY - outerRect.top + 14; // ล้นด้านบน → โชว์ใต้จุดแทน
+
+  box.style.left = left + 'px';
+  box.style.top  = top + 'px';
+
+  evt.stopPropagation(); // กันไม่ให้ไป trigger click บน wrap ที่จะปิด popover ทันที
 }
 
 // ════════════════════════════════════════════
@@ -322,6 +378,21 @@ function _injectFishStatsStyle() {
     .fs-chart-svg { width: 100%; height: auto; display: block; }
     .fs-chart-dot { cursor: pointer; }
     .fs-chart-dot:hover { r: 7; }
+
+    .fs-chart-outer { position: relative; }
+    .fs-point-popover {
+      position: absolute; display: none; z-index: 20; min-width: 200px; max-width: 260px;
+      background: #1e293b; color: #fff; border-radius: 10px; padding: 0.6rem 0.7rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.25); font-size: 0.78rem; line-height: 1.4;
+      pointer-events: none; /* กันไม่ให้ตัว popover เองไป trigger click ปิดตัวเอง */
+    }
+    .fs-point-popover.open { display: block; }
+    .fs-point-month { font-weight: 700; font-size: 0.82rem; margin-bottom: 4px; color: #cbd5e1; }
+    .fs-point-row { padding: 4px 0; border-top: 1px solid rgba(255,255,255,0.12); }
+    .fs-point-row:first-of-type { border-top: none; }
+    .fs-point-size { display: block; font-weight: 600; }
+    .fs-point-detail { display: block; color: #cbd5e1; font-size: 0.74rem; margin-top: 1px; }
+    .fs-point-total { display: block; color: #4ade80; font-weight: 700; margin-top: 1px; }
 
     .fs-empty { text-align: center; padding: 2.2rem 1rem; color: var(--gray); }
     .fs-empty i { font-size: 2rem; display: block; margin-bottom: 0.5rem; opacity: 0.6; }
