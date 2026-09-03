@@ -256,7 +256,7 @@ function hardDeleteFish(id) { return _hardDeleteFish(id, () => { loadFishFromDB(
 // ════════════════════════════════════════════
 //   SAVE EDIT (logic จริงอยู่ที่ scripts/modules/fishForm.js)
 // ════════════════════════════════════════════
-function saveEdit() { return _saveEdit(fishData, () => { loadFishFromDB(); }); }
+function saveEdit() { return _saveEdit(fishData, () => { loadFishFromDB(); refreshFinance(); }); }
 
 // ════════════════════════════════════════════
 //   STATS

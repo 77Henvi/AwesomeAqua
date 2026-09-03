@@ -508,6 +508,20 @@
       <div class="form-group"><label>ราคาต่ำสุด</label><input type="number" id="editPriceMin"></div>
       <div class="form-group"><label>ราคาสูงสุด (ถ้ามี)</label><input type="number" id="editPriceMax"></div>
       <div class="form-group"><label>จำนวนสต็อก</label><input type="number" id="editStock"></div>
+      <div class="form-group">
+        <label>ต้นทุน/ตัว (บาท)</label>
+        <input type="number" id="editCost" step="0.01" min="0">
+        <small style="color:var(--gray);font-size:0.78rem;display:block;margin-top:4px;">
+          ถ้าเพิ่ม "จำนวนสต็อก" มากกว่าเดิม ระบบจะบันทึกรายจ่าย (จำนวนที่เพิ่ม × ต้นทุนนี้) เข้า Finance ให้อัตโนมัติ
+        </small>
+      </div>
+      <div class="form-group">
+        <label>วันที่เติมสต็อก</label>
+        <input type="date" id="editRestockDate">
+        <small style="color:var(--gray);font-size:0.78rem;display:block;margin-top:4px;">
+          ใช้เป็นวันที่ของรายจ่ายที่บันทึกอัตโนมัติ (กรณีเพิ่มจำนวนสต็อก) — ค่าเริ่มต้นคือวันนี้
+        </small>
+      </div>
       
       <div class="form-group">
         <label>ขนาดปลา (ซม.)</label>

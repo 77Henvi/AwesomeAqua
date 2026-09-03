@@ -191,6 +191,7 @@ export function openEditModal(id, fishData) {
 
   if (document.getElementById('editCost')) document.getElementById('editCost').value = f.cost || '';
   if (document.getElementById('editSalePrice')) document.getElementById('editSalePrice').value = f.sale_price || '';
+  if (document.getElementById('editRestockDate')) document.getElementById('editRestockDate').value = new Date().toLocaleDateString('en-CA');
 
   const preview = document.getElementById('editImagePreview');
   if (preview) {
@@ -279,7 +280,32 @@ export async function saveEdit(fishData, onDone) {
     }).catch(() => {});
   }
 
-  showToast('<i class="ph-fill ph-check-circle" style="color:#10b981; font-size:1.1em; vertical-align:-2px;"></i> บันทึกการแก้ไขเรียบร้อย');
+  // ── เติมสต็อกผ่านหน้าแก้ไข (ไม่ใช่ปุ่ม "เติมสต็อก" โดยตรง) ──
+  // ถ้าจำนวนสต็อกที่แก้ไขมากกว่าค่าเดิม ถือว่ากำลังรับปลาล็อตใหม่เข้ามา
+  // → บันทึกรายจ่าย (จำนวนที่เพิ่ม × ต้นทุนที่กรอกไว้) เข้า Finance ให้อัตโนมัติ กันลืมไปกดรายจ่ายเองทีหลัง
+  const addedQty = stock - (oldData?.stock || 0);
+  let financeWarning = false;
+  if (addedQty > 0 && finalCost > 0) {
+    const amount = addedQty * finalCost;
+    const elRestockDate = document.getElementById('editRestockDate');
+    const restockDate = (elRestockDate && elRestockDate.value) || new Date().toLocaleDateString('en-CA');
+    const { error: financeError } = await supabase.from('finance').insert({
+      type: 'expense',
+      name: `เติมสต็อก (แก้ไขข้อมูล): ${document.getElementById('editName_th').value} x${addedQty} ตัว`,
+      amount,
+      date: restockDate,
+      fish_id: id,
+    });
+    financeWarning = !!financeError;
+  }
+
+  if (financeWarning) {
+    showToast('<i class="ph-fill ph-warning-circle" style="color:#f59e0b; font-size:1.1em; vertical-align:-2px;"></i> บันทึกการแก้ไขเรียบร้อย แต่บันทึกรายจ่ายไม่สำเร็จ');
+  } else if (addedQty > 0 && finalCost > 0) {
+    showToast('<i class="ph-fill ph-check-circle" style="color:#10b981; font-size:1.1em; vertical-align:-2px;"></i> บันทึกการแก้ไขและรายจ่ายเรียบร้อย');
+  } else {
+    showToast('<i class="ph-fill ph-check-circle" style="color:#10b981; font-size:1.1em; vertical-align:-2px;"></i> บันทึกการแก้ไขเรียบร้อย');
+  }
   closeEditModal();
   onDone?.();
 }
