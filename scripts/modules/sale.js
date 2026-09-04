@@ -1,6 +1,7 @@
 import { supabase }   from '../../supabase.js';
 import { showToast }  from '../shared/utils.js';
 import { hasSizeOptions as _hasSizeOptions, priceForSize as _priceForSize, shouldPromptArchive, isLowStock, LOW_STOCK_THRESHOLD } from '../shared/calc.js';
+import { EMS_COST_OPTIONS, resolveShippingCost } from '../shared/shipments.js';
 
 let _currentFish = null;
 let _onSaved     = null;
@@ -28,6 +29,36 @@ export function initSaleModal() {
       </div>
 
       <div id="saleSummary" style="margin-top:10px;font-size:0.95rem;font-weight:600;color:var(--royal-blue,#2563eb);"></div>
+
+      <label class="sale-ship-toggle">
+        <input type="checkbox" id="saleShipToggle">
+        <i class="ph ph-truck"></i> มีการจัดส่ง
+      </label>
+
+      <div id="saleShipFields" style="display:none;">
+        <label class="sale-label">ชื่อลูกค้า</label>
+        <input type="text" id="saleCustomerName" class="sale-input" placeholder="เช่น คุณสมชาย ใจดี">
+
+        <label class="sale-label">วิธีจัดส่ง</label>
+        <select id="saleShipMethod" class="sale-input">
+          <option value="ems">EMS (ต่างจังหวัด)</option>
+          <option value="lalamove">Lalamove (ในกรุง)</option>
+        </select>
+
+        <div id="saleEmsCostGroup">
+          <label class="sale-label">ค่าส่ง EMS</label>
+          <select id="saleEmsCost" class="sale-input">
+            ${EMS_COST_OPTIONS.map(c => `<option value="${c}">฿${c}</option>`).join('')}
+          </select>
+        </div>
+        <div id="saleLalaCostGroup" style="display:none;">
+          <label class="sale-label">ค่าส่ง Lalamove (ถ้ามี)</label>
+          <input type="number" id="saleLalaCost" class="sale-input" placeholder="เช่น 120" min="0">
+        </div>
+
+        <label class="sale-label">วันที่จัดส่ง</label>
+        <input type="date" id="saleShipDate" class="sale-input">
+      </div>
 
       <div style="display:flex;gap:8px;margin-top:18px;">
         <button type="button" onclick="window.closeSaleModal()" class="sale-btn sale-btn-ghost"><i class="ph ph-x"></i> ยกเลิก</button>
@@ -64,6 +95,11 @@ export function initSaleModal() {
       .sale-btn-primary:hover { opacity: 0.9; }
       .sale-btn-ghost { background: #f1f5f9; color: #475569; }
       .sale-btn-ghost:hover { background: #e2e8f0; }
+      .sale-ship-toggle {
+        display: flex; align-items: center; gap: 8px; font-size: 0.9rem; font-weight: 500;
+        padding: 10px 2px; margin-top: 12px; border-top: 1px solid var(--border,#eee); cursor: pointer;
+      }
+      .sale-ship-toggle input { width: 16px; height: 16px; cursor: pointer; }
     `;
     document.head.appendChild(style);
   }
@@ -73,6 +109,16 @@ export function initSaleModal() {
   document.getElementById('saleSize').addEventListener('change', () => {
     _updateFishInfo();
     _updateSummary();
+  });
+
+  // ── toggle ฟิลด์จัดส่ง + สลับ EMS/Lalamove ──
+  document.getElementById('saleShipToggle').addEventListener('change', (e) => {
+    document.getElementById('saleShipFields').style.display = e.target.checked ? 'block' : 'none';
+  });
+  document.getElementById('saleShipMethod').addEventListener('change', (e) => {
+    const isEms = e.target.value === 'ems';
+    document.getElementById('saleEmsCostGroup').style.display  = isEms ? 'block' : 'none';
+    document.getElementById('saleLalaCostGroup').style.display = isEms ? 'none'  : 'block';
   });
 
   // expose สำหรับ inline onclick
@@ -141,7 +187,17 @@ export function openSaleModal(fish, onSaved) {
 
   document.getElementById('saleQty').value = '1'; // ตั้งค่าเริ่มต้นที่ 1 ตัว
   document.getElementById('saleQty').max   = fish.stock;
-  
+
+  // ── รีเซ็ตฟิลด์จัดส่งทุกครั้งที่เปิดป๊อปอัปใหม่ (ไม่ให้ค้างจากการขายครั้งก่อน) ──
+  document.getElementById('saleShipToggle').checked = false;
+  document.getElementById('saleShipFields').style.display = 'none';
+  document.getElementById('saleCustomerName').value = '';
+  document.getElementById('saleShipMethod').value = 'ems';
+  document.getElementById('saleEmsCostGroup').style.display  = 'block';
+  document.getElementById('saleLalaCostGroup').style.display = 'none';
+  document.getElementById('saleLalaCost').value = '';
+  document.getElementById('saleShipDate').value = new Date().toLocaleDateString('en-CA');
+
   _updateSummary(); // แสดงยอดรวมเริ่มต้นทันที
 
   document.getElementById('saleModal').classList.add('open');
@@ -184,6 +240,20 @@ export async function confirmSale() {
   // เช็คเบื้องต้นจาก cache ให้ UX เร็ว (ตัวเช็คจริงที่กันพลาดคือใน DB ผ่าน RPC ด้านล่าง)
   if (qty > fish.stock) { showToast(`⚠️ จำนวนเกินสต็อกที่มี (${fish.stock} ตัว)`); return; }
 
+  // ── ข้อมูลจัดส่ง (ถ้าติ๊ก "มีการจัดส่ง" ไว้) ──
+  const wantsShipping = document.getElementById('saleShipToggle').checked;
+  const customerName  = document.getElementById('saleCustomerName').value.trim();
+  const shipMethod    = document.getElementById('saleShipMethod').value;
+  const shipDate       = document.getElementById('saleShipDate').value;
+  if (wantsShipping) {
+    if (!customerName) { showToast('⚠️ กรุณากรอกชื่อลูกค้า'); return; }
+    if (!shipDate)      { showToast('⚠️ กรุณาเลือกวันที่จัดส่ง'); return; }
+  }
+  const shipCostRaw = shipMethod === 'ems'
+    ? document.getElementById('saleEmsCost').value
+    : document.getElementById('saleLalaCost').value;
+  const shipCost = resolveShippingCost(shipMethod, shipCostRaw);
+
   const btn = document.getElementById('confirmSaleBtn');
   btn.disabled = true;
   btn.textContent = 'กำลังบันทึก...';
@@ -223,6 +293,36 @@ export async function confirmSale() {
 
     if (typeof window.loadFinanceFromDB === 'function') {
       window.loadFinanceFromDB();
+    }
+
+    // ── บันทึกข้อมูลจัดส่งแยกลงตาราง shipments (ถ้าติ๊ก "มีการจัดส่ง" ไว้) ──
+    // ดู docs/SHIPPING_CHECKLIST_SETUP.md — ต้องรัน SQL สร้างตารางนี้ก่อนใช้งานได้
+    // หา finance_id ของรายรับที่เพิ่งสร้างจาก RPC ด้านบน (RPC คืนแค่ยอดสต็อกใหม่ ไม่คืน id ของแถว finance)
+    if (wantsShipping) {
+      const { data: financeRow } = await supabase
+        .from('finance')
+        .select('id')
+        .eq('fish_id', fish.id)
+        .eq('date', today)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      const { error: shipErr } = await supabase.from('shipments').insert({
+        finance_id:      financeRow?.id || null,
+        fish_id:         fish.id,
+        fish_name:       `${fish.name_th || fish.name}${sizeLabel} x${qty} ตัว`,
+        customer_name:   customerName,
+        shipping_method: shipMethod,
+        shipping_cost:   shipCost,
+        shipping_date:   shipDate,
+      });
+
+      if (shipErr) {
+        showToast('<i class="ph-fill ph-warning-circle" style="color:#f59e0b;"></i> ขายสำเร็จ แต่บันทึกข้อมูลจัดส่งไม่สำเร็จ (เพิ่มในแท็บ "จัดส่ง" เองได้)');
+      } else if (typeof window.loadShipments === 'function') {
+        window.loadShipments();
+      }
     }
 
     closeSaleModal();

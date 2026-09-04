@@ -7,6 +7,7 @@ import { renderStats }                   from './modules/stats.js';
 import { initAds }                       from './modules/ads.js';
 import { renderAdminUsers, addAdminUser, removeAdminUser } from './modules/adminUsers.js';
 import { loadOrders, setOrderStatusFilter, updateOrderStatus, askCancelReason, closeLostReasonModal, confirmCancelWithReason } from './modules/orders.js';
+import { loadShipments, setShipmentStatusFilter, toggleShipmentStatus } from './modules/shipping.js';
 import { loadCustomers, setCustomerSegmentFilter, openCustomerModal, closeCustomerModal, saveCustomer } from './modules/customers.js';
 import { calcPricePreview, profitCell }  from './modules/profit.js';
 import { openSaleModal }                 from './modules/sale.js';
@@ -71,6 +72,9 @@ window.confirmRestock   = confirmRestock;
 window.switchTab        = switchTab;
 window.setOrderStatusFilter = setOrderStatusFilter;
 window.updateOrderStatus    = updateOrderStatus;
+window.setShipmentStatusFilter = setShipmentStatusFilter;
+window.toggleShipmentStatus    = toggleShipmentStatus;
+window.loadShipments           = loadShipments;
 window.askCancelReason        = askCancelReason;
 window.closeLostReasonModal   = closeLostReasonModal;
 window.confirmCancelWithReason = confirmCancelWithReason;
@@ -485,6 +489,7 @@ function switchTab(tab) {
   if (tab === 'ads')     initAds();
   if (tab === 'admins')  renderAdminUsers();
   if (tab === 'orders')  loadOrders();
+  if (tab === 'shipping') loadShipments();
   if (tab === 'customers') loadCustomers();
 }
 

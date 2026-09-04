@@ -38,6 +38,7 @@
       <button class="admin-nav-tab"        id="nav-stats"   onclick="switchTab('stats')"><i class="ph ph-chart-bar"></i> สถิติ</button>
       <button class="admin-nav-tab"        id="nav-ads"     onclick="switchTab('ads')"><i class="ph ph-megaphone"></i> โฆษณา</button>
       <button class="admin-nav-tab"        id="nav-orders"  onclick="switchTab('orders')"><i class="ph ph-receipt"></i> ออเดอร์</button>
+      <button class="admin-nav-tab"        id="nav-shipping" onclick="switchTab('shipping')"><i class="ph ph-truck"></i> จัดส่ง</button>
       <button class="admin-nav-tab"        id="nav-customers" onclick="switchTab('customers')"><i class="ph ph-users-three"></i> ลูกค้า</button>
       <button class="admin-nav-tab"        id="nav-admins"  onclick="switchTab('admins')"><i class="ph ph-users"></i> แอดมิน</button>
     </div>
@@ -415,6 +416,20 @@
       </div>
 
       <div id="orders-list"></div>
+    </div>
+
+    <div class="admin-page" id="page-shipping">
+      <div class="stats-fin-toolbar">
+        <div class="stats-fin-toolbar-title"><i class="ph ph-truck"></i> เช็คลิสต์จัดส่ง</div>
+      </div>
+
+      <div class="filter-chips" style="margin-bottom:1.25rem;">
+        <button class="filter-chip shipment-filter-chip active" onclick="setShipmentStatusFilter('pending', this)"><i class="ph ph-clock"></i> รอจัดส่ง</button>
+        <button class="filter-chip shipment-filter-chip" onclick="setShipmentStatusFilter('shipped', this)"><i class="ph ph-check-circle"></i> จัดส่งแล้ว</button>
+        <button class="filter-chip shipment-filter-chip" onclick="setShipmentStatusFilter('all', this)">ทั้งหมด</button>
+      </div>
+
+      <div id="shipments-list"></div>
     </div>
 
     <div class="admin-page" id="page-customers">
