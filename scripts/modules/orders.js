@@ -1,7 +1,7 @@
 // scripts/modules/orders.js
 // หน้า "ออเดอร์" — ดูรายการสั่งซื้อที่มาจากตะกร้า Messenger + อัปเดตสถานะ
 import { supabase }  from '../../supabase.js';
-import { showToast, adminEmpty } from '../shared/utils.js';
+import { showToast, adminEmpty, escapeHTML } from '../shared/utils.js';
 import { STATUS_LABEL, STATUS_COLOR, filterOrdersByStatus, groupItemsByOrder, formatOrderDate }
   from '../shared/orders.js';
 
@@ -61,7 +61,7 @@ export function renderOrders() {
 
   el.innerHTML = list.map(o => {
     const items = _itemsByOrder[o.id] || [];
-    const itemLines = items.map(i => `<div style="font-size:0.82rem;color:var(--gray);">• ${i.name}</div>`).join('');
+    const itemLines = items.map(i => `<div style="font-size:0.82rem;color:var(--gray);">• ${escapeHTML(i.name)}</div>`).join('');
     const shortId = o.id.slice(0, 8);
     const color = STATUS_COLOR[o.status] || '#6b7280';
 

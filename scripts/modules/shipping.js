@@ -3,7 +3,7 @@
 // แถวที่ shipment_group_id ตรงกัน (ลูกค้าคนเดิม นัดส่งพัสดุเดียวกัน) จะถูกรวมแสดงเป็นแถวเดียว
 // ดู docs/SHIPPING_CHECKLIST_SETUP.md
 import { supabase }  from '../../supabase.js';
-import { showToast, adminEmpty } from '../shared/utils.js';
+import { showToast, adminEmpty, escapeHTML } from '../shared/utils.js';
 import {
   SHIPPING_METHOD_LABEL, SHIPPING_STATUS_LABEL,
   filterShipmentsByStatus, sortShipmentsByDate, isOverdue, formatShipDate,
@@ -23,7 +23,8 @@ export async function loadShipments() {
   const { data, error } = await supabase
     .from('shipments')
     .select('*')
-    .order('shipping_date', { ascending: true });
+    .order('shipping_date', { ascending: true })
+    .order('created_at', { ascending: true }); // เรียงลำดับรองด้วย created_at กันแถววันเดียวกันสลับที่ไปมาไม่คงที่ทุกครั้งที่โหลด (Postgres ไม่การันตีลำดับถ้ามีแค่ key เดียวที่ค่าเท่ากันหลายแถว)
 
   if (error) {
     showToast('<i class="ph-fill ph-x-circle" style="color:#ef4444;"></i> โหลดรายการจัดส่งไม่สำเร็จ');
@@ -139,8 +140,8 @@ function _row(g) {
       <td style="padding:10px 6px;font-weight:600;color:${dateColor};">
         ${formatShipDate(g.shipping_date)}${overdue ? ' <i class="ph-fill ph-warning-circle" title="เลยกำหนดจัดส่งแล้ว"></i>' : ''}
       </td>
-      <td style="padding:10px 6px;">${g.customer_name || '—'}</td>
-      <td style="padding:10px 6px;">${g.items.join(', ')}</td>
+      <td style="padding:10px 6px;">${escapeHTML(g.customer_name || '—')}</td>
+      <td style="padding:10px 6px;">${escapeHTML(g.items.join(', '))}</td>
       <td style="padding:10px 6px;"><i class="ph ${methodIcon}"></i> ${SHIPPING_METHOD_LABEL[g.shipping_method] || g.shipping_method}</td>
       <td style="padding:10px 6px;">฿${(g.shipping_cost || 0).toLocaleString('th-TH')}</td>
       <td style="padding:10px 6px;">

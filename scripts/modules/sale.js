@@ -1,5 +1,5 @@
 import { supabase }   from '../../supabase.js';
-import { showToast }  from '../shared/utils.js';
+import { showToast, escapeHTML }  from '../shared/utils.js';
 import { hasSizeOptions as _hasSizeOptions, priceForSize as _priceForSize, shouldPromptArchive, isLowStock, LOW_STOCK_THRESHOLD } from '../shared/calc.js';
 import { EMS_COST_OPTIONS, resolveShippingCost, searchPendingShipmentGroups, groupShipments, SHIPPING_METHOD_LABEL } from '../shared/shipments.js';
 
@@ -166,7 +166,8 @@ export function initSaleModal() {
 
 // ── โหลดพัสดุที่ "รอจัดส่ง" อยู่ทั้งหมด มาแคชไว้ค้นหาตอนพิมพ์ชื่อลูกค้า (เรียกครั้งเดียวตอนติ๊กเปิด) ──
 async function _fetchPendingGroups() {
-  const { data, error } = await supabase.from('shipments').select('*').eq('status', 'pending');
+  const { data, error } = await supabase.from('shipments').select('*').eq('status', 'pending')
+    .order('created_at', { ascending: true }); // เรียงลำดับให้แน่นอน กันรายการปลาในพัสดุสลับที่ไปมาทุกครั้งที่โหลด
   if (error) { _pendingGroups = []; return; }
   // รวมเป็นพัสดุ (ไม่ใช่รายแถว) ด้วยฟังก์ชันเดียวกับที่แท็บ "จัดส่ง" ใช้ กันลอจิกเพี้ยนกันคนละที่
   _pendingGroups = groupShipments(data || []);
@@ -180,7 +181,7 @@ function _renderCustomerSuggestions(query) {
 
   box.innerHTML = matches.map(g => `
     <div class="sale-suggest-item" onclick="window.__saleAttachGroup('${g.group_id}')">
-      ${g.customer_name}
+      ${escapeHTML(g.customer_name)}
       <small>แนบเข้าพัสดุเดิม · ${SHIPPING_METHOD_LABEL[g.shipping_method] || g.shipping_method} · จัดส่ง ${g.shipping_date}</small>
     </div>
   `).join('');
@@ -208,6 +209,16 @@ function _attachGroup(groupId) {
   document.getElementById('saleAttachedNote').style.display = 'block';
 }
 window.__saleAttachGroup = _attachGroup;
+
+// ── สร้าง uuid ไว้ใช้เป็น shipment_group_id — crypto.randomUUID() ใช้ได้เฉพาะ secure context
+// (https/localhost) และเบราว์เซอร์ที่ค่อนข้างใหม่ ถ้าไม่มีให้ fallback เป็น RFC4122-v4 แบบมือ
+function _genGroupId() {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') return crypto.randomUUID();
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = (Math.random() * 16) | 0;
+    return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
+  });
+}
 
 function _currentSizeChoice() {
   const sel = document.getElementById('saleSize');
@@ -405,7 +416,7 @@ export async function confirmSale() {
         shipping_method:   shipMethod,
         shipping_cost:     shipCost,
         shipping_date:     shipDate,
-        shipment_group_id: _attachedGroupId || crypto.randomUUID(), // แนบเข้าพัสดุเดิม หรือสร้างพัสดุใหม่ (เผื่อมีคนมาแนบเข้าทีหลัง)
+        shipment_group_id: _attachedGroupId || _genGroupId(), // แนบเข้าพัสดุเดิม หรือสร้างพัสดุใหม่ (เผื่อมีคนมาแนบเข้าทีหลัง)
       });
 
       if (shipErr) {
