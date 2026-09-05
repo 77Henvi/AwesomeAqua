@@ -4,6 +4,7 @@ import {
   SHIPPING_METHOD_LABEL, SHIPPING_STATUS_LABEL, EMS_COST_OPTIONS,
   filterShipmentsByStatus, sortShipmentsByDate, isOverdue,
   countPendingShipments, formatShipDate, resolveShippingCost,
+  groupShipments, searchPendingShipmentGroups, countShipmentsByDate, buildCalendarMonth,
 } from '../scripts/shared/shipments.js';
 
 // ── filterShipmentsByStatus ─────────────────────
@@ -106,4 +107,92 @@ test('resolveShippingCost: ค่าว่าง/ไม่ใช่ตัวเ�
 test('label maps: ครบทุก key ที่ใช้จริงในระบบ', () => {
   assert.deepEqual(Object.keys(SHIPPING_METHOD_LABEL).sort(), ['ems', 'lalamove']);
   assert.deepEqual(Object.keys(SHIPPING_STATUS_LABEL).sort(), ['pending', 'shipped']);
+});
+
+// ── groupShipments ────────────────────────────────
+test('groupShipments: แถวที่ shipment_group_id ตรงกัน ถูกรวมเป็นพัสดุเดียว', () => {
+  const rows = [
+    { id: '1', shipment_group_id: 'g1', customer_name: 'คุณ A', shipping_method: 'ems', shipping_cost: 250, shipping_date: '2026-09-07', status: 'pending', fish_name: 'หมูอินโด x1 ตัว' },
+    { id: '2', shipment_group_id: 'g1', customer_name: 'คุณ A', shipping_method: 'ems', shipping_cost: 250, shipping_date: '2026-09-07', status: 'pending', fish_name: 'หมูอินโด x7 ตัว' },
+  ];
+  const groups = groupShipments(rows);
+  assert.equal(groups.length, 1);
+  assert.deepEqual(groups[0].ids, ['1', '2']);
+  assert.deepEqual(groups[0].items, ['หมูอินโด x1 ตัว', 'หมูอินโด x7 ตัว']);
+  assert.equal(groups[0].shipping_cost, 250); // ไม่บวกซ้ำ ใช้ค่าเดียวของพัสดุ
+  assert.equal(groups[0].status, 'pending');
+});
+
+test('groupShipments: ไม่มี shipment_group_id (ข้อมูลเก่า) → แต่ละแถวเป็นพัสดุของตัวเอง', () => {
+  const rows = [
+    { id: '1', shipment_group_id: null, customer_name: 'คุณ A', shipping_method: 'ems', shipping_cost: 250, shipping_date: '2026-09-07', status: 'pending', fish_name: 'ปลา A' },
+    { id: '2', shipment_group_id: null, customer_name: 'คุณ B', shipping_method: 'ems', shipping_cost: 250, shipping_date: '2026-09-07', status: 'pending', fish_name: 'ปลา B' },
+  ];
+  const groups = groupShipments(rows);
+  assert.equal(groups.length, 2);
+});
+
+test('groupShipments: สถานะรวมเป็น "shipped" ก็ต่อเมื่อทุกแถวในกลุ่มจัดส่งแล้ว', () => {
+  const rows = [
+    { id: '1', shipment_group_id: 'g1', customer_name: 'คุณ A', shipping_method: 'ems', shipping_cost: 250, shipping_date: '2026-09-07', status: 'shipped', fish_name: 'ปลา A' },
+    { id: '2', shipment_group_id: 'g1', customer_name: 'คุณ A', shipping_method: 'ems', shipping_cost: 250, shipping_date: '2026-09-07', status: 'pending', fish_name: 'ปลา B' },
+  ];
+  assert.equal(groupShipments(rows)[0].status, 'pending');
+
+  rows[1].status = 'shipped';
+  assert.equal(groupShipments(rows)[0].status, 'shipped');
+});
+
+test('groupShipments: array ว่าง → คืน array ว่าง', () => {
+  assert.deepEqual(groupShipments([]), []);
+  assert.deepEqual(groupShipments(undefined), []);
+});
+
+// ── searchPendingShipmentGroups ───────────────────
+test('searchPendingShipmentGroups: หาชื่อลูกค้าแบบ partial match ไม่สนตัวพิมพ์เล็ก/ใหญ่', () => {
+  const groups = [
+    { group_id: 'g1', customer_name: 'คุณจตุพร', status: 'pending' },
+    { group_id: 'g2', customer_name: 'คุณณัทกิจ', status: 'pending' },
+  ];
+  assert.deepEqual(searchPendingShipmentGroups(groups, 'จตุ').map(g => g.group_id), ['g1']);
+});
+
+test('searchPendingShipmentGroups: ไม่รวมพัสดุที่จัดส่งแล้ว (shipped)', () => {
+  const groups = [{ group_id: 'g1', customer_name: 'คุณจตุพร', status: 'shipped' }];
+  assert.deepEqual(searchPendingShipmentGroups(groups, 'จตุ'), []);
+});
+
+test('searchPendingShipmentGroups: query ว่าง → ไม่โชว์ผลอะไรเลย (กันเปิดมาแล้วเห็น dropdown ยาวทั้งหมด)', () => {
+  const groups = [{ group_id: 'g1', customer_name: 'คุณจตุพร', status: 'pending' }];
+  assert.deepEqual(searchPendingShipmentGroups(groups, ''), []);
+  assert.deepEqual(searchPendingShipmentGroups(groups, '   '), []);
+});
+
+// ── countShipmentsByDate ───────────────────────────
+test('countShipmentsByDate: นับจำนวนพัสดุต่อวัน', () => {
+  const groups = [
+    { shipping_date: '2026-09-07' }, { shipping_date: '2026-09-07' }, { shipping_date: '2026-09-04' },
+  ];
+  assert.deepEqual(countShipmentsByDate(groups), { '2026-09-07': 2, '2026-09-04': 1 });
+});
+
+test('countShipmentsByDate: array ว่าง → object ว่าง', () => {
+  assert.deepEqual(countShipmentsByDate([]), {});
+});
+
+// ── buildCalendarMonth ─────────────────────────────
+test('buildCalendarMonth: กันยายน 2026 (30 วัน ขึ้นต้นวันอังคาร) มีช่องครบและหารด้วย 7 ลงตัว', () => {
+  const cells = buildCalendarMonth(2026, 8); // month index 8 = กันยายน
+  assert.equal(cells.length % 7, 0);
+  assert.equal(cells[0], null); // 1 ก.ย. 2026 เป็นวันอังคาร (ไม่ใช่อาทิตย์) ช่องแรกต้องว่าง
+  assert.equal(cells.includes('2026-09-01'), true);
+  assert.equal(cells.includes('2026-09-30'), true);
+  assert.equal(cells.includes('2026-10-01'), false);
+});
+
+test('buildCalendarMonth: วันในเดือนเรียงต่อเนื่องไม่ขาดหาย', () => {
+  const cells = buildCalendarMonth(2026, 0).filter(Boolean); // มกราคม 2026 มี 31 วัน
+  assert.equal(cells.length, 31);
+  assert.equal(cells[0], '2026-01-01');
+  assert.equal(cells[30], '2026-01-31');
 });

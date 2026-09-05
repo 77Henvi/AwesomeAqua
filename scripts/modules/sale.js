@@ -1,10 +1,12 @@
 import { supabase }   from '../../supabase.js';
 import { showToast }  from '../shared/utils.js';
 import { hasSizeOptions as _hasSizeOptions, priceForSize as _priceForSize, shouldPromptArchive, isLowStock, LOW_STOCK_THRESHOLD } from '../shared/calc.js';
-import { EMS_COST_OPTIONS, resolveShippingCost } from '../shared/shipments.js';
+import { EMS_COST_OPTIONS, resolveShippingCost, searchPendingShipmentGroups, groupShipments, SHIPPING_METHOD_LABEL } from '../shared/shipments.js';
 
 let _currentFish = null;
 let _onSaved     = null;
+let _pendingGroups   = [];  // แคชพัสดุที่ "รอจัดส่ง" อยู่ทั้งหมด — ใช้ค้นหาตอนพิมพ์ชื่อลูกค้า (ดึงใหม่ทุกครั้งที่ติ๊ก "มีการจัดส่ง")
+let _attachedGroupId = null; // ถ้าเลือกแนบเข้าพัสดุเดิม จะเก็บ shipment_group_id ไว้ตรงนี้ (null = จะสร้างพัสดุใหม่)
 
 // ── สร้าง modal แบบ dynamic (ไม่ต้องแก้ HTML) ──
 export function initSaleModal() {
@@ -37,7 +39,14 @@ export function initSaleModal() {
 
       <div id="saleShipFields" style="display:none;">
         <label class="sale-label">ชื่อลูกค้า</label>
-        <input type="text" id="saleCustomerName" class="sale-input" placeholder="เช่น คุณสมชาย ใจดี">
+        <div style="position:relative;">
+          <input type="text" id="saleCustomerName" class="sale-input" placeholder="พิมพ์ชื่อลูกค้า..." autocomplete="off">
+          <div id="saleCustomerSuggest" class="sale-suggest"></div>
+        </div>
+        <div id="saleAttachedNote" style="display:none;font-size:0.78rem;color:#2563eb;background:#eff6ff;padding:6px 8px;border-radius:6px;margin-top:6px;">
+          <i class="ph ph-link"></i> <span id="saleAttachedText"></span>
+          <a href="#" onclick="window.__saleDetachGroup();return false;" style="color:#2563eb;text-decoration:underline;float:right;">ยกเลิก</a>
+        </div>
 
         <label class="sale-label">วิธีจัดส่ง</label>
         <select id="saleShipMethod" class="sale-input">
@@ -100,6 +109,16 @@ export function initSaleModal() {
         padding: 10px 2px; margin-top: 12px; border-top: 1px solid var(--border,#eee); cursor: pointer;
       }
       .sale-ship-toggle input { width: 16px; height: 16px; cursor: pointer; }
+      .sale-suggest {
+        display: none; position: absolute; left: 0; right: 0; top: calc(100% + 2px); z-index: 10;
+        background: #fff; border: 1px solid var(--border,#ddd); border-radius: 8px;
+        box-shadow: 0 6px 16px rgba(0,0,0,0.12); max-height: 180px; overflow-y: auto;
+      }
+      .sale-suggest.open { display: block; }
+      .sale-suggest-item { padding: 8px 12px; cursor: pointer; font-size: 0.85rem; border-bottom: 1px solid #f1f5f9; }
+      .sale-suggest-item:last-child { border-bottom: none; }
+      .sale-suggest-item:hover { background: #f8fafc; }
+      .sale-suggest-item small { display: block; color: #64748b; font-size: 0.75rem; margin-top: 2px; }
     `;
     document.head.appendChild(style);
   }
@@ -114,6 +133,7 @@ export function initSaleModal() {
   // ── toggle ฟิลด์จัดส่ง + สลับ EMS/Lalamove ──
   document.getElementById('saleShipToggle').addEventListener('change', (e) => {
     document.getElementById('saleShipFields').style.display = e.target.checked ? 'block' : 'none';
+    if (e.target.checked) _fetchPendingGroups();
   });
   document.getElementById('saleShipMethod').addEventListener('change', (e) => {
     const isEms = e.target.value === 'ems';
@@ -121,10 +141,73 @@ export function initSaleModal() {
     document.getElementById('saleLalaCostGroup').style.display = isEms ? 'none'  : 'block';
   });
 
+  // ── ค้นหาชื่อลูกค้า: พิมพ์แล้วโชว์พัสดุที่ "รอจัดส่ง" อยู่แล้วที่ชื่อตรงกัน ให้เลือกแนบได้เลย ──
+  document.getElementById('saleCustomerName').addEventListener('input', (e) => {
+    _attachedGroupId = null; // พิมพ์ใหม่ = ยกเลิกการแนบเดิม (ถ้ามี) จนกว่าจะเลือกจาก suggestion อีกครั้ง
+    document.getElementById('saleAttachedNote').style.display = 'none';
+    _renderCustomerSuggestions(e.target.value);
+  });
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#saleCustomerSuggest') && e.target.id !== 'saleCustomerName') {
+      document.getElementById('saleCustomerSuggest')?.classList.remove('open');
+    }
+  });
+  window.__saleDetachGroup = () => {
+    _attachedGroupId = null;
+    document.getElementById('saleAttachedNote').style.display = 'none';
+    document.getElementById('saleShipMethod').disabled = false;
+    document.getElementById('saleShipDate').disabled   = false;
+  };
+
   // expose สำหรับ inline onclick
   window.closeSaleModal = closeSaleModal;
   window.confirmSale    = confirmSale;
 }
+
+// ── โหลดพัสดุที่ "รอจัดส่ง" อยู่ทั้งหมด มาแคชไว้ค้นหาตอนพิมพ์ชื่อลูกค้า (เรียกครั้งเดียวตอนติ๊กเปิด) ──
+async function _fetchPendingGroups() {
+  const { data, error } = await supabase.from('shipments').select('*').eq('status', 'pending');
+  if (error) { _pendingGroups = []; return; }
+  // รวมเป็นพัสดุ (ไม่ใช่รายแถว) ด้วยฟังก์ชันเดียวกับที่แท็บ "จัดส่ง" ใช้ กันลอจิกเพี้ยนกันคนละที่
+  _pendingGroups = groupShipments(data || []);
+}
+
+function _renderCustomerSuggestions(query) {
+  const box = document.getElementById('saleCustomerSuggest');
+  const matches = searchPendingShipmentGroups(_pendingGroups, query);
+
+  if (!matches.length) { box.classList.remove('open'); box.innerHTML = ''; return; }
+
+  box.innerHTML = matches.map(g => `
+    <div class="sale-suggest-item" onclick="window.__saleAttachGroup('${g.group_id}')">
+      ${g.customer_name}
+      <small>แนบเข้าพัสดุเดิม · ${SHIPPING_METHOD_LABEL[g.shipping_method] || g.shipping_method} · จัดส่ง ${g.shipping_date}</small>
+    </div>
+  `).join('');
+  box.classList.add('open');
+}
+
+function _attachGroup(groupId) {
+  const g = _pendingGroups.find(x => x.group_id === groupId);
+  if (!g) return;
+
+  _attachedGroupId = groupId;
+  document.getElementById('saleCustomerName').value = g.customer_name;
+  document.getElementById('saleCustomerSuggest').classList.remove('open');
+
+  document.getElementById('saleShipMethod').value = g.shipping_method;
+  document.getElementById('saleShipMethod').dispatchEvent(new Event('change'));
+  document.getElementById('saleShipMethod').disabled = true;
+  if (g.shipping_method === 'ems') document.getElementById('saleEmsCost').value = g.shipping_cost;
+  else document.getElementById('saleLalaCost').value = g.shipping_cost;
+
+  document.getElementById('saleShipDate').value    = g.shipping_date;
+  document.getElementById('saleShipDate').disabled = true;
+
+  document.getElementById('saleAttachedText').textContent = `แนบเข้าพัสดุของ "${g.customer_name}" (${g.items.length} รายการ) — ไม่ต้องกรอกวิธีจัดส่ง/วันที่ซ้ำ`;
+  document.getElementById('saleAttachedNote').style.display = 'block';
+}
+window.__saleAttachGroup = _attachGroup;
 
 function _currentSizeChoice() {
   const sel = document.getElementById('saleSize');
@@ -189,14 +272,19 @@ export function openSaleModal(fish, onSaved) {
   document.getElementById('saleQty').max   = fish.stock;
 
   // ── รีเซ็ตฟิลด์จัดส่งทุกครั้งที่เปิดป๊อปอัปใหม่ (ไม่ให้ค้างจากการขายครั้งก่อน) ──
+  _attachedGroupId = null;
   document.getElementById('saleShipToggle').checked = false;
   document.getElementById('saleShipFields').style.display = 'none';
   document.getElementById('saleCustomerName').value = '';
+  document.getElementById('saleCustomerSuggest').classList.remove('open');
+  document.getElementById('saleAttachedNote').style.display = 'none';
   document.getElementById('saleShipMethod').value = 'ems';
+  document.getElementById('saleShipMethod').disabled = false;
   document.getElementById('saleEmsCostGroup').style.display  = 'block';
   document.getElementById('saleLalaCostGroup').style.display = 'none';
   document.getElementById('saleLalaCost').value = '';
   document.getElementById('saleShipDate').value = new Date().toLocaleDateString('en-CA');
+  document.getElementById('saleShipDate').disabled = false;
 
   _updateSummary(); // แสดงยอดรวมเริ่มต้นทันที
 
@@ -207,6 +295,7 @@ export function openSaleModal(fish, onSaved) {
 export function closeSaleModal() {
   document.getElementById('saleModal')?.classList.remove('open');
   _currentFish = null;
+  _attachedGroupId = null;
 }
 
 // ── แจ้งเตือนแอดมินผ่าน Messenger ตอนสต็อกใกล้หมด/หมดแล้ว ──
@@ -309,13 +398,14 @@ export async function confirmSale() {
         .maybeSingle();
 
       const { error: shipErr } = await supabase.from('shipments').insert({
-        finance_id:      financeRow?.id || null,
-        fish_id:         fish.id,
-        fish_name:       `${fish.name_th || fish.name}${sizeLabel} x${qty} ตัว`,
-        customer_name:   customerName,
-        shipping_method: shipMethod,
-        shipping_cost:   shipCost,
-        shipping_date:   shipDate,
+        finance_id:        financeRow?.id || null,
+        fish_id:           fish.id,
+        fish_name:         `${fish.name_th || fish.name}${sizeLabel} x${qty} ตัว`,
+        customer_name:     customerName,
+        shipping_method:   shipMethod,
+        shipping_cost:     shipCost,
+        shipping_date:     shipDate,
+        shipment_group_id: _attachedGroupId || crypto.randomUUID(), // แนบเข้าพัสดุเดิม หรือสร้างพัสดุใหม่ (เผื่อมีคนมาแนบเข้าทีหลัง)
       });
 
       if (shipErr) {
