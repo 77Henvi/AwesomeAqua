@@ -2,134 +2,128 @@
 
 [![CI](https://github.com/77Henvi/AwesomeAqua/actions/workflows/ci.yml/badge.svg)](https://github.com/77Henvi/AwesomeAqua/actions/workflows/ci.yml)
 
-> Aquarium fish marketplace — simple, direct, real
+> ระบบซื้อขายปลาสวยงามแบบครบวงจร (Fullstack Fish Shop) เชื่อมต่อการสั่งซื้อโดยตรงผ่าน Facebook Messenger
 
 ---
 
-## Overview
+## ภาพรวมโครงการ (Overview)
 
-A Fullstack Fish Shop web platform for buying and selling aquarium fish,
-connected directly through **Messenger**.
+**AwesomeAqua** คือเว็บแอปพลิเคชันสำหรับร้านขายปลาสวยงาม ที่รวมทั้งหน้าร้านออนไลน์
+ระบบแชทบอทรับออเดอร์ผ่าน Messenger และระบบหลังบ้าน (Admin) สำหรับบริหารจัดการสต็อก
+การเงิน และการจัดส่งไว้ในที่เดียว ออกแบบให้ใช้งานง่าย รวดเร็ว และตรวจสอบย้อนหลังได้ทุกขั้นตอน
 
-| Layer | Tech |
+**Live Demo:** https://awesome-aqua.vercel.app/
+
+| ส่วนประกอบ | เทคโนโลยีที่ใช้ |
 |---|---|
-| Auth | Supabase |
-| DB | Supabase (Postgres + RLS) |
-| Storage | Supabase Storage |
-| Frontend | Vanilla JS (ES Modules) |
-| Admin | CRUD + Dashboard + Finance |
-| Chat/Order | Facebook Messenger (webhook) |
-| Hosting | Vercel |
-| CI | GitHub Actions |
+| ฐานข้อมูล (Database) | Supabase (PostgreSQL + Row Level Security) |
+| ระบบยืนยันตัวตน (Auth) | Supabase Auth |
+| จัดเก็บไฟล์ (Storage) | Supabase Storage |
+| ฝั่งหน้าบ้าน (Frontend) | Vanilla JavaScript (ES Modules) |
+| ฝั่งหลังบ้าน (Admin) | CRUD + Dashboard การเงิน + จัดการจัดส่ง |
+| ช่องทางสั่งซื้อ | Facebook Messenger (Webhook) |
+| โฮสติ้ง | Vercel |
+| การทดสอบอัตโนมัติ (CI) | GitHub Actions |
 
 ---
 
-## Features
+## คุณสมบัติหลัก (Features)
 
-**หน้าร้าน (Storefront)**
-* Browse available fish with search + filter chips
-* Wishlist 
-* Multi-language (TH/EN)
-* Contact/order seller via Messenger instantly (auto-fills fish reference)
-* Skeleton loading, accessible (keyboard navigable, aria-labeled)
+### 🛍️ หน้าร้าน (Storefront)
+- แสดงรายการปลาที่มีจำหน่าย พร้อมระบบค้นหาและตัวกรอง (search + filter chips)
+- บันทึกรายการโปรด (Wishlist)
+- รองรับ 2 ภาษา (ไทย/อังกฤษ)
+- ติดต่อสั่งซื้อผ่าน Messenger ได้ทันที พร้อมแนบข้อมูลปลาให้อัตโนมัติ
+- ออกแบบให้เข้าถึงง่าย (รองรับการใช้งานผ่านคีย์บอร์ด และ screen reader)
 
-**Reliability & Ops**
-* Error monitoring — แจ้งเตือนแอดมินอัตโนมัติผ่าน Discord/Line เมื่อ webhook หรือ API function พัง (`api/_shared/errorNotify.js`, ดู [`docs/ERROR_MONITORING_SETUP.md`](docs/ERROR_MONITORING_SETUP.md))
-* Rate limiting — จำกัดไม่เกิน 20 ข้อความ/นาทีต่อ PSID บน Messenger webhook กันสแปม/abuse (`api/_shared/rateLimiter.js`)
-* CI status badge บน README (ดูด้านบนสุดของไฟล์นี้)
+### 💬 แชทบอท Messenger
+- ระบบตะกร้าสินค้า สั่งซื้อได้หลายรายการต่อออเดอร์ ปรับจำนวนได้
+- ลบสินค้าออกจากตะกร้าเป็นรายชิ้น หรือล้างตะกร้าทั้งหมด
+- ลบข้อมูลส่วนตัวของลูกค้าได้ด้วยตนเอง (รองรับ Meta Data Deletion Callback)
+- แจ้งเตือนแอดมินอัตโนมัติเมื่อสต็อกใกล้หมด
+- ค้นหาชื่อปลาแบบ fuzzy search — พิมพ์ไม่ตรงเป๊ะหรือสะกดผิดเล็กน้อยก็ค้นเจอ
+- แจ้งเตือนลูกค้าอัตโนมัติเมื่อปลาที่หมดสต็อกกลับมามีของอีกครั้ง
+- ลูกค้าตรวจสอบประวัติคำสั่งซื้อของตนเองย้อนหลังได้
 
-**Messenger Bot**
-* ตะกร้าสินค้า — สั่งหลายปลาต่อออเดอร์ ปรับจำนวนได้
-* ลบทีละชิ้นจากตะกร้า (`"ลบ 1"`) หรือล้างตะกร้าทั้งหมด (`"ล้างตะกร้า"`)
-* ลบข้อมูลตัวเอง (`"ลบข้อมูลฉัน"`) + Meta Data Deletion Callback (`api/data-deletion.js`)
-* Auto-alert สต็อกใกล้หมด แจ้งเตือนแอดมินอัตโนมัติ
-* **ค้นหาปลาแบบ fuzzy** — พิมพ์ชื่อปลาแบบไม่ต้องตรงเป๊ะ (พิมพ์ผิด/สะกดใกล้เคียงก็เจอ) บอทจะโชว์ผลลัพธ์ให้เลือก
-* **แจ้งเตือนเมื่อของกลับมามีสต็อก** (`"แจ้งเตือน"`) — สมัครรับแจ้งเตือนตอนดูปลาที่หมดสต็อก แล้วบอทจะทักอัตโนมัติทันทีที่แอดมินเติมสต็อก (ต้องตั้งค่าตาราง `restock_alerts` ก่อน ดู [`docs/RESTOCK_ALERTS_SETUP.md`](docs/RESTOCK_ALERTS_SETUP.md))
-* **ประวัติคำสั่งซื้อของตัวเอง** (`"ประวัติ"`) — ลูกค้าดูออเดอร์ 5 รายการล่าสุดของตัวเองได้เอง
-
-**Admin**
-* CRUD ปลา + จัดการสต็อก พร้อมไซส์/ราคาคู่ (min–max)
-* ระบบ "เลิกขาย" (soft-delete) — ไม่ลบประวัติการเงินทิ้งไปด้วย
-* บันทึกการขาย พร้อมเลือกไซส์ที่ขายได้จริง
-* Dashboard การเงิน: KPI รายปี, กราฟรายรับ-รายจ่าย, ดูย้อนหลังรายเดือน
-* **Export CSV** — ดาวน์โหลดรายการรายรับ-รายจ่ายของเดือนที่เลือกเป็นไฟล์ CSV เปิดด้วย Excel ได้ตรงๆ (ปุ่ม "Export" หน้า Finance)
-* ตารางปลา/รายการการเงิน แบ่งหน้า (pagination) รองรับข้อมูลจำนวนมาก
-* หน้า Orders — ดูออเดอร์จากตะกร้า Messenger, filter สถานะ, อัปเดต pending → paid/cancelled
-* Multi-admin (role owner/staff) + Dashboard วิเคราะห์เชิงลึก (ปลาขายดี, แนะนำรีสต็อค)
-* **แจ้งเตือนสต็อกใกล้หมดผ่าน 2 ช่องทาง** — Messenger (หลัก) + Line Notify (สำรอง กันพลาดกรณี Messenger ส่งไม่ถึง) — ตั้งค่าเพิ่มได้ที่ [`docs/ERROR_MONITORING_SETUP.md`](docs/ERROR_MONITORING_SETUP.md)
-* Real-time sync กับ Supabase DB
-
----
-
-## Security
-
-* Row Level Security (RLS) เปิดใช้งานทุกตาราง — public อ่านได้เฉพาะข้อมูลปลาที่เผยแพร่ ส่วนเขียน/แก้/ลบจำกัดเฉพาะ authenticated admin
-* Messenger webhook ใช้ Supabase **Service Role Key** (ฝั่ง server เท่านั้น ไม่เคยส่งเข้า client)
-* View สาธารณะ (`fish_public`) ไม่เปิดเผยข้อมูลภายใน (ต้นทุน/ราคาขายพิเศษ)
-* Backup อัตโนมัติรายวันผ่าน GitHub Actions (`.github/workflows/backup.yml`, `scripts/backup/backup-db.mjs`) — เพราะ Supabase Free Plan ไม่มี backup ในตัว
+### 🛠️ ระบบหลังบ้าน (Admin)
+- จัดการข้อมูลปลาแบบครบวงจร (CRUD) พร้อมไซส์และช่วงราคา (ต่ำสุด–สูงสุด)
+- แก้ไขต้นทุนต่อตัวได้โดยตรง เพื่อความถูกต้องของข้อมูลต้นทุน–กำไร
+- ระบบ "เลิกขาย" (Soft Delete) — ปิดการขายโดยไม่ลบประวัติทางการเงินทิ้ง
+- **เพิ่มสต็อกพร้อมบันทึกรายจ่ายอัตโนมัติ** — เมื่อเพิ่มจำนวนสต็อกพร้อมต้นทุน ระบบจะสร้างรายการ
+  รายจ่ายในหน้า Finance ให้ทันที พร้อมระบุวันที่รับสินค้าย้อนหลังได้
+- **สถิติรายตัว (Fish Stats)** — ดูกราฟรายรับ/ต้นทุน/กำไรรายเดือนของปลาแต่ละตัว
+  คลิกที่จุดบนกราฟเพื่อดูรายละเอียดแยกตามไซส์ (จำนวนที่ขาย, กำไรต่อตัว, กำไรรวม)
+- **ระบบเช็คลิสต์การจัดส่ง (Shipping Checklist)**
+  - บันทึกข้อมูลจัดส่ง (ชื่อลูกค้า, วิธีจัดส่ง, วันที่จัดส่ง) ได้ทันทีตอนบันทึกการขาย
+  - รองรับการจัดส่งแบบ EMS (ต่างจังหวัด) และ Lalamove (ในกรุงเทพฯ)
+  - ค้นหาและแนบคำสั่งซื้อเข้ากับพัสดุเดิมของลูกค้าคนเดียวกันได้ ไม่ต้องกรอกข้อมูลซ้ำ
+  - แสดงผลเป็นเช็คลิสต์แยกตามสถานะ (รอจัดส่ง / จัดส่งแล้ว) พร้อมมุมมองปฏิทินรายเดือน
+- แดชบอร์ดการเงิน แสดง KPI รายปี กราฟรายรับ–รายจ่าย และดูข้อมูลย้อนหลังรายเดือน
+- ส่งออกข้อมูลรายรับ–รายจ่ายเป็นไฟล์ CSV เปิดใช้งานกับ Excel ได้ทันที
+- ระบบแบ่งหน้า (Pagination) รองรับข้อมูลจำนวนมากในตารางปลาและตารางการเงิน
+- จัดการคำสั่งซื้อจากตะกร้า Messenger พร้อมกรองสถานะและอัปเดตความคืบหน้า
+- รองรับผู้ดูแลระบบหลายระดับสิทธิ์ (Owner / Staff)
+- แจ้งเตือนสต็อกใกล้หมดผ่าน 2 ช่องทาง (Messenger เป็นหลัก, Line Notify เป็นช่องทางสำรอง)
+- ข้อมูลซิงค์กับฐานข้อมูล Supabase แบบเรียลไทม์
 
 ---
 
-## Testing & CI
+## ความปลอดภัย (Security)
+
+- เปิดใช้งาน Row Level Security (RLS) กับทุกตารางในฐานข้อมูล
+- Public เข้าถึงได้เฉพาะข้อมูลปลาที่เผยแพร่แล้วเท่านั้น การเขียน/แก้ไข/ลบข้อมูลจำกัดสิทธิ์
+  เฉพาะผู้ดูแลระบบที่ผ่านการยืนยันตัวตน
+- Messenger Webhook ใช้ Supabase Service Role Key ฝั่งเซิร์ฟเวอร์เท่านั้น ไม่มีการส่งกุญแจนี้
+  ไปยังฝั่ง client โดยเด็ดขาด
+- View สาธารณะ (`fish_public`) ไม่เปิดเผยข้อมูลภายใน เช่น ต้นทุนหรือราคาขายพิเศษ
+- ป้องกันการโจมตีแบบ Stored XSS ด้วยการเข้ารหัสอักขระ HTML (`escapeHTML`) ก่อนแสดงผลข้อมูล
+  ที่มาจากผู้ใช้งาน
+- สำรองข้อมูล (Backup) อัตโนมัติทุกวันผ่าน GitHub Actions เนื่องจาก Supabase Free Plan
+  ไม่มีระบบสำรองข้อมูลในตัว
+
+---
+
+## การทดสอบและ CI/CD (Testing & CI)
+
+รันชุดทดสอบอัตโนมัติทั้งหมดด้วยคำสั่ง:
 
 ```bash
 node --test tests/*.test.mjs
 ```
 
-ทุก push ขึ้น `main` จะรัน GitHub Actions อัตโนมัติ (`.github/workflows/ci.yml`):
-1. ตรวจ syntax ไฟล์ JS ทั้งหมด (`scripts/`, `api/`)
-2. รัน automated test ทั้งหมด:
-   - `tests/calc.test.mjs` — ฟังก์ชันคำนวณราคา/ไซส์/กราฟ (`scripts/shared/calc.js`)
-   - `tests/orders.test.mjs` — filter/group/format ของแท็บ Orders (`scripts/shared/orders.js`)
-   - `tests/orderHelpersSync.test.mjs` — กันไม่ให้ `scripts/shared/orders.js` (ฝั่ง admin browser) กับ `api/_shared/orderHelpers.js` (ฝั่ง server) พฤติกรรมเพี้ยนไปคนละทาง (ไฟล์ทั้งสองมีเนื้อหาซ้ำกันโดยตั้งใจ เพราะ `/api` บน Vercel ไม่ได้เสิร์ฟเป็น static file ให้เบราว์เซอร์ดึงได้)
-   - `tests/pagination.test.mjs` — ตัวแบ่งหน้าที่ใช้ร่วมกันในตารางปลา/รายการการเงิน (`scripts/shared/utils.js`)
-   - `tests/cart.test.mjs` — parse คำสั่งลบของในตะกร้า Messenger (`api/_shared/cart.js`)
-   - `tests/signedRequest.test.mjs` — ตรวจลายเซ็น Meta Data Deletion Callback (`api/_shared/signedRequest.js`)
-   - `tests/fishSearch.test.mjs` — fuzzy search หาปลาจากข้อความอิสระ (`api/_shared/fishSearch.js`)
-   - `tests/rateLimiter.test.mjs` — sliding-window rate limiter กันสแปม webhook (`api/_shared/rateLimiter.js`)
-   - `tests/csvExport.test.mjs` — สร้างไฟล์ CSV export หน้า Finance (`scripts/shared/utils.js`)
+ทุกครั้งที่มีการ push โค้ดขึ้น branch `main` ระบบ GitHub Actions จะทำงานอัตโนมัติ 2 ขั้นตอน:
+
+1. ตรวจสอบความถูกต้องของไวยากรณ์ (Syntax Check) ของไฟล์ JavaScript ทั้งหมดในโฟลเดอร์
+   `scripts/` และ `api/`
+2. รันชุดทดสอบอัตโนมัติ (Unit Tests) ครอบคลุมการทำงานหลักของระบบ เช่น การคำนวณราคา/สถิติปลา,
+   การจัดการออเดอร์และการจัดส่ง, ตะกร้าสินค้า Messenger, ระบบค้นหาแบบ fuzzy search,
+   การจำกัดอัตราการส่งข้อความ (rate limiting), การส่งออกไฟล์ CSV และการป้องกัน XSS
 
 ---
 
-## Staging
+## เอกสารประกอบเพิ่มเติม (Documentation)
 
-Branch `develop` + Vercel preview deployment ใช้ทดสอบก่อนขึ้น production
-รายละเอียดการแยก Supabase project จริงจังสำหรับ staging (ไม่ปนกับ DB จริง) อยู่ที่
-[`docs/STAGING_SETUP.md`](docs/STAGING_SETUP.md)
-
-## Messenger App Review
-
-ตอนนี้บอทเปิดให้คุยได้แค่ tester/admin ของแอป — ขั้นตอนเปิดให้ลูกค้าทั่วไปคุยได้จริง
-(Business Verification, Live Mode, Privacy Policy ฯลฯ) สรุปไว้ที่
-[`docs/MESSENGER_APP_REVIEW.md`](docs/MESSENGER_APP_REVIEW.md)
+| เอกสาร | รายละเอียด |
+|---|---|
+| [`docs/STAGING_SETUP.md`](docs/STAGING_SETUP.md) | ตั้งค่าสภาพแวดล้อมทดสอบ (Staging) แยกจากฐานข้อมูลจริง |
+| [`docs/ERROR_MONITORING_SETUP.md`](docs/ERROR_MONITORING_SETUP.md) | ตั้งค่าระบบแจ้งเตือนข้อผิดพลาดผ่าน Discord/Line |
+| [`docs/RESTOCK_ALERTS_SETUP.md`](docs/RESTOCK_ALERTS_SETUP.md) | ตั้งค่าระบบแจ้งเตือนลูกค้าเมื่อสินค้ากลับมามีสต็อก |
+| [`docs/SHIPPING_CHECKLIST_SETUP.md`](docs/SHIPPING_CHECKLIST_SETUP.md) | ตั้งค่าระบบเช็คลิสต์การจัดส่ง (ต้องรัน SQL ก่อนใช้งาน) |
+| [`docs/MESSENGER_APP_REVIEW.md`](docs/MESSENGER_APP_REVIEW.md) | ขั้นตอนขอเปิดใช้งานแอป Messenger สำหรับผู้ใช้งานทั่วไป |
 
 ---
 
-## Live
+## วัตถุประสงค์ของโครงการ (Purpose)
 
-https://awesome-aqua.vercel.app/
+โครงการนี้ถูกออกแบบภายใต้แนวคิดความเรียบง่าย:
 
----
-
-## Purpose
-
-Built to keep things simple:
-
-* No unnecessary features
-* No complicated checkout
-* Just connect and trade
+- ไม่เพิ่มฟีเจอร์ที่ไม่จำเป็น
+- ไม่ทำขั้นตอนการชำระเงินให้ซับซ้อนเกินไป
+- มุ่งเน้นการเชื่อมต่อระหว่างผู้ซื้อและผู้ขายโดยตรง
 
 ---
 
-## Philosophy
+## ผู้พัฒนา (Author)
 
-> Simple sells
-> Fast wins
-> Direct works
-
----
-
-## Author
-
-Rapeepat Nitakorn
+**Rapeepat Nitakorn**
 GitHub: [77Henvi](https://github.com/77Henvi)
