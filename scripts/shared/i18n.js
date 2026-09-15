@@ -32,6 +32,9 @@ export const translations = {
     contactTag:       'ติดต่อเรา',
     contactTitle:     'ช่องทางติดต่อ',
     socialPhoneLabel: 'โทรศัพท์',
+    bentoTag:         'คอลเลกชันระดับมาสเตอร์พีซ',
+    bentoTitle:       'Curated Masterpieces',
+    bentoSub:         'คัดสรรสายพันธุ์โดดเด่นประจำสัปดาห์ สมบูรณ์แบบทั้งสรีระและสีสัน',
   },
   en: {
     loaderText:       'Getting the tank ready...',
@@ -64,6 +67,9 @@ export const translations = {
     contactTag:       'Contact',
     contactTitle:     'Get In Touch',
     socialPhoneLabel: 'Phone',
+    bentoTag:         'Masterpiece Collection',
+    bentoTitle:       'Curated Masterpieces',
+    bentoSub:         'Hand-selected premier breeds of the week, flawless in form and coloration.',
   }
 };
 

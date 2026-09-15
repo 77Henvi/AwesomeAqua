@@ -83,6 +83,17 @@ setTimeout(() => {
 
 window.toggleLanguage = toggleLanguage;
 
+// ── Card Spotlight Mouse Tracking ──
+document.addEventListener('pointermove', (e) => {
+  const card = e.target.closest('.fish-card, .bento-card');
+  if (!card) return;
+  const rect = card.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  card.style.setProperty('--mouse-x', `${x}px`);
+  card.style.setProperty('--mouse-y', `${y}px`);
+}, { passive: true });
+
 // ── Init ──
 initLanguage();
 injectFishBackgrounds();

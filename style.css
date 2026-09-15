@@ -232,13 +232,24 @@
     display: flex; flex-direction: column; align-items: center;
   }
   .hero-tag {
-    display: inline-flex; align-items: center; gap: 0.4rem;
+    display: inline-flex; align-items: center; gap: 0.5rem;
     background: rgba(44,172,173,0.18);
-    backdrop-filter: blur(6px);
-    color: var(--ocean-sky); border: 1px solid rgba(117,226,224,0.35);
-    padding: 0.35rem 1rem; border-radius: 100px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: var(--ocean-sky); border: 1px solid rgba(117,226,224,0.38);
+    padding: 0.4rem 1.15rem; border-radius: 100px;
     font-size: 0.82rem; font-weight: 500;
     margin-bottom: 1.5rem; letter-spacing: 0.5px;
+  }
+  .hero-tag-pulse {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--ocean-sky);
+    box-shadow: 0 0 10px var(--ocean-sky);
+    animation: tagPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  @keyframes tagPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.35; transform: scale(1.3); }
   }
   .hero h1 {
     font-family: var(--font-display);
@@ -252,24 +263,64 @@
     font-size: clamp(3.2rem, 7vw, 5.6rem);
     letter-spacing: -0.01em;
   }
-  .hero h1 span { color: var(--ocean-sky); }
+  .hero h1 span {
+    background: linear-gradient(135deg, #ffffff 10%, var(--ocean-sky) 60%, var(--ocean-teal) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
   .hero p {
-    color: rgba(255,255,255,0.82);
+    color: rgba(255,255,255,0.85);
     font-size: 1.05rem; line-height: 1.7;
     margin-bottom: 2rem;
   }
   .hero-content--center p { max-width: 480px; }
   .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; }
   .hero-content--center .hero-btns { justify-content: center; }
-  /* ปุ่ม primary เฉพาะใน hero ให้ใช้โทน ocean-teal (เด่นบนพื้นมืดกว่า royal-blue เดิม)
-     ไม่กระทบ .btn-primary ส่วนอื่นของเว็บที่ยังใช้ royal-blue ตามปกติ */
+  
+  /* ปุ่ม primary เฉพาะใน hero ให้ใช้โทน ocean-teal พร้อมแสง Shimmer */
   .hero .btn-primary {
     background: var(--ocean-teal); color: #04222b;
     box-shadow: 0 8px 24px rgba(44,172,173,0.35);
-    padding: 0.85rem 2rem; border-radius: var(--radius-pill);
-    font-weight: 600;
+    padding: 0.85rem 2.2rem; border-radius: var(--radius-pill);
+    font-weight: 600; position: relative; overflow: hidden;
+    transition: all 0.3s ease;
   }
-  .hero .btn-primary:hover { background: var(--ocean-sky); }
+  .hero .btn-primary:hover {
+    background: var(--ocean-sky);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(117,226,224,0.45);
+  }
+  .hero .hero-cta-btn::after {
+    content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: linear-gradient(60deg, transparent 35%, rgba(255,255,255,0.45) 50%, transparent 65%);
+    transform: rotate(30deg) translateX(-100%);
+    transition: transform 0.65s ease;
+  }
+  .hero .hero-cta-btn:hover::after {
+    transform: rotate(30deg) translateX(100%);
+  }
+
+  /* ปุ่ม secondary สไตล์กระจกหรูหรา */
+  .btn-glass-secondary {
+    display: inline-flex; align-items: center; gap: 0.55rem;
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 0.85rem 1.85rem;
+    border-radius: var(--radius-pill);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: var(--font-body);
+  }
+  .btn-glass-secondary:hover {
+    background: rgba(255, 255, 255, 0.22);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  }
   
   /* dots ย้ายมาเป็น absolute มุมล่างซ้ายของ hero (แยกจาก hero-content ที่ตอนนี้จัดกลางแล้ว) */
   .slide-dots {
@@ -293,15 +344,15 @@
     padding: 0 5%;
   }
   .stats-glass {
-    background: rgba(255,255,255,0.10);
-    border: 1px solid rgba(255,255,255,0.22);
-    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-    border-radius: var(--radius-lg);
-    box-shadow: 0 12px 40px rgba(2,30,40,0.35);
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.25);
+    backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(2,48,70,0.35), inset 0 1px 1px rgba(255,255,255,0.35);
     display: grid; grid-template-columns: repeat(3, 1fr);
     text-align: center;
-    padding: 1.5rem 2rem;
-    max-width: 720px; width: 100%;
+    padding: 1.6rem 2.2rem;
+    max-width: 740px; width: 100%;
     color: white;
   }
   .stat {
@@ -311,10 +362,11 @@
   .stat:last-child { border-right: none; }
   .stat-num {
     font-family: var(--font-body); 
-    font-size: 1.75rem; font-weight: 700; display: block;
+    font-size: 1.85rem; font-weight: 700; display: block;
     color: var(--ocean-sky);
+    text-shadow: 0 0 16px rgba(117,226,224,0.4);
   }
-  .stat-label { font-size: 0.78rem; opacity: 0.75; margin-top: 0.2rem; }
+  .stat-label { font-size: 0.8rem; opacity: 0.85; margin-top: 0.25rem; letter-spacing: 0.2px; }
   
   /* พื้นที่เว้นให้การ์ดกระจกที่ล้ำออกมาครึ่งหนึ่ง ไม่ให้ไปทับเนื้อหา section ถัดไป */
   .stats-float-spacer { height: 70px; }
@@ -349,33 +401,271 @@
      (ไม่แตะ .section-tag ตัวหลักเพราะใช้ร่วมหลาย section อื่นที่ยังไม่ redesign) */
   #fish .section-tag { color: var(--ocean-deep); }
   #fish .section-tag::before { background: var(--ocean-teal); }
+  .section-tag--ocean { color: var(--ocean-deep) !important; }
+  .section-tag--ocean::before { background: var(--ocean-teal) !important; }
   .section-header {
     display: flex; justify-content: space-between;
     align-items: flex-end; flex-wrap: wrap; gap: 1rem;
   }
   
   
+  /* ── BENTO SPOTLIGHT SECTION ── */
+  .bento-section {
+    padding: 3.5rem 5% 2.5rem;
+    background: linear-gradient(180deg, #ffffff 0%, #f4faf9 55%, #ffffff 100%);
+    position: relative;
+  }
+  .bento-header-badge {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.45rem 1rem;
+    background: var(--ocean-mist);
+    border: 1px solid rgba(44, 172, 173, 0.35);
+    border-radius: var(--radius-pill);
+    font-size: 0.8rem; font-weight: 600;
+    color: var(--ocean-deep);
+  }
+  .live-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 8px #10b981;
+    animation: livePulse 2s infinite;
+  }
+  @keyframes livePulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(1.35); }
+  }
+
+  .bento-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 1.5rem;
+    max-width: 1200px;
+    margin: 2rem auto 0;
+  }
+
+  .bento-card {
+    position: relative; border-radius: 24px;
+    overflow: hidden; transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Bento Item 1: Masterpiece */
+  .bento-card--masterpiece {
+    grid-row: 1 / span 2;
+    background: linear-gradient(160deg, #071927 0%, var(--ocean-deep) 100%);
+    color: white;
+    border: 1px solid rgba(117, 226, 224, 0.28);
+    box-shadow: 0 20px 45px rgba(2, 77, 96, 0.2);
+    display: flex; flex-direction: column; justify-content: flex-end;
+    min-height: 480px; cursor: pointer;
+  }
+  .bento-card--masterpiece:hover {
+    transform: translateY(-5px);
+    border-color: var(--ocean-sky);
+    box-shadow: 0 28px 60px rgba(2, 77, 96, 0.32);
+  }
+  .bento-visual {
+    position: absolute; inset: 0; z-index: 0;
+  }
+  .bento-img {
+    width: 100%; height: 100%; object-fit: cover; object-position: center;
+    transition: transform 0.6s ease;
+  }
+  .bento-card--masterpiece:hover .bento-img {
+    transform: scale(1.05);
+  }
+  .bento-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(2, 30, 40, 0.95) 0%, rgba(2, 77, 96, 0.6) 45%, rgba(0, 0, 0, 0.25) 100%);
+  }
+  .bento-ribbon {
+    position: absolute; top: 1.25rem; left: 1.25rem; z-index: 2;
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    background: rgba(2, 77, 96, 0.85);
+    border: 1px solid rgba(117, 226, 224, 0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: var(--ocean-sky);
+    padding: 0.4rem 0.95rem; border-radius: var(--radius-pill);
+    font-size: 0.78rem; font-weight: 600; letter-spacing: 0.3px;
+  }
+  .bento-info {
+    position: relative; z-index: 2; padding: 2.25rem;
+  }
+  .bento-tag-row {
+    display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem;
+  }
+  .bento-chip {
+    font-size: 0.75rem; font-weight: 500;
+    padding: 0.25rem 0.75rem; border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(6px);
+    color: rgba(255, 255, 255, 0.95);
+  }
+  .bento-chip--glow {
+    background: rgba(44, 172, 173, 0.28);
+    color: var(--ocean-mist);
+    border: 1px solid rgba(117, 226, 224, 0.35);
+  }
+  .bento-fish-title {
+    font-family: var(--font-display);
+    font-size: 1.75rem; font-weight: 700;
+    color: #ffffff; margin-bottom: 0.5rem;
+    letter-spacing: -0.01em;
+  }
+  .bento-fish-desc {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.88rem; line-height: 1.6;
+    margin-bottom: 1.5rem; max-width: 520px;
+  }
+  .bento-action-row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 1rem; flex-wrap: wrap;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  .bento-price-block {
+    display: flex; flex-direction: column;
+  }
+  .bento-price-label {
+    font-size: 0.72rem; color: rgba(255, 255, 255, 0.65);
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .bento-price-val {
+    font-family: var(--font-display);
+    font-size: 1.5rem; font-weight: 700;
+    color: var(--ocean-sky);
+  }
+  .bento-btn-order {
+    padding: 0.75rem 1.6rem;
+    border-radius: var(--radius-pill);
+  }
+
+  /* Bento Item 2: Craft Spec */
+  .bento-card--spec {
+    background: var(--white);
+    border: 1px solid var(--border);
+    padding: 2rem; display: flex; flex-direction: column; justify-content: space-between;
+    box-shadow: 0 10px 30px rgba(2, 77, 96, 0.05);
+  }
+  .bento-card--spec:hover {
+    transform: translateY(-4px);
+    border-color: var(--ocean-teal);
+    box-shadow: 0 16px 36px rgba(44, 172, 173, 0.12);
+  }
+  .bento-card-top {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  .bento-icon-box {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: var(--ocean-mist); color: var(--ocean-deep);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
+  }
+  .bento-mini-label {
+    font-size: 0.75rem; font-weight: 600;
+    color: var(--ocean-teal); text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .bento-card--spec h4 {
+    font-family: var(--font-display);
+    font-size: 1.25rem; font-weight: 700;
+    color: var(--ocean-deep); margin-bottom: 0.5rem;
+  }
+  .bento-card--spec p {
+    font-size: 0.86rem; color: var(--gray); line-height: 1.6;
+    margin-bottom: 1.25rem;
+  }
+  .bento-metrics {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;
+    padding-top: 1rem; border-top: 1px solid var(--border);
+  }
+  .bento-metric-item {
+    display: flex; flex-direction: column;
+  }
+  .metric-num {
+    font-size: 1.15rem; font-weight: 700; color: var(--ocean-deep);
+  }
+  .metric-lbl {
+    font-size: 0.72rem; color: var(--gray); margin-top: 2px;
+  }
+
+  /* Bento Item 3: Collector Explore */
+  .bento-card--explore {
+    background: linear-gradient(135deg, var(--ocean-mist) 0%, #e2f5f2 100%);
+    border: 1px solid rgba(44, 172, 173, 0.3);
+    padding: 2rem; display: flex; flex-direction: column; justify-content: space-between;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(2, 77, 96, 0.05);
+  }
+  .bento-card--explore:hover {
+    transform: translateY(-4px);
+    border-color: var(--ocean-teal);
+    box-shadow: 0 16px 36px rgba(44, 172, 173, 0.16);
+  }
+  .bento-card--explore h4 {
+    font-family: var(--font-display);
+    font-size: 1.25rem; font-weight: 700;
+    color: var(--ocean-deep); margin-bottom: 0.5rem;
+  }
+  .bento-card--explore p {
+    font-size: 0.86rem; color: #2e5963; line-height: 1.6;
+    margin-bottom: 1.25rem;
+  }
+  .bento-explore-cta {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-top: 0.75rem;
+    font-size: 0.88rem; font-weight: 600; color: var(--ocean-deep);
+  }
+  .explore-circle {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--ocean-deep); color: white;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.25s ease, background 0.25s ease;
+  }
+  .bento-card--explore:hover .explore-circle {
+    transform: translateX(4px) scale(1.06);
+    background: var(--ocean-teal);
+  }
+  
+  
   /* ── FISH GRID ── */
   .fish-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 1.35rem; padding: 1rem 0;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 1.4rem; padding: 1.25rem 0;
   }
-  /* อัปเกรด: เพิ่ม Hover Interactive ให้นุ่มนวลขึ้น + เงาโทน ocean แทนเงาดำเรียบๆ เดิม */
+  /* การ์ดปลาเวอร์ชัน Luxury Acrylic Frame พร้อม Spotlight Tracker */
   .fish-card {
-    border: 1px solid var(--border);
+    position: relative;
+    border: 1px solid rgba(229, 231, 235, 0.9);
     border-radius: var(--radius-lg); overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease, border-color 0.3s ease;
     background: var(--white); cursor: pointer;
+    display: flex; flex-direction: column;
   }
   .fish-card:hover {
-    box-shadow: 0 16px 32px rgba(2,77,96,0.14);
-    transform: translateY(-5px);
+    box-shadow: 0 18px 36px rgba(2, 77, 96, 0.13), 0 0 0 1px rgba(44, 172, 173, 0.3);
+    transform: translateY(-6px);
     border-color: var(--ocean-teal);
   }
   .fish-card:focus-visible {
     outline: 3px solid var(--ocean-teal);
     outline-offset: 2px;
+  }
+  /* Spotlight reflection overlay */
+  .card-spotlight {
+    position: absolute; inset: 0; pointer-events: none; z-index: 3;
+    background: radial-gradient(400px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(117, 226, 224, 0.14), transparent 60%);
+    opacity: 0; transition: opacity 0.3s ease;
+  }
+  .fish-card:hover .card-spotlight {
+    opacity: 1;
+  }
+  .card-img-gradient {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 28px;
+    background: linear-gradient(to top, rgba(255,255,255,0.6) 0%, transparent 100%);
+    pointer-events: none; z-index: 1;
   }
   .fish-img {
     position: relative; overflow: hidden;
@@ -387,19 +677,43 @@
   .fish-img img {
     width: 100%; height: 100%;
     object-fit: cover; object-position: center;
-    transition: transform 0.4s ease;
+    transition: transform 0.45s ease;
   }
   .fish-card:hover .fish-img img { transform: scale(1.06); }
-  .fish-info { padding: 1.25rem; }
+  .fish-info { padding: 1.25rem; display: flex; flex-direction: column; flex: 1; }
   .fish-name {
     font-family: var(--font-display);
-    font-size: 1.1rem; font-weight: 700; margin-bottom: 0.25rem;
+    font-size: 1.15rem; font-weight: 700; margin-bottom: 0.25rem;
+    color: var(--black);
+    transition: color 0.2s;
   }
-  .fish-species { font-size: 0.8rem; color: var(--gray); font-style: italic; margin-bottom: 0.75rem; }
-  .fish-meta { display: flex; justify-content: space-between; align-items: center; }
-  .fish-price { font-size: 1.15rem; font-weight: 700; color: var(--ocean-deep); }
-  .fish-stock { font-size: 0.78rem; color: var(--gray); }
-  .fish-stock.low { color: #dc2626; }
+  .fish-card:hover .fish-name { color: var(--ocean-deep); }
+  .fish-species { font-size: 0.8rem; color: var(--gray); font-style: italic; margin-bottom: 0.85rem; }
+  .fish-meta {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: auto; margin-bottom: 0.95rem;
+  }
+  .fish-price {
+    font-family: var(--font-display);
+    font-size: 1.2rem; font-weight: 700; color: var(--ocean-deep);
+  }
+  .fish-stock {
+    font-size: 0.78rem; font-weight: 500; color: var(--gray);
+    display: inline-flex; align-items: center;
+  }
+  .stock-dot {
+    display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    margin-right: 5px; flex-shrink: 0;
+  }
+  .stock-dot--ok {
+    background: #10b981;
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+  }
+  .stock-dot--low {
+    background: #f59e0b;
+    box-shadow: 0 0 6px rgba(245, 158, 11, 0.6);
+  }
+  .fish-stock.low { color: #d97706; }
   
   /* อัปเกรด: ซ่อน Fish Tags บนการ์ดหลักเพื่อลดความรก (ให้ไปโชว์ใน Modal แทน) */
   .fish-card .fish-tags { display: none !important; }
@@ -1368,6 +1682,19 @@
   
     .fish-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
   
+    .bento-grid {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto;
+      gap: 1.25rem;
+    }
+    .bento-card--masterpiece {
+      grid-row: auto;
+      min-height: 420px;
+    }
+    .bento-info { padding: 1.5rem; }
+    .bento-fish-title { font-size: 1.4rem; }
+    .bento-card--spec, .bento-card--explore { padding: 1.5rem; }
+  
     .about-hero { flex-direction: column; align-items: center; text-align: center; }
     .about-hero-content { max-width: 100%; }
     .video-showcase { width: 100%; }
@@ -1387,6 +1714,11 @@
     .hero-content--center h1 { font-size: 2.2rem; }
     .stats-glass { padding: 1rem; }
     .stat-num { font-size: 1.5rem; }
+    .bento-card--masterpiece { min-height: 380px; }
+    .bento-info { padding: 1.25rem; }
+    .bento-fish-title { font-size: 1.25rem; }
+    .bento-action-row { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+    .bento-btn-order { width: 100%; justify-content: center; }
     .fish-grid { grid-template-columns: 1fr 1fr; padding: 0.5rem 0; }
     .section-title { font-size: 1.5rem; }
     .fish-video-wrap { width: 160px; }

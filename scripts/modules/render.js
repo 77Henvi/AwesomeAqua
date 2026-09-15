@@ -59,6 +59,7 @@ function _availableCard(f) {
     <div class="fish-card ${outOfStock ? 'fish-card--out' : ''}" role="button" tabindex="0" aria-label="ดูรายละเอียด ${displayName}"
          onclick="openFishDetail('${f.id}')"
          onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openFishDetail('${f.id}')}">
+      <div class="card-spotlight"></div>
       <div class="fish-card-img-wrap">
           <button class="wishlist-btn ${liked ? 'active' : ''}" onclick="onWishToggle('${f.id}', this, event)" aria-label="${liked ? 'นำออกจากรายการโปรด' : 'เพิ่มในรายการโปรด'}" aria-pressed="${liked}">
             ${heartIcon}
@@ -67,25 +68,26 @@ function _availableCard(f) {
           ? `<img src="${f.image}" alt="${displayName}" loading="lazy" onerror="this.parentElement.innerHTML='<span>${f.emoji || fallbackIconEsc}</span>'">`
           : `<span>${f.emoji || fallbackIcon}</span>`
         }
+        <div class="card-img-gradient"></div>
         ${outOfStock ? `<div class="out-badge">${txtOut}</div>` : ''}
       </div>
       <div class="fish-info">
         <div class="fish-name">${displayName}</div>
-        <div class="fish-species" style="margin-bottom: 1rem;">${f.species}</div>
+        <div class="fish-species">${f.species || '—'}</div>
         
         <div class="fish-meta">
           <div class="fish-price ${outOfStock ? 'fish-price--dim' : ''}">
             ฿${f.priceMin.toLocaleString()}${f.priceMax ? ' – ' + f.priceMax.toLocaleString() : ''}
           </div>
           <div class="fish-stock ${f.stock > 0 && f.stock <= 5 ? 'low' : ''}">
-            ${f.stock === 0 ? txtEmpty : f.stock <= 5 ? `<i class="ph ph-warning"></i> ${f.stock} ${txtUnit}` : `<i class="ph ph-check-circle"></i> ${f.stock} ${txtUnit}`}
+            ${f.stock === 0 ? txtEmpty : f.stock <= 5 ? `<span class="stock-dot stock-dot--low"></span> ${f.stock} ${txtUnit}` : `<span class="stock-dot stock-dot--ok"></span> ${f.stock} ${txtUnit}`}
           </div>
         </div>
         
         ${f.stock > 0
           ? `<button class="btn-messenger" style="width:100%;justify-content:center"
                onclick="event.stopPropagation(); openMessenger('${f.id}')">
-               ${MESSENGER_ICON(16)} ${txtOrder}
+               ${MESSENGER_ICON(16)} <span>${txtOrder}</span>
              </button>`
           : `<button class="btn" style="width:100%;background:#f3f4f6;color:#9ca3af;cursor:not-allowed" disabled>${txtOut}</button>`
         }
@@ -188,6 +190,32 @@ export function renderFishGrid() {
              grid.innerHTML = storeEmpty('ph ph-magnifying-glass-minus', 'ไม่พบผลลัพธ์ที่ค้นหา');
           }
       }
+  }
+
+  // Update Bento Spotlight if present
+  const featured = available.find(f => f.stock > 0 && f.image) || available[0];
+  if (featured) {
+    const lang = localStorage.getItem('aqua-lang') || 'th';
+    const isEn = lang === 'en';
+    const bentoName = document.getElementById('bentoFeaturedName');
+    const bentoPrice = document.getElementById('bentoFeaturedPrice');
+    const bentoImg = document.getElementById('bentoFeaturedImg');
+    const bentoCard = document.getElementById('bentoFeaturedCard');
+    if (bentoName) bentoName.textContent = isEn && featured.name_en ? featured.name_en : featured.name_th;
+    if (bentoPrice) bentoPrice.textContent = `฿${featured.priceMin.toLocaleString()}${featured.priceMax ? ' – ฿' + featured.priceMax.toLocaleString() : ''}`;
+    if (bentoImg && featured.image) bentoImg.src = featured.image;
+    if (bentoCard) {
+      bentoCard.onclick = () => {
+        if (typeof window.openFishDetail === 'function') window.openFishDetail(featured.id);
+      };
+      const bentoBtn = bentoCard.querySelector('.bento-btn-order');
+      if (bentoBtn) {
+        bentoBtn.onclick = (e) => {
+          e.stopPropagation();
+          if (typeof window.openMessenger === 'function') window.openMessenger(featured.id);
+        };
+      }
+    }
   }
 
   // Render Coming Soon
