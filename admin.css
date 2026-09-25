@@ -150,41 +150,6 @@ body.logged-in { background: #eceef3; }
   color: #0e9384;
 }
 
-/* Header Nav Pills */
-.admin-header-nav {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: #f8fafc;
-  padding: 4px;
-  border-radius: 14px;
-  border: 1px solid #e2e8f0;
-  overflow-x: auto;
-}
-.admin-nav-tab {
-  padding: 7px 18px;
-  border-radius: 10px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #64748b;
-  cursor: pointer;
-  border: none;
-  background: transparent;
-  font-family: var(--font-body);
-  transition: all 0.16s ease;
-  white-space: nowrap;
-}
-.admin-nav-tab:hover {
-  color: #0f172a;
-  background: #edf2f7;
-}
-.admin-nav-tab.active {
-  background: #024D60;
-  color: #ffffff;
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(2, 77, 96, 0.22);
-}
-
 /* Header Right Actions */
 .admin-header-right {
   display: flex;
@@ -824,11 +789,31 @@ body.logged-in { background: #eceef3; }
   }
 }
 @media (max-width: 900px) {
-  .admin-dock {
-    display: none;
+  .admin-app-layout {
+    flex-direction: column;
+    gap: 16px;
   }
-  .admin-header-nav {
+  .admin-dock {
+    width: 100%;
+    min-height: auto;
+    flex-direction: row;
+    justify-content: flex-start;
     overflow-x: auto;
+    padding: 8px 12px;
+    position: sticky;
+    top: 10px;
+    z-index: 50;
+    gap: 8px;
+    border-radius: 16px;
+  }
+  .dock-group {
+    flex-direction: row;
+    gap: 8px;
+    width: auto;
+  }
+  .dock-group--bottom {
+    margin-top: 0;
+    margin-left: auto;
   }
   .quixotic-bento-grid {
     grid-template-columns: 1fr;
