@@ -26,84 +26,304 @@
 </div>
 
 <div class="admin-dashboard" id="adminDashboard">
+  <div class="admin-shell">
 
-  <div class="admin-topbar">
-    <div class="admin-topbar-logo">Awesome <span>Aqua</span>
-      <span class="admin-topbar-sub">Admin</span>
-    </div>
-    <div class="admin-nav-tabs">
-      <button class="admin-nav-tab active" id="nav-home"    onclick="switchTab('home')"><i class="ph ph-house"></i> หน้าหลัก</button>
-      <button class="admin-nav-tab"        id="nav-fish"    onclick="switchTab('fish')"><i class="ph ph-fish-simple"></i> จัดการปลา</button>
-      <button class="admin-nav-tab"        id="nav-finance" onclick="switchTab('finance')"><i class="ph ph-wallet"></i> การเงิน</button>
-      <button class="admin-nav-tab"        id="nav-stats"   onclick="switchTab('stats')"><i class="ph ph-chart-bar"></i> สถิติ</button>
-      <button class="admin-nav-tab"        id="nav-ads"     onclick="switchTab('ads')"><i class="ph ph-megaphone"></i> โฆษณา</button>
-      <button class="admin-nav-tab"        id="nav-orders"  onclick="switchTab('orders')"><i class="ph ph-receipt"></i> ออเดอร์</button>
-      <button class="admin-nav-tab"        id="nav-shipping" onclick="switchTab('shipping')"><i class="ph ph-truck"></i> จัดส่ง</button>
-      <button class="admin-nav-tab"        id="nav-customers" onclick="switchTab('customers')"><i class="ph ph-users-three"></i> ลูกค้า</button>
-      <button class="admin-nav-tab"        id="nav-admins"  onclick="switchTab('admins')"><i class="ph ph-users"></i> แอดมิน</button>
-    </div>
-    <div class="admin-topbar-right">
-      <a href="index.html" target="_blank">← ดูหน้าลูกค้า</a>
-      <button class="admin-logout-btn" onclick="adminLogout()">ออกจากระบบ</button>
-    </div>
-  </div>
-
-  <div class="admin-body">
-
-    <div class="admin-page active" id="page-home">
-      <div class="date-banner">
-        <div>
-          <div class="date-banner-title">ภาพรวมวันนี้</div>
-          <div class="date-banner-text">วันนี้ <strong id="headerDate">—</strong></div>
-        </div>
-        <div class="date-banner-badge"><i class="ph ph-fish-simple"></i> AwesomeAqua Admin</div>
-      </div>
-      <div class="admin-stats" id="adminStats"></div>
-
-      <div class="admin-card">
-        <div class="dash-chart-card-head">
-          <div class="admin-panel-title" style="margin-bottom:0;"><i class="ph ph-chart-line-up"></i> แนวโน้มรายรับ-รายจ่าย · <span id="dashFinYearLabel"></span></div>
-          <div style="display:flex; align-items:center; gap:1rem;">
-            <span class="stats-chart-legend" id="dash-fin-legend"></span>
-            <button class="dash-chart-link" onclick="switchTab('stats')">ดูสถิติทั้งหมด <i class="ph ph-arrow-right"></i></button>
-          </div>
-        </div>
-        <div id="dash-fin-chart"></div>
-      </div>
-
-      <div class="dash-two-col">
-        <div class="admin-card dash-card--attention">
-          <div class="admin-panel-title">
-            <i class="ph ph-warning-circle" style="color: var(--adm-warning, #b5760a);"></i> ต้องดำเนินการ
-          </div>
-          <div id="dash-lowstock">
-            <div class="admin-empty-state"><div class="admin-empty-icon">🎉</div><div class="admin-empty-text">สต็อกครบทุกรายการ</div></div>
-          </div>
-        </div>
-        <div class="admin-card">
-          <div class="admin-panel-title"><i class="ph ph-clock-counter-clockwise"></i> เพิ่มล่าสุด</div>
-          <div id="dash-recent">
-            <div class="admin-empty-state"><div class="admin-empty-icon">🐟</div><div class="admin-empty-text">ยังไม่มีปลา</div></div>
-          </div>
+    <!-- Top Header Navigation Bar (Quixotic Master Header) -->
+    <header class="admin-header">
+      <div class="admin-header-left">
+        <div class="admin-brand">
+          <div class="brand-badge"><i class="ph-bold ph-fish"></i></div>
+          <span class="brand-text">Awesome<span>Aqua</span></span>
         </div>
       </div>
 
-      <div class="admin-card">
-        <div class="admin-panel-title"><i class="ph ph-receipt"></i> บันทึกรายรับ-รายจ่ายด่วน</div>
-        <div class="quick-fin-row">
-          <input type="text" id="finItemName" class="form-input" placeholder="เช่น ค่าอาหารปลา, ขายปลาเทวดา...">
-          <input type="number" id="finItemAmount" class="form-input quick-fin-amount" placeholder="จำนวนเงิน">
+      <nav class="admin-header-nav">
+        <button class="admin-nav-tab active" id="nav-home"    onclick="switchTab('home')">Dashboard</button>
+        <button class="admin-nav-tab"        id="nav-fish"    onclick="switchTab('fish')">ปลา</button>
+        <button class="admin-nav-tab"        id="nav-finance" onclick="switchTab('finance')">การเงิน</button>
+        <button class="admin-nav-tab"        id="nav-stats"   onclick="switchTab('stats')">สถิติ</button>
+        <button class="admin-nav-tab"        id="nav-orders"  onclick="switchTab('orders')">ออเดอร์</button>
+        <button class="admin-nav-tab"        id="nav-shipping" onclick="switchTab('shipping')">จัดส่ง</button>
+        <button class="admin-nav-tab"        id="nav-customers" onclick="switchTab('customers')">ลูกค้า</button>
+        <button class="admin-nav-tab"        id="nav-ads"     onclick="switchTab('ads')">โฆษณา</button>
+        <button class="admin-nav-tab"        id="nav-admins"  onclick="switchTab('admins')">แอดมิน</button>
+      </nav>
+
+      <div class="admin-header-right">
+        <a href="index.html" target="_blank" class="header-icon-btn" title="ดูหน้าลูกค้า">
+          <i class="ph ph-arrow-square-out"></i>
+        </a>
+        <button class="header-icon-btn" onclick="openTodoModal()" title="To-Do งานที่ต้องทำ">
+          <i class="ph ph-bell"></i>
+          <span class="noti-dot"></span>
+        </button>
+        <div class="admin-user-pill" onclick="switchTab('admins')" title="ข้อมูลผู้ดูแลระบบ">
+          <div class="admin-avatar">
+            <i class="ph-fill ph-user"></i>
+          </div>
+          <span class="admin-user-name">Admin</span>
         </div>
-        <div class="quick-fin-actions">
-          <button class="btn-quick-fin expense" onclick="addFinance('expense')"><i class="ph ph-minus-circle"></i> บันทึกรายจ่าย</button>
-          <button class="btn-quick-fin income" onclick="addFinance('income')"><i class="ph ph-plus-circle"></i> บันทึกรายรับ</button>
-        </div>
-        <div class="quick-fin-today-head"><i class="ph ph-calendar-blank"></i> วันนี้ · <span id="todayLabel">—</span></div>
-        <div id="financeTodayList">
-          <div class="admin-empty-state"><div class="admin-empty-text">กำลังโหลด...</div></div>
-        </div>
+        <button class="header-logout-btn" onclick="adminLogout()" title="ออกจากระบบ">
+          <i class="ph ph-sign-out"></i>
+        </button>
       </div>
-    </div>
+    </header>
+
+    <!-- App Body Layout with Left Dock and Main Content -->
+    <div class="admin-app-layout">
+      <!-- Left Floating Icon Dock (Like Reference Image 1) -->
+      <aside class="admin-dock">
+        <div class="dock-group">
+          <button class="dock-btn active" id="dock-home" onclick="switchTab('home')" title="หน้าหลัก (Dashboard)">
+            <i class="ph ph-squares-four"></i>
+          </button>
+          <button class="dock-btn" id="dock-fish" onclick="switchTab('fish')" title="จัดการปลา">
+            <i class="ph ph-fish-simple"></i>
+          </button>
+          <button class="dock-btn" id="dock-finance" onclick="switchTab('finance')" title="การเงิน">
+            <i class="ph ph-wallet"></i>
+          </button>
+          <button class="dock-btn" id="dock-stats" onclick="switchTab('stats')" title="สถิติ">
+            <i class="ph ph-chart-bar"></i>
+          </button>
+          <button class="dock-btn" id="dock-orders" onclick="switchTab('orders')" title="คำสั่งซื้อ">
+            <i class="ph ph-receipt"></i>
+          </button>
+        </div>
+
+        <div class="dock-group">
+          <button class="dock-btn" id="dock-shipping" onclick="switchTab('shipping')" title="รายการจัดส่ง">
+            <i class="ph ph-truck"></i>
+          </button>
+          <button class="dock-btn" id="dock-customers" onclick="switchTab('customers')" title="ฐานข้อมูลลูกค้า">
+            <i class="ph ph-users-three"></i>
+          </button>
+          <button class="dock-btn" id="dock-ads" onclick="switchTab('ads')" title="จัดการโฆษณา">
+            <i class="ph ph-megaphone"></i>
+          </button>
+        </div>
+
+        <div class="dock-group dock-group--bottom">
+          <button class="dock-btn" id="dock-admins" onclick="switchTab('admins')" title="ตั้งค่าแอดมิน">
+            <i class="ph ph-gear-six"></i>
+          </button>
+          <button class="dock-btn dock-btn--logout" onclick="adminLogout()" title="ออกจากระบบ">
+            <i class="ph ph-sign-out"></i>
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main App Content -->
+      <main class="admin-main">
+        <div class="admin-page active" id="page-home">
+          
+          <!-- Hero Greeting Bar (Quixotic Style) -->
+          <div class="quixotic-hero-bar">
+            <div class="hero-greeting-wrap">
+              <h1 class="hero-greeting-title">Welcome Back, <span class="greeting-highlight">Admin</span></h1>
+              <div class="hero-greeting-sub">ภาพรวมระบบร้านปลาและการดำเนินงานวันนี้</div>
+            </div>
+            <div class="hero-actions-wrap">
+              <div class="quixotic-date-pill">
+                <i class="ph ph-calendar-blank"></i>
+                <span id="headerDate">—</span>
+                <i class="ph ph-caret-down" style="font-size:0.75rem; opacity:0.6;"></i>
+              </div>
+              <button class="quixotic-add-btn" onclick="switchTab('fish'); toggleAddPanel(true);">
+                <i class="ph-bold ph-plus"></i>
+                <span>เพิ่มปลาใหม่</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Hidden container for adminStats compatibility -->
+          <div id="adminStats" style="display:none;"></div>
+
+          <!-- Bento Grid Layout (Exact Match with Image 1) -->
+          <div class="quixotic-bento-grid">
+            
+            <!-- Col 1: Left Column (Aqua Card + Recent Activity) -->
+            <div class="bento-col bento-col-left">
+              
+              <!-- Card 1: Aqua Pass Portfolio Card (Like Green Visa Card in Image 1) -->
+              <div class="bento-card bento-card--portfolio">
+                <div class="bento-card-header">
+                  <div>
+                    <div class="bento-card-title">Stock Portfolio</div>
+                    <div class="bento-card-sub">ภาพรวมคลังปลาทั้งหมด</div>
+                  </div>
+                  <button class="bento-arrow-btn" onclick="switchTab('fish')" title="ดูคลังปลาทั้งหมด"><i class="ph ph-arrow-up-right"></i></button>
+                </div>
+
+                <div class="aqua-credit-card">
+                  <div class="acc-top">
+                    <div class="acc-brand"><i class="ph-bold ph-fish"></i> AQUA PASS</div>
+                    <i class="ph ph-broadcast"></i>
+                  </div>
+                  <div class="acc-mid">
+                    <div class="acc-label">Active Species</div>
+                    <div class="acc-val" id="dashTotalSpecies">— ชนิด</div>
+                  </div>
+                  <div class="acc-bottom">
+                    <div class="acc-dots">•••• 909090</div>
+                    <div class="acc-exp">EXP 09/26</div>
+                  </div>
+                </div>
+
+                <div class="bento-stat-strip">
+                  <div>
+                    <div class="bss-label">พร้อมจำหน่าย (In Stock)</div>
+                    <div class="bss-val" id="dashInStockVal">—</div>
+                  </div>
+                  <span class="bento-pill-tag tag-green" id="dashInStockPercent">+100% Active</span>
+                </div>
+              </div>
+
+              <!-- Card 2: Recent Activity Table (Payment History Style) -->
+              <div class="bento-card bento-card--history">
+                <div class="bento-card-header">
+                  <div>
+                    <div class="bento-card-title">Recent Activity</div>
+                    <div class="bento-card-sub">ปลาและรายการเพิ่มล่าสุด</div>
+                  </div>
+                  <button class="bento-arrow-btn" onclick="switchTab('fish')" title="ดูปลาทั้งหมด"><i class="ph ph-arrow-up-right"></i></button>
+                </div>
+                
+                <div class="quixotic-activity-list" id="dash-recent">
+                  <div class="admin-empty-state"><div class="admin-empty-icon">🐟</div><div class="admin-empty-text">ยังไม่มีปลา</div></div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Col 2: Center Column (Finance Engagement Chart + Quick Finance) -->
+            <div class="bento-col bento-col-center">
+              
+              <!-- Card 3: Finance Trend Chart -->
+              <div class="bento-card bento-card--chart">
+                <div class="bento-card-header">
+                  <div style="display:flex; align-items:center; gap:10px;">
+                    <div class="bento-icon-box"><i class="ph ph-chart-line-up"></i></div>
+                    <div>
+                      <div class="bento-card-title">แนวโน้มรายรับ-รายจ่าย</div>
+                      <div class="bento-card-sub">สถิติการเงิน · <span id="dashFinYearLabel"></span></div>
+                    </div>
+                  </div>
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <div class="bento-toggle-capsule">
+                      <button class="capsule-btn active" onclick="switchTab('stats')">รายเดือน</button>
+                      <button class="capsule-btn" onclick="switchTab('stats')">รายปี</button>
+                    </div>
+                    <button class="bento-arrow-btn" onclick="switchTab('stats')" title="ดูสถิติทั้งหมด"><i class="ph ph-arrow-up-right"></i></button>
+                  </div>
+                </div>
+
+                <div class="dash-chart-inner">
+                  <div id="dash-fin-legend" class="dash-fin-legend-styled"></div>
+                  <div id="dash-fin-chart" class="dash-fin-chart-styled"></div>
+                </div>
+              </div>
+
+              <!-- Card 4: Quick Finance Transaction Box -->
+              <div class="bento-card bento-card--quickfin">
+                <div class="bento-card-header">
+                  <div>
+                    <div class="bento-card-title">บันทึกรายรับ-รายจ่ายด่วน</div>
+                    <div class="bento-card-sub">วันนี้ · <span id="todayLabel">—</span></div>
+                  </div>
+                  <button class="bento-arrow-btn" onclick="switchTab('finance')" title="ไปที่หน้าการเงิน"><i class="ph ph-arrow-up-right"></i></button>
+                </div>
+
+                <div class="quick-fin-inline-grid">
+                  <input type="text" id="finItemName" class="form-input" placeholder="เช่น ค่าอาหารปลา, ขายปลาเทวดา...">
+                  <input type="number" id="finItemAmount" class="form-input" placeholder="จำนวนเงิน ฿">
+                  <button class="btn-quixotic-action expense" onclick="addFinance('expense')"><i class="ph ph-minus"></i> รายจ่าย</button>
+                  <button class="btn-quixotic-action income" onclick="addFinance('income')"><i class="ph ph-plus"></i> รายรับ</button>
+                </div>
+
+                <div id="financeTodayList" class="quixotic-today-list">
+                  <div class="admin-empty-state"><div class="admin-empty-text">กำลังโหลด...</div></div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Col 3: Right Column (Summary Card + Alerts & Team Stack) -->
+            <div class="bento-col bento-col-right">
+              
+              <!-- Card 5: Finance Goal & Sparkline Summary (Like Top Right in Image 1) -->
+              <div class="bento-card bento-card--summary">
+                <div class="bento-card-header">
+                  <div>
+                    <div class="bento-card-title">Financial Goal</div>
+                    <div class="bento-card-sub">สรุปกำไรสะสมสุทธิ</div>
+                  </div>
+                  <button class="bento-arrow-btn" onclick="switchTab('finance')" title="ไปที่หน้าการเงิน"><i class="ph ph-arrow-up-right"></i></button>
+                </div>
+
+                <div class="quixotic-balance-display">
+                  <div class="qbd-label">Net Profit / กำไรสะสม</div>
+                  <div class="qbd-num" id="dashNetProfitDisplay">฿0.00</div>
+                  
+                  <div class="sparkline-svg-wrap">
+                    <svg viewBox="0 0 200 45" preserveAspectRatio="none">
+                      <path d="M0,35 Q30,10 60,28 T120,12 T170,22 T200,8" fill="none" stroke="#0e9384" stroke-width="2.5" stroke-linecap="round"/>
+                      <path d="M0,35 Q30,10 60,28 T120,12 T170,22 T200,8 L200,45 L0,45 Z" fill="url(#sparkGrad)" opacity="0.15"/>
+                      <defs>
+                        <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stop-color="#0e9384"/>
+                          <stop offset="100%" stop-color="#ffffff"/>
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                  </div>
+                </div>
+
+                <div class="quixotic-btn-pair">
+                  <button class="quixotic-pill-btn btn-send" onclick="switchTab('finance')">
+                    <span>บันทึกรายรับ</span> <i class="ph-bold ph-arrow-up"></i>
+                  </button>
+                  <button class="quixotic-pill-btn btn-receive" onclick="switchTab('finance')">
+                    <span>บันทึกรายจ่าย</span> <i class="ph-bold ph-arrow-down"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Card 6: Alerts & Attention + Team Stack (Like Bottom Right in Image 1) -->
+              <div class="bento-card bento-card--alerts">
+                <div class="bento-card-header">
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <div class="bento-icon-box alert"><i class="ph ph-warning-circle"></i></div>
+                    <div>
+                      <div class="bento-card-title">ต้องดำเนินการ</div>
+                      <div class="bento-card-sub">สต็อกเหลือน้อย & รายการเตือน</div>
+                    </div>
+                  </div>
+                  <button class="bento-arrow-btn" onclick="switchTab('fish'); setStockFilter('low', document.querySelector('.filter-chip.low') || this)" title="ดูสต็อกเหลือน้อย"><i class="ph ph-arrow-up-right"></i></button>
+                </div>
+
+                <div class="quixotic-alerts-list" id="dash-lowstock">
+                  <div class="admin-empty-state"><div class="admin-empty-icon">🎉</div><div class="admin-empty-text">สต็อกครบทุกรายการ</div></div>
+                </div>
+
+                <div class="mandatory-team-bar">
+                  <div class="team-avatar-stack">
+                    <span class="team-av av-1" title="Staff 1"><i class="ph-fill ph-user"></i></span>
+                    <span class="team-av av-2" title="Staff 2"><i class="ph-fill ph-user"></i></span>
+                    <span class="team-av av-3" title="Staff 3"><i class="ph-fill ph-user"></i></span>
+                    <span class="team-av av-plus" title="Admin Team">+2</span>
+                  </div>
+                  <button class="team-manage-link" onclick="switchTab('admins')">
+                    <span>Admin Team</span>
+                    <i class="ph ph-arrow-right"></i>
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
 
     <div class="admin-page" id="page-fish">
       <div class="admin-card" style="margin-bottom:1.25rem;">

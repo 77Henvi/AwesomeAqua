@@ -158,6 +158,7 @@ function refreshFinance() {
   return loadFinanceFromDB(() => {
     profitMap = getProfitMap(); // sync ให้ renderFishTable() อ่านค่าล่าสุดได้
     if (fishData.length > 0) renderFishTable(); // รีเรนเดอร์ตารางปลาเพื่ออัปเดตกำไรสะสม
+    renderAdminStats();
     // ข้อมูลการเงินโหลดเสร็จช้ากว่าปลา (เรียกคู่ขนานกันใน showDashboard) —
     // รีเฟรชกราฟ shortcut บนหน้าแรกอีกครั้งตรงนี้ กันกรณีโหลดไม่ทันตอน renderDashboardCards() รอบแรก
     renderFinanceChart(getFinanceData(), new Date().getFullYear(), 'dash-fin-chart', 'dash-fin-legend');
@@ -276,25 +277,51 @@ function renderAdminStats() {
   const inStock  = active.filter(f => f.stock > 0).length;
   const lowStock = active.filter(f => f.stock > 0 && f.stock <= 5).length;
   const outStock = active.filter(f => f.stock === 0).length;
+  const totalQty = active.reduce((sum, f) => sum + (f.stock || 0), 0);
 
-  document.getElementById('adminStats').innerHTML = `
-    <div class="admin-stat-card stat-card-total">
-      <div class="admin-stat-icon"><i class="ph ph-fish-simple"></i></div>
-      <div><div class="admin-stat-num">${total}</div><div class="admin-stat-label">ชนิดปลาทั้งหมด</div></div>
-    </div>
-    <div class="admin-stat-card stat-card-ok">
-      <div class="admin-stat-icon"><i class="ph ph-check-circle"></i></div>
-      <div><div class="admin-stat-num">${inStock}</div><div class="admin-stat-label">มีในสต็อก</div></div>
-    </div>
-    <div class="admin-stat-card stat-card-low">
-      <div class="admin-stat-icon"><i class="ph ph-warning-circle"></i></div>
-      <div><div class="admin-stat-num">${lowStock}</div><div class="admin-stat-label">สต็อกเหลือน้อย</div></div>
-    </div>
-    <div class="admin-stat-card stat-card-out">
-      <div class="admin-stat-icon"><i class="ph ph-x-circle"></i></div>
-      <div><div class="admin-stat-num">${outStock}</div><div class="admin-stat-label">หมดสต็อก</div></div>
-    </div>
-  `;
+  // อัปเดตข้อมูลบน Quixotic Bento Grid
+  const totalSpeciesEl = document.getElementById('dashTotalSpecies');
+  if (totalSpeciesEl) totalSpeciesEl.textContent = `${total} ชนิด`;
+
+  const inStockValEl = document.getElementById('dashInStockVal');
+  if (inStockValEl) inStockValEl.textContent = `${inStock} ชนิด (${totalQty.toLocaleString('th-TH')} ตัว)`;
+
+  const inStockPctEl = document.getElementById('dashInStockPercent');
+  if (inStockPctEl) {
+    const pct = total > 0 ? Math.round((inStock / total) * 100) : 0;
+    inStockPctEl.textContent = `${pct}% Active`;
+  }
+
+  // คำนวณ Net Profit ใน Financial Goal
+  const finData = getFinanceData();
+  const netProfitEl = document.getElementById('dashNetProfitDisplay');
+  if (netProfitEl && Array.isArray(finData)) {
+    const net = finData.reduce((sum, r) => sum + (r.type === 'income' ? (r.amount || 0) : -(r.amount || 0)), 0);
+    netProfitEl.textContent = `฿${net.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    netProfitEl.style.color = net >= 0 ? '#0f172a' : '#ef4444';
+  }
+
+  const adminStatsEl = document.getElementById('adminStats');
+  if (adminStatsEl) {
+    adminStatsEl.innerHTML = `
+      <div class="admin-stat-card stat-card-total">
+        <div class="admin-stat-icon"><i class="ph ph-fish-simple"></i></div>
+        <div><div class="admin-stat-num">${total}</div><div class="admin-stat-label">ชนิดปลาทั้งหมด</div></div>
+      </div>
+      <div class="admin-stat-card stat-card-ok">
+        <div class="admin-stat-icon"><i class="ph ph-check-circle"></i></div>
+        <div><div class="admin-stat-num">${inStock}</div><div class="admin-stat-label">มีในสต็อก</div></div>
+      </div>
+      <div class="admin-stat-card stat-card-low">
+        <div class="admin-stat-icon"><i class="ph ph-warning-circle"></i></div>
+        <div><div class="admin-stat-num">${lowStock}</div><div class="admin-stat-label">สต็อกเหลือน้อย</div></div>
+      </div>
+      <div class="admin-stat-card stat-card-out">
+        <div class="admin-stat-icon"><i class="ph ph-x-circle"></i></div>
+        <div><div class="admin-stat-num">${outStock}</div><div class="admin-stat-label">หมดสต็อก</div></div>
+      </div>
+    `;
+  }
 }
 
 // ════════════════════════════════════════════
@@ -488,10 +515,15 @@ function openEditModal(id) { return _openEditModal(id, fishData); }
 // ════════════════════════════════════════════
 function switchTab(tab) {
   document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.admin-nav-tab, .bnav-item').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.admin-nav-tab, .dock-btn, .bnav-item').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + tab)?.classList.add('active');
   document.getElementById('nav-'  + tab)?.classList.add('active');
+  document.getElementById('dock-' + tab)?.classList.add('active');
   document.getElementById('bnav-' + tab)?.classList.add('active');
+  if (tab === 'home') {
+    renderAdminStats();
+    renderDashboardCards();
+  }
   if (tab === 'finance') renderFinancePage();
   if (tab === 'stats')   renderStats(fishData, getFinanceData());
   if (tab === 'ads')     initAds();

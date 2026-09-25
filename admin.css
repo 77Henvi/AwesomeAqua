@@ -97,66 +97,247 @@ body.logged-in .admin-dashboard    { display: block; }
 body.logged-in { background: #eceef3; }
 
 /* ── TOPBAR (mobile/tablet header — becomes the sidebar on desktop, see media query) ── */
-.admin-topbar {
-  background: linear-gradient(180deg, var(--adm-primary-deep), var(--adm-primary));
-  color: white;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 5%; height: 60px;
-  position: sticky; top: 0; z-index: 100;
-  gap: 1rem;
-}
-.admin-topbar-logo {
-  font-family: var(--font-display); font-size: 1.2rem; font-weight: 700;
-  white-space: nowrap; flex-shrink: 0;
-  display: flex; align-items: baseline; gap: 0;
-}
-.admin-topbar-logo span { color: #8fb4ff; }
-.admin-topbar-sub {
-  font-size: 0.68rem; opacity: 0.55;
-  font-family: var(--font-body); font-weight: 500; margin-left: 8px;
-  text-transform: uppercase; letter-spacing: 0.08em;
+/* ── APP CANVAS & SHELL (Quixotic Master Floating Layout) ── */
+.admin-shell {
+  max-width: 1520px;
+  margin: 18px auto;
+  background: #ffffff;
+  border-radius: 28px;
+  box-shadow: 0 16px 50px rgba(15, 23, 42, 0.05);
+  border: 1px solid #eef2f6;
+  padding: 20px 24px 28px 24px;
+  min-height: calc(100vh - 36px);
+  display: flex;
+  flex-direction: column;
 }
 
-/* ── TAB NAV (topbar / sidebar) ── */
-.admin-nav-tabs {
-  display: flex; gap: 2px;
-  background: rgba(255,255,255,0.08);
-  border-radius: 10px; padding: 3px;
+/* ── QUIXOTIC HEADER ── */
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 22px;
+  gap: 16px;
+}
+.admin-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+.brand-badge {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: #024D60;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  box-shadow: 0 4px 12px rgba(2, 77, 96, 0.2);
+}
+.brand-text {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+}
+.brand-text span {
+  color: #0e9384;
+}
+
+/* Header Nav Pills */
+.admin-header-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #f8fafc;
+  padding: 4px;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  overflow-x: auto;
 }
 .admin-nav-tab {
-  padding: 6px 14px; border-radius: 8px;
-  font-size: 0.8rem; font-weight: 500;
-  color: rgba(255,255,255,0.6);
-  cursor: pointer; border: none;
-  background: transparent; font-family: var(--font-body);
-  transition: all 0.15s ease; white-space: nowrap;
+  padding: 7px 18px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  font-family: var(--font-body);
+  transition: all 0.16s ease;
+  white-space: nowrap;
 }
-.admin-nav-tab:hover { color: white; background: rgba(255,255,255,0.08); }
+.admin-nav-tab:hover {
+  color: #0f172a;
+  background: #edf2f7;
+}
 .admin-nav-tab.active {
-  background: rgba(255,255,255,0.14); color: white; font-weight: 600;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18);
+  background: #024D60;
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(2, 77, 96, 0.22);
 }
 
-.admin-topbar-right { display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
-.admin-topbar-right a {
-  color: rgba(255,255,255,0.7); text-decoration: none;
-  font-size: 0.8rem; transition: color 0.2s; white-space: nowrap;
+/* Header Right Actions */
+.admin-header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
 }
-.admin-topbar-right a:hover { color: white; }
-.admin-logout-btn {
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.22);
-  color: white; padding: 0.4rem 0.95rem;
-  border-radius: 9px; cursor: pointer;
-  font-size: 0.8rem; font-weight: 500; font-family: var(--font-body);
-  transition: background 0.2s; white-space: nowrap;
+.header-icon-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 1.05rem;
+  transition: all 0.15s ease;
 }
-.admin-logout-btn:hover { background: rgba(255,255,255,0.2); }
+.header-icon-btn:hover {
+  background: #edf2f7;
+  color: #0f172a;
+}
+.noti-dot {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 7px;
+  height: 7px;
+  background: #ef4444;
+  border-radius: 50%;
+  border: 1.5px solid #ffffff;
+}
+.admin-user-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px 4px 4px;
+  border-radius: 20px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: 0.15s ease;
+}
+.admin-user-pill:hover {
+  background: #edf2f7;
+}
+.admin-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #024D60;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+.admin-user-name {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+.header-logout-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  border: 1px solid #fee2e2;
+  background: #fff5f5;
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.05rem;
+  transition: all 0.15s ease;
+}
+.header-logout-btn:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
 
-/* ── BODY & PAGES ── */
-.admin-body {
-  padding: 1.75rem 5%; background: var(--adm-bg, #f4f6fb);
-  min-height: calc(100vh - 60px);
+/* ── APP BODY LAYOUT ── */
+.admin-app-layout {
+  display: flex;
+  gap: 22px;
+  align-items: flex-start;
+  flex: 1;
+}
+
+/* ── LEFT FLOATING DOCK (Image 1 Capsule Dock) ── */
+.admin-dock {
+  width: 56px;
+  flex-shrink: 0;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 22px;
+  padding: 14px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  min-height: 560px;
+  position: sticky;
+  top: 20px;
+}
+.dock-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+}
+.dock-group--bottom {
+  margin-top: auto;
+}
+.dock-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+.dock-btn:hover {
+  background: #edf2f7;
+  color: #0f172a;
+}
+.dock-btn.active {
+  background: #024D60;
+  color: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(2, 77, 96, 0.28);
+}
+.dock-btn--logout:hover {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+/* ── MAIN CONTENT AREA ── */
+.admin-main {
+  flex: 1;
+  min-width: 0;
 }
 .admin-page {
   display: none;
@@ -164,99 +345,511 @@ body.logged-in { background: #eceef3; }
 }
 .admin-page.active { display: block; }
 @keyframes adminPageIn {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── CARD ──
-   ยกระดับพื้นผิวการ์ดของ Admin โดยเฉพาะ (ไม่กระทบ .admin-card บนหน้าเว็บลูกค้า
-   เพราะ selector นี้ถูกโหลดทีหลังและ scope เฉพาะ .admin-dashboard) ── */
-.admin-dashboard .admin-card {
-  background: var(--adm-surface, #fff);
-  border: 1px solid var(--adm-border-soft, #f0f2f8);
-  border-radius: var(--adm-radius-lg, 20px);
-  box-shadow: 0 2px 14px rgba(15,27,61,0.045);
-  padding: 1.6rem 1.75rem;
-  margin-bottom: var(--adm-space-4, 16px);
+/* ── QUIXOTIC HERO GREETING BAR ── */
+.quixotic-hero-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 14px;
 }
-.admin-dashboard .admin-card:last-child { margin-bottom: 0; }
+.hero-greeting-title {
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+.greeting-highlight {
+  color: #024D60;
+  font-family: var(--font-display);
+}
+.hero-greeting-sub {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-top: 3px;
+  font-weight: 500;
+}
+.hero-actions-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.quixotic-date-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #475569;
+}
+.quixotic-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 20px;
+  background: #024D60;
+  color: #ffffff;
+  border: none;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(2, 77, 96, 0.25);
+  transition: all 0.18s ease;
+  font-family: var(--font-body);
+}
+.quixotic-add-btn:hover {
+  background: #0e9384;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(14, 147, 132, 0.3);
+}
 
-/* ── PANEL TITLE ── */
-.admin-panel-title {
-  font-family: var(--font-display); font-size: 1.15rem; font-weight: 700;
-  margin-bottom: 1.1rem; display: flex; align-items: center; gap: 0.5rem;
-  color: var(--adm-ink, inherit);
-}
-.admin-panel-title i { font-size: 1.05rem; }
-
-/* ── PAGE HEADER (เดิมชื่อ date-banner) ──
-   ยกระดับจาก "แถบวันที่" เล็กๆ ให้เป็นหัวหน้าเพจที่มีลำดับชั้นชัดเจน:
-   Title ใหญ่ + วันที่รอง + badge สถานะ ── */
-.date-banner {
-  background: transparent; border: none; padding: 0;
-  margin-bottom: var(--adm-space-8, 32px);
-  display: flex; align-items: flex-end; justify-content: space-between;
-  flex-wrap: wrap; gap: var(--adm-space-4, 16px);
-}
-.date-banner-title {
-  font-family: var(--font-display); font-weight: 700;
-  font-size: 1.7rem; color: var(--adm-ink, var(--royal-blue));
-  line-height: 1.2; margin: 0 0 4px;
-}
-.date-banner-text { font-size: 0.86rem; color: var(--adm-ink-muted, var(--gray)); }
-.date-banner-text strong { color: var(--adm-ink-soft, var(--royal-blue)); font-weight: 600; }
-.date-banner-badge {
-  font-size: 0.74rem; background: var(--adm-primary-tint, #eff4ff); color: var(--adm-primary, var(--royal-blue));
-  padding: 6px 14px; border-radius: 20px; font-weight: 600;
-  display: inline-flex; align-items: center; gap: 6px;
-  box-shadow: var(--adm-shadow-sm, none);
-}
-
-/* ── STATS ──
-   4 การ์ดไม่เท่ากันทางความหมาย: total/available = ข้อมูลทั่วไป (พื้นผิวขาว)
-   low/out = ต้องให้ความสนใจ (พื้นผิวโทนเตือน) — สร้างลำดับชั้นด้วยสี ไม่ใช่แค่ไอคอน ── */
-.admin-stats {
+/* ── QUIXOTIC BENTO GRID (3 Columns Match Image 1) ── */
+.quixotic-bento-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: var(--adm-space-4, 16px); margin-bottom: var(--adm-space-6, 24px);
+  grid-template-columns: 1.05fr 1.35fr 1fr;
+  gap: 20px;
+  align-items: stretch;
 }
-.admin-stat-card {
-  background: var(--adm-surface, #fff); border: 1px solid var(--adm-border, var(--border));
-  border-radius: var(--adm-radius-lg, 20px); padding: 1.35rem 1.5rem;
-  display: flex; align-items: center; gap: 1rem;
-  transition: box-shadow 0.2s, transform 0.2s;
-  box-shadow: 0 2px 10px rgba(15,27,61,0.04);
+.bento-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
-.admin-stat-card:hover { box-shadow: var(--adm-shadow-md, 0 4px 16px rgba(26,58,143,0.1)); transform: translateY(-1px); }
-.admin-stat-icon {
-  font-size: 1.35rem; width: 42px; height: 42px; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  border-radius: var(--adm-radius-md, 10px);
+.bento-card {
+  background: #f8fafc;
+  border: 1px solid #eef2f6;
+  border-radius: 24px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.02);
+  transition: transform 0.2s, box-shadow 0.2s;
 }
-.admin-stat-num { font-family: var(--font-display); font-weight: 700; line-height: 1; }
-.admin-stat-label { font-size: 0.76rem; color: var(--adm-ink-muted, var(--gray)); margin-top: 0.3rem; }
+.bento-card:hover {
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+}
+.bento-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+.bento-card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.2;
+}
+.bento-card-sub {
+  font-size: 0.76rem;
+  color: #64748b;
+  margin-top: 3px;
+  font-weight: 500;
+}
+.bento-arrow-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.15s ease;
+  font-size: 0.95rem;
+}
+.bento-arrow-btn:hover {
+  background: #024D60;
+  color: #ffffff;
+  border-color: #024D60;
+  transform: scale(1.06);
+}
+.bento-icon-box {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #e0f2fe;
+  color: #0284c7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+}
+.bento-icon-box.alert {
+  background: #fef3c7;
+  color: #d97706;
+}
 
-/* total = metric ที่ใหญ่ที่สุดในกลุ่ม (ตัวเลขหลักของธุรกิจ) */
-.stat-card-total .admin-stat-num { font-size: 1.9rem; color: var(--adm-ink, var(--royal-blue)); }
-.stat-card-ok    .admin-stat-num { font-size: 1.6rem; color: var(--adm-ink, var(--royal-blue)); }
-.stat-card-low   .admin-stat-num { font-size: 1.6rem; color: var(--adm-warning, #b5760a); }
-.stat-card-out   .admin-stat-num { font-size: 1.6rem; color: var(--adm-danger, #c0342b); }
+/* ── AQUA VISA CARD ── */
+.aqua-credit-card {
+  background: linear-gradient(135deg, #024D60 0%, #036b85 55%, #0e9384 100%);
+  color: #ffffff;
+  border-radius: 18px;
+  padding: 18px 20px;
+  box-shadow: 0 10px 24px rgba(2, 77, 96, 0.28);
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.aqua-credit-card::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 130px;
+  height: 130px;
+  background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.acc-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  opacity: 0.92;
+  margin-bottom: 16px;
+}
+.acc-brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.acc-mid .acc-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  opacity: 0.8;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+.acc-mid .acc-val {
+  font-size: 1.7rem;
+  font-weight: 800;
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+.acc-bottom {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  opacity: 0.8;
+  font-family: monospace;
+  letter-spacing: 0.12em;
+  margin-top: 14px;
+}
 
-/* low / out ยังคงสื่อความหมายด้วยสี แต่บางลง (โทนพื้นอ่อนมาก) ให้ใกล้เคียงกับ
-   ความมินิมอลแบบพรีเมียมของการ์ดขาวล้วน แทนที่จะเป็นแผ่นสีเข้ม */
-.stat-card-low { background: #fffaf0; border-color: #f3e6c4; }
-.stat-card-out { background: #fff5f4; border-color: #f3d6d3; }
+/* Bento Stat Strip */
+.bento-stat-strip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 12px 16px;
+}
+.bss-label {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 500;
+}
+.bss-val {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+.bento-pill-tag.tag-green {
+  background: #dcfce7;
+  color: #15803d;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
 
-/* ── DASHBOARD 2-COL ──
-   asymmetric: "ต้องดำเนินการ" (low stock) ได้พื้นที่มากกว่า "เพิ่มล่าสุด" เพราะสำคัญกว่าในการดำเนินงาน ── */
-.dash-two-col {
-  display: grid; grid-template-columns: 1fr 1fr; gap: var(--adm-space-4, 16px);
-  margin-bottom: var(--adm-space-4, 16px);
-  align-items: start;
+/* ── QUIXOTIC ACTIVITY & ALERTS ROWS ── */
+.quixotic-activity-list,
+.quixotic-alerts-list,
+.quixotic-today-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 .dash-mini-row {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0.7rem 0; border-bottom: 1px solid var(--adm-border-soft, #f0f4ff); gap: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: #ffffff;
+  border: 1px solid #f1f5f9;
+  border-radius: 14px;
+  gap: 10px;
+  transition: all 0.15s ease;
+}
+.dash-mini-row:hover {
+  border-color: #e2e8f0;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+.dash-mini-name {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.dash-mini-sub {
+  font-size: 0.72rem;
+  color: #64748b;
+  margin-top: 2px;
+}
+.btn-restock-tiny {
+  background: #024D60;
+  color: #ffffff;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.15s;
+}
+.btn-restock-tiny:hover {
+  background: #0e9384;
+}
+
+/* ── FINANCE CHART CAPSULE TOGGLE ── */
+.bento-toggle-capsule {
+  display: flex;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 2px;
+}
+.capsule-btn {
+  padding: 4px 12px;
+  border-radius: 16px;
+  border: none;
+  background: transparent;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: 0.15s ease;
+}
+.capsule-btn.active {
+  background: #024D60;
+  color: #ffffff;
+}
+
+/* ── QUICK FINANCE INLINE GRID ── */
+.quick-fin-inline-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr auto auto;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.btn-quixotic-action {
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-body);
+  transition: all 0.15s ease;
+}
+.btn-quixotic-action.expense {
+  background: #fef2f2;
+  color: #ef4444;
+  border-color: #fecaca;
+}
+.btn-quixotic-action.expense:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+.btn-quixotic-action.income {
+  background: #ecfdf5;
+  color: #10b981;
+  border-color: #a7f3d0;
+}
+.btn-quixotic-action.income:hover {
+  background: #10b981;
+  color: #ffffff;
+}
+
+/* ── FINANCIAL GOAL & SPARKLINE ── */
+.quixotic-balance-display {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 16px 18px;
+  margin-bottom: 14px;
+  position: relative;
+  overflow: hidden;
+}
+.qbd-label {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.qbd-num {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #0f172a;
+  font-family: var(--font-display);
+  margin-top: 4px;
+}
+.sparkline-svg-wrap {
+  margin-top: 10px;
+  height: 45px;
+  width: 100%;
+}
+.quixotic-btn-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.quixotic-pill-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px;
+  border-radius: 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: 0.15s ease;
+  font-family: var(--font-body);
+}
+.btn-send {
+  background: #024D60;
+  color: #ffffff;
+}
+.btn-send:hover {
+  background: #0e9384;
+}
+.btn-receive {
+  background: #ffffff;
+  color: #1e293b;
+  border: 1px solid #e2e8f0;
+}
+.btn-receive:hover {
+  background: #f1f5f9;
+}
+
+/* ── TEAM STACK BAR ── */
+.mandatory-team-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid #e2e8f0;
+}
+.team-avatar-stack {
+  display: flex;
+  align-items: center;
+}
+.team-av {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  margin-left: -8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: #ffffff;
+  background: #64748b;
+}
+.team-av:first-child {
+  margin-left: 0;
+}
+.team-av.av-1 { background: #024D60; }
+.team-av.av-2 { background: #0e9384; }
+.team-av.av-3 { background: #3b82f6; }
+.team-av.av-plus {
+  background: #e2e8f0;
+  color: #475569;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+.team-manage-link {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #024D60;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.team-manage-link:hover {
+  color: #0e9384;
+}
+
+/* Responsive Media Queries */
+@media (max-width: 1240px) {
+  .quixotic-bento-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .bento-col-right {
+    grid-column: span 2;
+  }
+}
+@media (max-width: 900px) {
+  .admin-dock {
+    display: none;
+  }
+  .admin-header-nav {
+    overflow-x: auto;
+  }
+  .quixotic-bento-grid {
+    grid-template-columns: 1fr;
+  }
+  .bento-col-right {
+    grid-column: span 1;
+  }
+  .admin-shell {
+    margin: 8px;
+    padding: 14px;
+    border-radius: 18px;
+  }
+}
+@media (max-width: 600px) {
+  .quixotic-hero-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .quick-fin-inline-grid {
+    grid-template-columns: 1fr;
+  }
 }
 .dash-mini-row:last-child { border-bottom: none; }
 .dash-mini-name { font-size: 0.88rem; font-weight: 600; color: var(--adm-ink, inherit); }
