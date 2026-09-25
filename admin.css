@@ -1,3 +1,9 @@
+/* ══════════════════════════════════════════════════════════
+   ADMIN DESIGN TOKENS
+   ระบบโทเค็นของ Admin Control Center — สืบทอดสี royal-blue เดิม
+   จาก style.css แต่ขยายเป็นระบบ surface / semantic / spacing ที่
+   สมบูรณ์ขึ้น ใช้เฉพาะภายใน .admin-dashboard เท่านั้น
+   ══════════════════════════════════════════════════════════ */
 .admin-dashboard {
   --adm-ink:        #0f1b3d;   /* primary text */
   --adm-ink-soft:   #4b5875;   /* secondary text */
@@ -24,10 +30,10 @@
   --adm-info:         #2563eb;
   --adm-info-tint:    #eaf1ff;
 
-  --adm-radius-sm:  8px;
-  --adm-radius-md:  12px;
-  --adm-radius-lg:  18px;
-  --adm-radius-xl:  22px;
+  --adm-radius-sm:  10px;
+  --adm-radius-md:  14px;
+  --adm-radius-lg:  20px;
+  --adm-radius-xl:  26px;
 
   --adm-space-1: 4px;  --adm-space-2: 8px;  --adm-space-3: 12px;
   --adm-space-4: 16px; --adm-space-5: 20px; --adm-space-6: 24px;
@@ -88,6 +94,7 @@
 .admin-dashboard { display: none; }
 body.logged-in .admin-login-screen { display: none; }
 body.logged-in .admin-dashboard    { display: block; }
+body.logged-in { background: #eceef3; }
 
 /* ── TOPBAR (mobile/tablet header — becomes the sidebar on desktop, see media query) ── */
 .admin-topbar {
@@ -166,9 +173,9 @@ body.logged-in .admin-dashboard    { display: block; }
    เพราะ selector นี้ถูกโหลดทีหลังและ scope เฉพาะ .admin-dashboard) ── */
 .admin-dashboard .admin-card {
   background: var(--adm-surface, #fff);
-  border: 1px solid var(--adm-border, var(--border));
-  border-radius: var(--adm-radius-lg, 16px);
-  box-shadow: var(--adm-shadow-sm, 0 2px 12px rgba(26,58,143,0.06));
+  border: 1px solid var(--adm-border-soft, #f0f2f8);
+  border-radius: var(--adm-radius-lg, 20px);
+  box-shadow: 0 2px 14px rgba(15,27,61,0.045);
   padding: 1.6rem 1.75rem;
   margin-bottom: var(--adm-space-4, 16px);
 }
@@ -215,10 +222,10 @@ body.logged-in .admin-dashboard    { display: block; }
 }
 .admin-stat-card {
   background: var(--adm-surface, #fff); border: 1px solid var(--adm-border, var(--border));
-  border-radius: var(--adm-radius-lg, 14px); padding: 1.35rem 1.5rem;
+  border-radius: var(--adm-radius-lg, 20px); padding: 1.35rem 1.5rem;
   display: flex; align-items: center; gap: 1rem;
   transition: box-shadow 0.2s, transform 0.2s;
-  box-shadow: var(--adm-shadow-sm, none);
+  box-shadow: 0 2px 10px rgba(15,27,61,0.04);
 }
 .admin-stat-card:hover { box-shadow: var(--adm-shadow-md, 0 4px 16px rgba(26,58,143,0.1)); transform: translateY(-1px); }
 .admin-stat-icon {
@@ -235,9 +242,10 @@ body.logged-in .admin-dashboard    { display: block; }
 .stat-card-low   .admin-stat-num { font-size: 1.6rem; color: var(--adm-warning, #b5760a); }
 .stat-card-out   .admin-stat-num { font-size: 1.6rem; color: var(--adm-danger, #c0342b); }
 
-/* low / out ต้องสะดุดตากว่า — ใช้พื้นผิวโทนอ่อนแทนขาวล้วน เพื่อสื่อว่า "ต้องดู" */
-.stat-card-low { background: var(--adm-warning-tint, #fdf4e3); border-color: #f3e2b8; }
-.stat-card-out { background: var(--adm-danger-tint, #fbeceb); border-color: #f0c9c6; }
+/* low / out ยังคงสื่อความหมายด้วยสี แต่บางลง (โทนพื้นอ่อนมาก) ให้ใกล้เคียงกับ
+   ความมินิมอลแบบพรีเมียมของการ์ดขาวล้วน แทนที่จะเป็นแผ่นสีเข้ม */
+.stat-card-low { background: #fffaf0; border-color: #f3e6c4; }
+.stat-card-out { background: #fff5f4; border-color: #f3d6d3; }
 
 /* ── DASHBOARD 2-COL ──
    asymmetric: "ต้องดำเนินการ" (low stock) ได้พื้นที่มากกว่า "เพิ่มล่าสุด" เพราะสำคัญกว่าในการดำเนินงาน ── */
@@ -651,36 +659,34 @@ body.logged-in .admin-dashboard    { display: block; }
   }
 
   .admin-topbar {
-    position: fixed; top: 0; left: 0; bottom: 0;
-    width: 248px; height: 100vh;
+    position: fixed; top: 16px; left: 16px; bottom: 16px;
+    width: 236px; height: auto;
     flex-direction: column; align-items: stretch; justify-content: flex-start;
-    padding: 1.75rem 1.1rem; gap: 0;
+    padding: 1.6rem 1rem; gap: 0;
     overflow-y: auto;
-    box-shadow: var(--adm-shadow-lg, 0 16px 40px rgba(15,27,61,0.1));
+    border-radius: var(--adm-radius-xl, 26px);
+    box-shadow: 0 20px 45px rgba(13,31,92,0.22);
   }
 
   .admin-topbar-logo {
     padding: 0 0.4rem; margin-bottom: 2.25rem;
-    font-size: 1.32rem;
+    font-size: 1.28rem;
   }
 
   .admin-nav-tabs {
     flex-direction: column; align-items: stretch;
-    background: transparent; padding: 0; gap: 2px;
+    background: transparent; padding: 0; gap: 3px;
     flex: 1; width: 100%;
   }
   .admin-nav-tab {
     display: flex; align-items: center; gap: 11px;
     width: 100%; text-align: left; justify-content: flex-start;
-    padding: 10px 14px; font-size: 0.87rem;
-    position: relative; border-radius: 10px;
+    padding: 10px 14px; font-size: 0.86rem;
+    position: relative; border-radius: var(--adm-radius-md, 14px);
   }
   .admin-nav-tab i { font-size: 1.05rem; flex-shrink: 0; width: 1.1rem; text-align: center; }
-  .admin-nav-tab.active::before {
-    content: ''; position: absolute; left: -1.1rem; top: 50%; transform: translateY(-50%);
-    width: 3px; height: 18px; border-radius: 3px;
-    background: #8fb4ff;
-  }
+  .admin-nav-tab.active { background: rgba(255,255,255,0.16); box-shadow: none; }
+  .admin-nav-tab.active::before { display: none; }
 
   .admin-topbar-right {
     flex-direction: column; align-items: stretch; gap: 0.6rem;
@@ -688,14 +694,17 @@ body.logged-in .admin-dashboard    { display: block; }
     border-top: 1px solid rgba(255,255,255,0.12);
   }
   .admin-topbar-right a { text-align: center; padding: 0.35rem 0; }
-  .admin-logout-btn { width: 100%; text-align: center; }
+  .admin-logout-btn { width: 100%; text-align: center; border-radius: var(--adm-radius-md, 14px); }
 
   .admin-body {
     flex: 1; min-width: 0;
-    margin-left: 248px;
-    padding: 2.25rem 3rem 3rem;
-    min-height: 100vh;
+    margin: 16px 16px 16px calc(236px + 32px);
+    padding: 2rem 2.25rem 2.5rem;
+    min-height: calc(100vh - 32px);
     max-width: 1440px;
+    background: var(--adm-surface, #fff);
+    border-radius: var(--adm-radius-xl, 26px);
+    box-shadow: 0 10px 35px rgba(15,27,61,0.06);
   }
 
   .admin-stats           { grid-template-columns: repeat(4, 1fr); }
