@@ -7,6 +7,7 @@ const MONTH_FULL  = ['มกราคม','กุมภาพันธ์','ม�
 let _fishData    = [];
 let _financeData = [];
 let _selectedYear = null;
+let _currentPieMode = 'finance';
 
 // ── entry point ──────────────────────────────
 export function renderStats(fishData, financeData) {
@@ -22,6 +23,7 @@ export function renderStats(fishData, financeData) {
   renderYearSelect(financeData);
   renderFinanceKPI(financeData, _selectedYear);
   renderFinanceChart(financeData, _selectedYear);
+  renderStatsPieChart(_fishData, financeData, _selectedYear, _currentPieMode);
   renderMonthlyList(financeData, _selectedYear);
   renderBestSellers(_fishData, financeData, _selectedYear);
   renderRestockSuggest(_fishData, financeData, _selectedYear);
@@ -66,6 +68,7 @@ function renderYearSelect(financeData) {
     _selectedYear = parseInt(sel.value, 10);
     renderFinanceKPI(_financeData, _selectedYear);
     renderFinanceChart(_financeData, _selectedYear);
+    renderStatsPieChart(_fishData, _financeData, _selectedYear, _currentPieMode);
     renderMonthlyList(_financeData, _selectedYear);
     renderBestSellers(_fishData, _financeData, _selectedYear);
     renderRestockSuggest(_fishData, _financeData, _selectedYear);
@@ -208,6 +211,117 @@ export function renderFinanceChart(financeData, year, chartElId = 'stats-fin-cha
 
   window.__statsOpenMonth = openMonthModal;
 }
+
+// ── กราฟพาย/โดนัทวิเคราะห์สัดส่วน (Pie/Donut Chart) ──────────────────
+export function renderStatsPieChart(fishData, financeData, year, mode = 'finance') {
+  const el = document.getElementById('stats-pie-chart');
+  const yearLabel = document.getElementById('statsPieYearLabel');
+  if (yearLabel) yearLabel.textContent = `· ปี ${year}`;
+  if (!el) return;
+
+  // Toggle active button states
+  const btnFin = document.getElementById('btnPieFinance');
+  const btnLvl = document.getElementById('btnPieLevel');
+  if (btnFin) btnFin.classList.toggle('active', mode === 'finance');
+  if (btnLvl) btnLvl.classList.toggle('active', mode === 'level');
+
+  let slices = [];
+  let centerTitle = '';
+  let centerVal = '';
+
+  if (mode === 'finance') {
+    const months = _monthlyBreakdown(financeData, year);
+    const totalIncome = months.reduce((s, m) => s + m.income, 0);
+    const totalExpense = months.reduce((s, m) => s + m.expense, 0);
+    const netProfit = Math.max(0, totalIncome - totalExpense);
+
+    if (totalIncome === 0 && totalExpense === 0) {
+      el.innerHTML = statsEmpty(`ไม่มีข้อมูลการเงินในปี ${year}`);
+      return;
+    }
+
+    const marginPct = totalIncome > 0 ? Math.round(((totalIncome - totalExpense) / totalIncome) * 100) : 0;
+    centerTitle = 'กำไรสุทธิ';
+    centerVal = `${marginPct >= 0 ? '+' : ''}${marginPct}%`;
+
+    const totalBase = totalExpense + netProfit || 1;
+    slices = [
+      { label: 'กำไรสุทธิ (Profit)', val: netProfit, color: '#10b981', displayVal: `฿${netProfit.toLocaleString('th-TH')}`, pct: Math.round((netProfit / totalBase) * 100) },
+      { label: 'รายจ่าย (Expenses)', val: totalExpense, color: '#f59e0b', displayVal: `฿${totalExpense.toLocaleString('th-TH')}`, pct: Math.round((totalExpense / totalBase) * 100) },
+    ];
+  } else {
+    // Mode: Fish Level Distribution
+    const activeFish = fishData.filter(f => !f.is_archived);
+    const totalFish = activeFish.length || 1;
+    const easyCount = activeFish.filter(f => f.level === 'มือใหม่').length;
+    const medCount = activeFish.filter(f => f.level === 'ปานกลาง').length;
+    const hardCount = activeFish.filter(f => f.level === 'ผู้เชี่ยวชาญ').length;
+
+    centerTitle = 'ปลาทั้งหมด';
+    centerVal = `${activeFish.length} ชนิด`;
+
+    slices = [
+      { label: 'มือใหม่ (Easy)', val: easyCount, color: '#10b981', displayVal: `${easyCount} ชนิด`, pct: Math.round((easyCount / totalFish) * 100) },
+      { label: 'ปานกลาง (Medium)', val: medCount, color: '#3b82f6', displayVal: `${medCount} ชนิด`, pct: Math.round((medCount / totalFish) * 100) },
+      { label: 'ผู้เชี่ยวชาญ (Hard)', val: hardCount, color: '#8b5cf6', displayVal: `${hardCount} ชนิด`, pct: Math.round((hardCount / totalFish) * 100) },
+    ];
+  }
+
+  // Draw SVG Donut
+  const R = 64;
+  const C = 2 * Math.PI * R; // ~402.12
+  let accumulatedRatio = 0;
+  const totalVal = slices.reduce((s, x) => s + x.val, 0) || 1;
+
+  const circlesSvg = slices.map(s => {
+    const ratio = s.val / totalVal;
+    const dash = ratio * C;
+    const gap = C - dash;
+    const offset = -(accumulatedRatio * C) + (C * 0.25); // start from top
+    accumulatedRatio += ratio;
+    if (dash <= 0) return '';
+    return `
+      <circle cx="100" cy="100" r="${R}" fill="none" stroke="${s.color}" stroke-width="24"
+        stroke-dasharray="${dash.toFixed(2)} ${gap.toFixed(2)}"
+        stroke-dashoffset="${offset.toFixed(2)}"
+        class="pie-slice"></circle>
+    `;
+  }).join('');
+
+  const legendHtml = slices.map(s => `
+    <div class="pie-legend-item">
+      <div class="pie-legend-head">
+        <span class="pie-legend-dot" style="background:${s.color};"></span>
+        <span class="pie-legend-label">${s.label}</span>
+      </div>
+      <div class="pie-legend-meta">
+        <span class="pie-legend-val">${s.displayVal}</span>
+        <span class="pie-legend-pct" style="color:${s.color};">${s.pct}%</span>
+      </div>
+    </div>
+  `).join('');
+
+  el.innerHTML = `
+    <div class="pie-layout-wrap">
+      <div class="pie-svg-wrap">
+        <svg viewBox="0 0 200 200" class="pie-donut-svg">
+          <circle cx="100" cy="100" r="${R}" fill="none" stroke="#f1f5f9" stroke-width="24"></circle>
+          ${circlesSvg}
+          <text x="100" y="94" text-anchor="middle" class="pie-center-title">${centerTitle}</text>
+          <text x="100" y="118" text-anchor="middle" class="pie-center-val">${centerVal}</text>
+        </svg>
+      </div>
+      <div class="pie-legend-wrap">
+        ${legendHtml}
+      </div>
+    </div>
+  `;
+}
+
+window.__statsSwitchPie = (mode) => {
+  _currentPieMode = mode;
+  renderStatsPieChart(_fishData, _financeData, _selectedYear, _currentPieMode);
+};
 
 // ── รายละเอียดรายเดือน (list) ────────────────────
 function renderMonthlyList(financeData, year) {
@@ -642,9 +756,165 @@ function _injectStatsStyle() {
     .stats-modal-tx-amt.inc { color: #059669; }
     .stats-modal-tx-amt.exp { color: #dc2626; }
 
+    /* ── Analytics Row (Spline Chart + Donut Pie Chart) ── */
+    .stats-analytics-row {
+      display: grid;
+      grid-template-columns: 1.55fr 1fr;
+      gap: 16px;
+      margin-bottom: 1.25rem;
+      align-items: stretch;
+    }
+    .stats-chart-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px 18px;
+      box-shadow: 0 1px 3px rgba(15,23,42,0.04);
+      display: flex;
+      flex-direction: column;
+    }
+    .stats-spline-card {
+      min-height: 310px;
+    }
+    .stats-pie-card {
+      min-height: 310px;
+    }
+    .stats-pie-toggle-wrap {
+      display: flex;
+      background: #f1f5f9;
+      padding: 2px;
+      border-radius: 20px;
+      gap: 2px;
+    }
+    .stats-pie-toggle-btn {
+      padding: 4px 12px;
+      border-radius: 16px;
+      border: none;
+      background: transparent;
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: #64748b;
+      cursor: pointer;
+      font-family: var(--font-body);
+      transition: all 0.15s ease;
+    }
+    .stats-pie-toggle-btn.active {
+      background: var(--royal-blue, #1a3a8f);
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(26,58,143,0.2);
+    }
+    .stats-pie-chart-inner {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 6px;
+    }
+    .pie-layout-wrap {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      width: 100%;
+      justify-content: space-between;
+    }
+    .pie-svg-wrap {
+      width: 155px;
+      height: 155px;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .pie-donut-svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+    .pie-center-title {
+      font-size: 11px;
+      fill: #64748b;
+      font-weight: 600;
+      transform: rotate(90deg);
+      transform-origin: 100px 94px;
+    }
+    .pie-center-val {
+      font-size: 19px;
+      fill: #0f172a;
+      font-weight: 800;
+      font-family: var(--font-display, sans-serif);
+      transform: rotate(90deg);
+      transform-origin: 100px 118px;
+    }
+    .pie-legend-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 0;
+    }
+    .pie-legend-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 6px 10px;
+      background: #f8fafc;
+      border: 1px solid #f1f5f9;
+      border-radius: 10px;
+    }
+    .pie-legend-head {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .pie-legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .pie-legend-label {
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: #334155;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .pie-legend-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding-left: 14px;
+    }
+    .pie-legend-val {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #0f172a;
+      font-family: var(--font-number, 'Jost', sans-serif);
+    }
+    .pie-legend-pct {
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+
+    @media (max-width: 1080px) {
+      .stats-analytics-row {
+        grid-template-columns: 1fr;
+      }
+      .pie-layout-wrap {
+        justify-content: center;
+        gap: 24px;
+      }
+    }
     @media (max-width: 640px) {
       .stats-mini-grid { grid-template-columns: 1fr; }
       .stats-chart-card-head { gap: 6px; }
+      .pie-layout-wrap {
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+      }
+      .pie-legend-wrap {
+        width: 100%;
+      }
     }
   `;
   document.head.appendChild(style);

@@ -541,12 +541,26 @@
 
       <div id="stats-fin-kpi" class="stats-kpi-grid"></div>
 
-      <div class="stats-chart-card">
-        <div class="stats-chart-card-head">
-          <div class="stats-chart-card-title">รายรับ vs รายจ่าย <span class="stats-hint">· กดจุดเพื่อดูรายละเอียด</span></div>
-          <div class="stats-chart-legend" id="stats-fin-legend"></div>
+      <!-- Analytics Row: Spline Trend Chart (Left) + Analysis Pie Chart (Right) -->
+      <div class="stats-analytics-row">
+        <div class="stats-chart-card stats-spline-card">
+          <div class="stats-chart-card-head">
+            <div class="stats-chart-card-title">รายรับ vs รายจ่าย <span class="stats-hint">· กดจุดเพื่อดูรายละเอียด</span></div>
+            <div class="stats-chart-legend" id="stats-fin-legend"></div>
+          </div>
+          <div id="stats-fin-chart"></div>
         </div>
-        <div id="stats-fin-chart"></div>
+
+        <div class="stats-chart-card stats-pie-card">
+          <div class="stats-chart-card-head">
+            <div class="stats-chart-card-title">สัดส่วนวิเคราะห์ <span id="statsPieYearLabel" class="stats-hint"></span></div>
+            <div class="stats-pie-toggle-wrap">
+              <button class="stats-pie-toggle-btn active" id="btnPieFinance" onclick="window.__statsSwitchPie('finance')">การเงิน</button>
+              <button class="stats-pie-toggle-btn" id="btnPieLevel" onclick="window.__statsSwitchPie('level')">ระดับปลา</button>
+            </div>
+          </div>
+          <div id="stats-pie-chart" class="stats-pie-chart-inner"></div>
+        </div>
       </div>
 
       <div class="stats-section-card">
