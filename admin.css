@@ -1,3 +1,46 @@
+.admin-dashboard {
+  --adm-ink:        #0f1b3d;   /* primary text */
+  --adm-ink-soft:   #4b5875;   /* secondary text */
+  --adm-ink-muted:  #8892a6;   /* tertiary / caption */
+
+  --adm-bg:         #f4f6fb;   /* page background (level 0) */
+  --adm-surface:    #ffffff;   /* level 1 */
+  --adm-surface-2:  #f8f9fd;   /* level 2, subtle tint inside cards */
+  --adm-border:     #e7eaf3;
+  --adm-border-soft:#eef1f8;
+
+  --adm-primary:      var(--royal-blue, #1a3a8f);
+  --adm-primary-deep: #0d1f5c;
+  --adm-primary-tint: #eef2ff;
+  --adm-accent:       #0e9384;   /* aquatic teal accent — used sparingly */
+  --adm-accent-tint:  #e6f7f4;
+
+  --adm-success:      #0f9d63;
+  --adm-success-tint: #e9f9f1;
+  --adm-warning:      #b5760a;
+  --adm-warning-tint: #fdf4e3;
+  --adm-danger:       #c0342b;
+  --adm-danger-tint:  #fbeceb;
+  --adm-info:         #2563eb;
+  --adm-info-tint:    #eaf1ff;
+
+  --adm-radius-sm:  8px;
+  --adm-radius-md:  12px;
+  --adm-radius-lg:  18px;
+  --adm-radius-xl:  22px;
+
+  --adm-space-1: 4px;  --adm-space-2: 8px;  --adm-space-3: 12px;
+  --adm-space-4: 16px; --adm-space-5: 20px; --adm-space-6: 24px;
+  --adm-space-8: 32px; --adm-space-10: 40px;
+
+  --adm-shadow-sm: 0 1px 2px rgba(15,27,61,0.05);
+  --adm-shadow-md: 0 6px 20px rgba(15,27,61,0.06);
+  --adm-shadow-lg: 0 16px 40px rgba(15,27,61,0.10);
+
+  font-family: var(--font-body);
+  color: var(--adm-ink);
+}
+
 /* ── LOGIN SCREEN ── */
 .admin-login-screen {
   min-height: 100vh;
@@ -46,9 +89,10 @@
 body.logged-in .admin-login-screen { display: none; }
 body.logged-in .admin-dashboard    { display: block; }
 
-/* ── TOPBAR ── */
+/* ── TOPBAR (mobile/tablet header — becomes the sidebar on desktop, see media query) ── */
 .admin-topbar {
-  background: var(--royal-blue); color: white;
+  background: linear-gradient(180deg, var(--adm-primary-deep), var(--adm-primary));
+  color: white;
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 5%; height: 60px;
   position: sticky; top: 0; z-index: 100;
@@ -57,49 +101,54 @@ body.logged-in .admin-dashboard    { display: block; }
 .admin-topbar-logo {
   font-family: var(--font-display); font-size: 1.2rem; font-weight: 700;
   white-space: nowrap; flex-shrink: 0;
+  display: flex; align-items: baseline; gap: 0;
 }
-.admin-topbar-logo span { color: #7eb3ff; }
+.admin-topbar-logo span { color: #8fb4ff; }
 .admin-topbar-sub {
-  font-size: 0.72rem; opacity: 0.6;
-  font-family: var(--font-body); font-weight: 400; margin-left: 6px;
+  font-size: 0.68rem; opacity: 0.55;
+  font-family: var(--font-body); font-weight: 500; margin-left: 8px;
+  text-transform: uppercase; letter-spacing: 0.08em;
 }
 
-/* ── TAB NAV (topbar) ── */
+/* ── TAB NAV (topbar / sidebar) ── */
 .admin-nav-tabs {
   display: flex; gap: 2px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 8px; padding: 3px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 10px; padding: 3px;
 }
 .admin-nav-tab {
-  padding: 5px 14px; border-radius: 6px;
+  padding: 6px 14px; border-radius: 8px;
   font-size: 0.8rem; font-weight: 500;
-  color: rgba(255,255,255,0.65);
+  color: rgba(255,255,255,0.6);
   cursor: pointer; border: none;
   background: transparent; font-family: var(--font-body);
-  transition: all 0.15s; white-space: nowrap;
+  transition: all 0.15s ease; white-space: nowrap;
 }
-.admin-nav-tab:hover { color: white; background: rgba(255,255,255,0.1); }
-.admin-nav-tab.active { background: white; color: var(--royal-blue); font-weight: 600; }
+.admin-nav-tab:hover { color: white; background: rgba(255,255,255,0.08); }
+.admin-nav-tab.active {
+  background: rgba(255,255,255,0.14); color: white; font-weight: 600;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18);
+}
 
 .admin-topbar-right { display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
 .admin-topbar-right a {
-  color: rgba(255,255,255,0.75); text-decoration: none;
-  font-size: 0.82rem; transition: color 0.2s; white-space: nowrap;
+  color: rgba(255,255,255,0.7); text-decoration: none;
+  font-size: 0.8rem; transition: color 0.2s; white-space: nowrap;
 }
 .admin-topbar-right a:hover { color: white; }
 .admin-logout-btn {
-  background: rgba(255,255,255,0.15);
-  border: 1px solid rgba(255,255,255,0.3);
-  color: white; padding: 0.35rem 0.9rem;
-  border-radius: 8px; cursor: pointer;
-  font-size: 0.82rem; font-family: var(--font-body);
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.22);
+  color: white; padding: 0.4rem 0.95rem;
+  border-radius: 9px; cursor: pointer;
+  font-size: 0.8rem; font-weight: 500; font-family: var(--font-body);
   transition: background 0.2s; white-space: nowrap;
 }
-.admin-logout-btn:hover { background: rgba(255,255,255,0.25); }
+.admin-logout-btn:hover { background: rgba(255,255,255,0.2); }
 
 /* ── BODY & PAGES ── */
 .admin-body {
-  padding: 1.75rem 5%; background: #f8faff;
+  padding: 1.75rem 5%; background: var(--adm-bg, #f4f6fb);
   min-height: calc(100vh - 60px);
 }
 .admin-page {
@@ -112,59 +161,103 @@ body.logged-in .admin-dashboard    { display: block; }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── CARD ── */
-/* .admin-card base is in style.css — only extend here */
-.admin-card { margin-bottom: 1.5rem; }
-.admin-card:last-child { margin-bottom: 0; }
+/* ── CARD ──
+   ยกระดับพื้นผิวการ์ดของ Admin โดยเฉพาะ (ไม่กระทบ .admin-card บนหน้าเว็บลูกค้า
+   เพราะ selector นี้ถูกโหลดทีหลังและ scope เฉพาะ .admin-dashboard) ── */
+.admin-dashboard .admin-card {
+  background: var(--adm-surface, #fff);
+  border: 1px solid var(--adm-border, var(--border));
+  border-radius: var(--adm-radius-lg, 16px);
+  box-shadow: var(--adm-shadow-sm, 0 2px 12px rgba(26,58,143,0.06));
+  padding: 1.6rem 1.75rem;
+  margin-bottom: var(--adm-space-4, 16px);
+}
+.admin-dashboard .admin-card:last-child { margin-bottom: 0; }
 
 /* ── PANEL TITLE ── */
 .admin-panel-title {
-  font-family: var(--font-display); font-size: 1.3rem; font-weight: 700;
-  margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;
+  font-family: var(--font-display); font-size: 1.15rem; font-weight: 700;
+  margin-bottom: 1.1rem; display: flex; align-items: center; gap: 0.5rem;
+  color: var(--adm-ink, inherit);
 }
+.admin-panel-title i { font-size: 1.05rem; }
 
-/* ── DATE BANNER ── */
+/* ── PAGE HEADER (เดิมชื่อ date-banner) ──
+   ยกระดับจาก "แถบวันที่" เล็กๆ ให้เป็นหัวหน้าเพจที่มีลำดับชั้นชัดเจน:
+   Title ใหญ่ + วันที่รอง + badge สถานะ ── */
 .date-banner {
-  background: white; border: 1px solid var(--border);
-  border-radius: 12px; padding: 0.75rem 1.25rem;
-  margin-bottom: 1.5rem;
-  display: flex; align-items: center; justify-content: space-between;
-  flex-wrap: wrap; gap: 0.5rem;
+  background: transparent; border: none; padding: 0;
+  margin-bottom: var(--adm-space-8, 32px);
+  display: flex; align-items: flex-end; justify-content: space-between;
+  flex-wrap: wrap; gap: var(--adm-space-4, 16px);
 }
-.date-banner-text { font-size: 0.85rem; color: var(--gray); }
-.date-banner-text strong { color: var(--royal-blue); font-weight: 600; }
+.date-banner-title {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: 1.7rem; color: var(--adm-ink, var(--royal-blue));
+  line-height: 1.2; margin: 0 0 4px;
+}
+.date-banner-text { font-size: 0.86rem; color: var(--adm-ink-muted, var(--gray)); }
+.date-banner-text strong { color: var(--adm-ink-soft, var(--royal-blue)); font-weight: 600; }
 .date-banner-badge {
-  font-size: 0.75rem; background: #eff4ff; color: var(--royal-blue);
-  padding: 3px 10px; border-radius: 20px; font-weight: 500;
+  font-size: 0.74rem; background: var(--adm-primary-tint, #eff4ff); color: var(--adm-primary, var(--royal-blue));
+  padding: 6px 14px; border-radius: 20px; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 6px;
+  box-shadow: var(--adm-shadow-sm, none);
 }
 
-/* ── STATS ── */
+/* ── STATS ──
+   4 การ์ดไม่เท่ากันทางความหมาย: total/available = ข้อมูลทั่วไป (พื้นผิวขาว)
+   low/out = ต้องให้ความสนใจ (พื้นผิวโทนเตือน) — สร้างลำดับชั้นด้วยสี ไม่ใช่แค่ไอคอน ── */
 .admin-stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 1rem; margin-bottom: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--adm-space-4, 16px); margin-bottom: var(--adm-space-6, 24px);
 }
 .admin-stat-card {
-  background: white; border: 1px solid var(--border);
-  border-radius: 12px; padding: 1.25rem 1.5rem;
+  background: var(--adm-surface, #fff); border: 1px solid var(--adm-border, var(--border));
+  border-radius: var(--adm-radius-lg, 14px); padding: 1.35rem 1.5rem;
   display: flex; align-items: center; gap: 1rem;
-  transition: box-shadow 0.2s;
+  transition: box-shadow 0.2s, transform 0.2s;
+  box-shadow: var(--adm-shadow-sm, none);
 }
-.admin-stat-card:hover { box-shadow: 0 4px 16px rgba(26,58,143,0.1); }
-.admin-stat-icon { font-size: 1.75rem; }
-.admin-stat-label { font-size: 0.78rem; color: var(--gray); margin-top: 0.2rem; }
+.admin-stat-card:hover { box-shadow: var(--adm-shadow-md, 0 4px 16px rgba(26,58,143,0.1)); transform: translateY(-1px); }
+.admin-stat-icon {
+  font-size: 1.35rem; width: 42px; height: 42px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--adm-radius-md, 10px);
+}
+.admin-stat-num { font-family: var(--font-display); font-weight: 700; line-height: 1; }
+.admin-stat-label { font-size: 0.76rem; color: var(--adm-ink-muted, var(--gray)); margin-top: 0.3rem; }
 
-/* ── DASHBOARD 2-COL ── */
+/* total = metric ที่ใหญ่ที่สุดในกลุ่ม (ตัวเลขหลักของธุรกิจ) */
+.stat-card-total .admin-stat-num { font-size: 1.9rem; color: var(--adm-ink, var(--royal-blue)); }
+.stat-card-ok    .admin-stat-num { font-size: 1.6rem; color: var(--adm-ink, var(--royal-blue)); }
+.stat-card-low   .admin-stat-num { font-size: 1.6rem; color: var(--adm-warning, #b5760a); }
+.stat-card-out   .admin-stat-num { font-size: 1.6rem; color: var(--adm-danger, #c0342b); }
+
+/* low / out ต้องสะดุดตากว่า — ใช้พื้นผิวโทนอ่อนแทนขาวล้วน เพื่อสื่อว่า "ต้องดู" */
+.stat-card-low { background: var(--adm-warning-tint, #fdf4e3); border-color: #f3e2b8; }
+.stat-card-out { background: var(--adm-danger-tint, #fbeceb); border-color: #f0c9c6; }
+
+/* ── DASHBOARD 2-COL ──
+   asymmetric: "ต้องดำเนินการ" (low stock) ได้พื้นที่มากกว่า "เพิ่มล่าสุด" เพราะสำคัญกว่าในการดำเนินงาน ── */
 .dash-two-col {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+  display: grid; grid-template-columns: 1fr 1fr; gap: var(--adm-space-4, 16px);
+  margin-bottom: var(--adm-space-4, 16px);
+  align-items: start;
 }
 .dash-mini-row {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 0.6rem 0; border-bottom: 1px solid #f0f4ff; gap: 0.5rem;
+  padding: 0.7rem 0; border-bottom: 1px solid var(--adm-border-soft, #f0f4ff); gap: 0.5rem;
 }
 .dash-mini-row:last-child { border-bottom: none; }
-.dash-mini-name { font-size: 0.88rem; font-weight: 500; }
-.dash-mini-sub  { font-size: 0.73rem; color: var(--gray); }
+.dash-mini-name { font-size: 0.88rem; font-weight: 600; color: var(--adm-ink, inherit); }
+.dash-mini-sub  { font-size: 0.72rem; color: var(--adm-ink-muted, var(--gray)); font-style: italic; margin-top: 1px; }
+
+/* การ์ด "ต้องดำเนินการ" ได้เส้นขอบบนโทนเตือนบางๆ เพื่อดึงสายตาโดยไม่ต้องใช้สีสด */
+.admin-dashboard .admin-card.dash-card--attention {
+  border-top: 3px solid var(--adm-warning, #b5760a);
+}
 
 /* ── QUICK รายรับ-รายจ่าย (หน้าหลัก) ── */
 .quick-fin-row { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
@@ -559,46 +652,54 @@ body.logged-in .admin-dashboard    { display: block; }
 
   .admin-topbar {
     position: fixed; top: 0; left: 0; bottom: 0;
-    width: 232px; height: 100vh;
+    width: 248px; height: 100vh;
     flex-direction: column; align-items: stretch; justify-content: flex-start;
-    padding: 1.5rem 1rem; gap: 0;
+    padding: 1.75rem 1.1rem; gap: 0;
     overflow-y: auto;
+    box-shadow: var(--adm-shadow-lg, 0 16px 40px rgba(15,27,61,0.1));
   }
 
   .admin-topbar-logo {
-    padding: 0 0.4rem; margin-bottom: 2rem;
-    font-size: 1.3rem;
+    padding: 0 0.4rem; margin-bottom: 2.25rem;
+    font-size: 1.32rem;
   }
 
   .admin-nav-tabs {
     flex-direction: column; align-items: stretch;
-    background: transparent; padding: 0; gap: 3px;
+    background: transparent; padding: 0; gap: 2px;
     flex: 1; width: 100%;
   }
   .admin-nav-tab {
-    display: flex; align-items: center; gap: 10px;
+    display: flex; align-items: center; gap: 11px;
     width: 100%; text-align: left; justify-content: flex-start;
-    padding: 10px 14px; font-size: 0.88rem;
+    padding: 10px 14px; font-size: 0.87rem;
+    position: relative; border-radius: 10px;
   }
-  .admin-nav-tab i { font-size: 1.05rem; flex-shrink: 0; }
+  .admin-nav-tab i { font-size: 1.05rem; flex-shrink: 0; width: 1.1rem; text-align: center; }
+  .admin-nav-tab.active::before {
+    content: ''; position: absolute; left: -1.1rem; top: 50%; transform: translateY(-50%);
+    width: 3px; height: 18px; border-radius: 3px;
+    background: #8fb4ff;
+  }
 
   .admin-topbar-right {
     flex-direction: column; align-items: stretch; gap: 0.6rem;
     margin-top: 1rem; padding-top: 1rem;
-    border-top: 1px solid rgba(255,255,255,0.15);
+    border-top: 1px solid rgba(255,255,255,0.12);
   }
   .admin-topbar-right a { text-align: center; padding: 0.35rem 0; }
   .admin-logout-btn { width: 100%; text-align: center; }
 
   .admin-body {
     flex: 1; min-width: 0;
-    margin-left: 232px;
-    padding: 2rem 3rem;
+    margin-left: 248px;
+    padding: 2.25rem 3rem 3rem;
     min-height: 100vh;
+    max-width: 1440px;
   }
 
   .admin-stats           { grid-template-columns: repeat(4, 1fr); }
-  .dash-two-col          { grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .dash-two-col          { grid-template-columns: 1.35fr 1fr; gap: 1.5rem; }
   .finance-summary-grid  { grid-template-columns: repeat(3, 1fr); }
   .finance-lists         { grid-template-columns: 1fr 1fr; }
 }
@@ -643,7 +744,8 @@ body.logged-in .admin-dashboard    { display: block; }
 
   /* dashboard */
   .dash-two-col          { grid-template-columns: 1fr; }
-  .date-banner           { padding: 0.6rem 1rem; }
+  .date-banner           { padding: 0; align-items: flex-start; }
+  .date-banner-title     { font-size: 1.3rem; }
 
   /* finance */
   .finance-summary-grid  { grid-template-columns: 1fr; }

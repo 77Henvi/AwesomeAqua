@@ -52,21 +52,24 @@
 
     <div class="admin-page active" id="page-home">
       <div class="date-banner">
-        <div class="date-banner-text">วันนี้ <strong id="headerDate">—</strong></div>
-        <div class="date-banner-badge">🐟 AwesomeAqua Admin</div>
+        <div>
+          <div class="date-banner-title">ภาพรวมวันนี้</div>
+          <div class="date-banner-text">วันนี้ <strong id="headerDate">—</strong></div>
+        </div>
+        <div class="date-banner-badge"><i class="ph ph-fish-simple"></i> AwesomeAqua Admin</div>
       </div>
       <div class="admin-stats" id="adminStats"></div>
       <div class="dash-two-col">
-        <div class="admin-card">
-          <div class="admin-panel-title" style="font-size:1rem;margin-bottom:0.75rem;">
-            <i class="ph ph-warning-circle" style="color: #f59e0b;"></i> สต็อกน้อย
+        <div class="admin-card dash-card--attention">
+          <div class="admin-panel-title">
+            <i class="ph ph-warning-circle" style="color: var(--adm-warning, #b5760a);"></i> ต้องดำเนินการ
           </div>
           <div id="dash-lowstock">
             <div class="admin-empty-state"><div class="admin-empty-icon">🎉</div><div class="admin-empty-text">สต็อกครบทุกรายการ</div></div>
           </div>
         </div>
         <div class="admin-card">
-          <div class="admin-panel-title" style="font-size:1rem;margin-bottom:0.75rem;"><i class="ph ph-clock-counter-clockwise"></i> เพิ่มล่าสุด</div>
+          <div class="admin-panel-title"><i class="ph ph-clock-counter-clockwise"></i> เพิ่มล่าสุด</div>
           <div id="dash-recent">
             <div class="admin-empty-state"><div class="admin-empty-icon">🐟</div><div class="admin-empty-text">ยังไม่มีปลา</div></div>
           </div>
@@ -74,7 +77,7 @@
       </div>
 
       <div class="admin-card">
-        <div class="admin-panel-title" style="font-size:1rem;margin-bottom:0.9rem;"><i class="ph ph-receipt"></i> บันทึกรายรับ-รายจ่ายด่วน</div>
+        <div class="admin-panel-title"><i class="ph ph-receipt"></i> บันทึกรายรับ-รายจ่ายด่วน</div>
         <div class="quick-fin-row">
           <input type="text" id="finItemName" class="form-input" placeholder="เช่น ค่าอาหารปลา, ขายปลาเทวดา...">
           <input type="number" id="finItemAmount" class="form-input quick-fin-amount" placeholder="จำนวนเงิน">
