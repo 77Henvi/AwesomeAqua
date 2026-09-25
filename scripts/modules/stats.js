@@ -305,10 +305,12 @@ export function renderStatsPieChart(fishData, financeData, year, mode = 'finance
     <div class="pie-layout-wrap">
       <div class="pie-svg-wrap">
         <svg viewBox="0 0 200 200" class="pie-donut-svg">
-          <circle cx="100" cy="100" r="${R}" fill="none" stroke="#f1f5f9" stroke-width="24"></circle>
-          ${circlesSvg}
-          <text x="100" y="94" text-anchor="middle" class="pie-center-title">${centerTitle}</text>
-          <text x="100" y="118" text-anchor="middle" class="pie-center-val">${centerVal}</text>
+          <g transform="rotate(-90 100 100)">
+            <circle cx="100" cy="100" r="${R}" fill="none" stroke="#f1f5f9" stroke-width="24"></circle>
+            ${circlesSvg}
+          </g>
+          <text x="100" y="96" text-anchor="middle" dominant-baseline="middle" class="pie-center-title">${centerTitle}</text>
+          <text x="100" y="118" text-anchor="middle" dominant-baseline="middle" class="pie-center-val">${centerVal}</text>
         </svg>
       </div>
       <div class="pie-legend-wrap">
@@ -826,22 +828,18 @@ function _injectStatsStyle() {
     .pie-donut-svg {
       width: 100%;
       height: 100%;
-      transform: rotate(-90deg);
     }
     .pie-center-title {
       font-size: 11px;
       fill: #64748b;
       font-weight: 600;
-      transform: rotate(90deg);
-      transform-origin: 100px 94px;
+      letter-spacing: 0.01em;
     }
     .pie-center-val {
       font-size: 19px;
       fill: #0f172a;
       font-weight: 800;
       font-family: var(--font-display, sans-serif);
-      transform: rotate(90deg);
-      transform-origin: 100px 118px;
     }
     .pie-legend-wrap {
       flex: 1;
