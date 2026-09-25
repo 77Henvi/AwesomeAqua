@@ -267,6 +267,29 @@ body.logged-in { background: #eceef3; }
   border-top: 3px solid var(--adm-warning, #b5760a);
 }
 
+/* ── SHARED FINANCE-CHART STYLES ──
+   คลาสเดียวกับที่หน้า "สถิติ" ใช้ (สร้างแบบ inject ผ่าน JS ทีหลัง) — ประกาศไว้ล่วงหน้าที่นี่ด้วย
+   เพื่อให้กราฟ shortcut บนหน้า Dashboard ขึ้นสวยได้ตั้งแต่โหลดหน้าแรก ไม่ต้องรอผู้ใช้กดเข้าแท็บสถิติก่อน ── */
+.stats-chart-legend { display: flex; gap: 0.9rem; font-size: 0.75rem; color: var(--adm-ink-muted, var(--gray)); flex-shrink: 0; }
+.stats-legend-item { display: flex; align-items: center; gap: 5px; }
+.stats-legend-swatch { width: 14px; height: 0; border-top: 2.5px solid var(--royal-blue); display: inline-block; }
+.stats-legend-swatch.dash { border-top: 1.75px dashed #94a3b8; }
+.stats-fin-svg { width: 100%; height: auto; display: block; }
+.stats-chart-dot { cursor: pointer; }
+
+/* ── DASHBOARD SHORTCUT: กราฟรายรับ-รายจ่าย ── */
+.dash-chart-card-head {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 0.6rem; margin-bottom: var(--adm-space-4, 16px);
+}
+.dash-chart-link {
+  font-size: 0.78rem; font-weight: 600; color: var(--adm-primary, var(--royal-blue));
+  text-decoration: none; display: inline-flex; align-items: center; gap: 4px;
+  cursor: pointer; background: none; border: none; font-family: var(--font-body);
+  padding: 0;
+}
+.dash-chart-link:hover { text-decoration: underline; }
+
 /* ── QUICK รายรับ-รายจ่าย (หน้าหลัก) ── */
 .quick-fin-row { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
 .quick-fin-row .form-input { flex: 1; min-width: 180px; }
@@ -711,9 +734,14 @@ body.logged-in { background: #eceef3; }
   .admin-page { max-width: 1320px; }
 
   .admin-stats           { grid-template-columns: repeat(4, 1fr); }
-  .dash-two-col          { grid-template-columns: 1.35fr 1fr; gap: 1.5rem; }
+  .dash-two-col          { grid-template-columns: 1fr 1fr; gap: 1.5rem; }
   .finance-summary-grid  { grid-template-columns: repeat(3, 1fr); }
   .finance-lists         { grid-template-columns: 1fr 1fr; }
+}
+
+/* ── LARGE DESKTOP (≥ 1280px): พื้นที่พอให้การ์ด "ต้องดำเนินการ" กว้างกว่า "เพิ่มล่าสุด" ── */
+@media (min-width: 1280px) {
+  .dash-two-col { grid-template-columns: 1.35fr 1fr; }
 }
 
 /* ── TABLET (641px – 1024px) ── */

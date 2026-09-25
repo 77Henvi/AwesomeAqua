@@ -3,7 +3,7 @@ import { showToast, paginate, renderPager } from './shared/utils.js';
 import { LOW_STOCK_THRESHOLD }            from './shared/calc.js';
 import { previewNewImage, previewEditImage } from './shared/image.js';
 import { toggleTag }                      from './shared/tags.js';
-import { renderStats }                   from './modules/stats.js';
+import { renderStats, renderFinanceChart }                   from './modules/stats.js';
 import { initAds }                       from './modules/ads.js';
 import { renderAdminUsers, addAdminUser, removeAdminUser } from './modules/adminUsers.js';
 import { loadOrders, setOrderStatusFilter, updateOrderStatus, askCancelReason, closeLostReasonModal, confirmCancelWithReason } from './modules/orders.js';
@@ -158,6 +158,9 @@ function refreshFinance() {
   return loadFinanceFromDB(() => {
     profitMap = getProfitMap(); // sync ให้ renderFishTable() อ่านค่าล่าสุดได้
     if (fishData.length > 0) renderFishTable(); // รีเรนเดอร์ตารางปลาเพื่ออัปเดตกำไรสะสม
+    // ข้อมูลการเงินโหลดเสร็จช้ากว่าปลา (เรียกคู่ขนานกันใน showDashboard) —
+    // รีเฟรชกราฟ shortcut บนหน้าแรกอีกครั้งตรงนี้ กันกรณีโหลดไม่ทันตอน renderDashboardCards() รอบแรก
+    renderFinanceChart(getFinanceData(), new Date().getFullYear(), 'dash-fin-chart', 'dash-fin-legend');
   });
 }
 
@@ -337,6 +340,9 @@ function renderDashboardCards() {
         </span>
       </div>`).join('');
   }
+
+  // ── Shortcut: กราฟรายรับ-รายจ่ายของปีปัจจุบัน (ใช้ฟังก์ชันเดียวกับหน้าสถิติ ต่างแค่ id container) ──
+  renderFinanceChart(getFinanceData(), new Date().getFullYear(), 'dash-fin-chart', 'dash-fin-legend');
 }
 
 // ════════════════════════════════════════════
@@ -529,8 +535,10 @@ function _setDateHeaders() {
   });
   const hd = document.getElementById('headerDate');
   const tl = document.getElementById('todayLabel');
+  const yl = document.getElementById('dashFinYearLabel');
   if (hd) hd.textContent = str;
   if (tl) tl.textContent = str;
+  if (yl) yl.textContent = new Date().getFullYear() + 543; // แสดง พ.ศ. ให้ตรงกับที่อื่นในหน้านี้
 }
 
 function _empty(icon, text) {

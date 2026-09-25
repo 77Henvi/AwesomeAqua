@@ -59,6 +59,18 @@
         <div class="date-banner-badge"><i class="ph ph-fish-simple"></i> AwesomeAqua Admin</div>
       </div>
       <div class="admin-stats" id="adminStats"></div>
+
+      <div class="admin-card">
+        <div class="dash-chart-card-head">
+          <div class="admin-panel-title" style="margin-bottom:0;"><i class="ph ph-chart-line-up"></i> แนวโน้มรายรับ-รายจ่าย · <span id="dashFinYearLabel"></span></div>
+          <div style="display:flex; align-items:center; gap:1rem;">
+            <span class="stats-chart-legend" id="dash-fin-legend"></span>
+            <button class="dash-chart-link" onclick="switchTab('stats')">ดูสถิติทั้งหมด <i class="ph ph-arrow-right"></i></button>
+          </div>
+        </div>
+        <div id="dash-fin-chart"></div>
+      </div>
+
       <div class="dash-two-col">
         <div class="admin-card dash-card--attention">
           <div class="admin-panel-title">

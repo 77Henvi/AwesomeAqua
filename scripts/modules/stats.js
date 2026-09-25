@@ -126,10 +126,12 @@ function renderFinanceKPI(financeData, year) {
     </div>`).join('');
 }
 
-// ── กราฟรายรับ vs รายจ่าย (area + line) ─────────
-function renderFinanceChart(financeData, year) {
-  const el     = document.getElementById('stats-fin-chart');
-  const legEl  = document.getElementById('stats-fin-legend');
+// ── กราฟรายรับ vs รายจ่าย (area + line)
+//    รับ id ของ container ได้ (ค่าเริ่มต้น = หน้าสถิติเดิม) เพื่อให้เรียกใช้ซ้ำได้จากหน้า Dashboard
+//    โดยไม่ชนกับ id เดิมของหน้าสถิติ (DOM ทั้งสองหน้าอยู่พร้อมกันเสมอ ต่างกันแค่ display) ─────
+export function renderFinanceChart(financeData, year, chartElId = 'stats-fin-chart', legendElId = 'stats-fin-legend') {
+  const el     = document.getElementById(chartElId);
+  const legEl  = document.getElementById(legendElId);
   if (!el) return;
 
   const months = _monthlyBreakdown(financeData, year);
