@@ -12,6 +12,7 @@
     --border: #e5e7eb;
     --font-display: 'Playfair Display', 'Noto Serif Thai', 'Cormorant Garamond', serif;
     --font-body: 'Jost', 'Noto Sans Thai', sans-serif;
+    --font-number: 'Jost', 'Noto Sans Thai', sans-serif;
   
     /* ── Radius scale (ให้ทั้งเว็บใช้ชุดค่าเดียวกัน แทนการเดาตัวเลขมั่วๆ) ── */
     --radius-sm: 8px;    /* input, badge เล็ก, ปุ่มย่อย */
@@ -694,8 +695,9 @@
     margin-top: auto; margin-bottom: 0.95rem;
   }
   .fish-price {
-    font-family: var(--font-display);
+    font-family: var(--font-number);
     font-size: 1.2rem; font-weight: 700; color: var(--ocean-deep);
+    font-variant-numeric: tabular-nums;
   }
   .fish-stock {
     font-size: 0.78rem; font-weight: 500; color: var(--gray);
