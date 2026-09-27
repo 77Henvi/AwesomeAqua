@@ -890,14 +890,56 @@
     .fd-name { font-size: 1.9rem; }
   }
 
-  /* ── DESKTOP (≥1025px): สองคอลัมน์ — รูปคงที่ซ้าย / เนื้อหา scroll ขวา ── */
+  /* ══════════════════════════════════════════════
+     DESKTOP (≥1025px): FULL-SCREEN TAKEOVER
+     พื้นที่กว้างพอ ไม่จำเป็นต้องเลียนแบบ "การ์ดลอยแคบๆ" แบบมือถือ —
+     ใช้พื้นที่ทั้งจอ: รูปใหญ่เต็มความสูงซ้าย / เนื้อหาเป็นคอลัมน์อ่านง่ายขวา
+     พร้อม gutter ว่างสองข้างของคอลัมน์เนื้อหาเพื่อไม่ให้บรรทัดยาวเกินไป
+     ══════════════════════════════════════════════ */
   @media (min-width: 1025px) {
-    #fishModal .modal, #csModal .modal { max-width: 900px; max-height: 640px; }
-    .fish-detail-body { display: flex; align-items: stretch; min-height: 560px; max-height: 640px; }
-    .fd-hero { flex: 0 0 42%; height: auto; }
-    .fd-body { flex: 1; min-width: 0; overflow-y: auto; padding: 2rem 2.5rem 2.25rem; }
-    .fd-name { font-size: 1.65rem; }
-    .fd-info-row { grid-template-columns: repeat(3, 1fr); }
+    #fishModal.modal-overlay, #csModal.modal-overlay { padding: 0; align-items: stretch; }
+    #fishModal .modal, #csModal .modal {
+      max-width: none; width: 100vw; height: 100vh; max-height: none;
+      border-radius: 0; animation: fadeInFull 0.2s ease;
+    }
+    @keyframes fadeInFull { from { opacity: 0; } to { opacity: 1; } }
+
+    .fish-detail-body { display: flex; align-items: stretch; height: 100vh; }
+
+    .fd-hero { flex: 0 0 56%; height: 100vh; }
+    .fd-hero-bottom { padding: 2.5rem 3.5rem; }
+    .fd-name { font-size: 2.4rem; }
+    .fd-species { font-size: 1rem; }
+
+    .fd-body {
+      flex: 1; min-width: 0; height: 100vh; overflow-y: auto;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 3rem 4vw;
+    }
+    /* คอลัมน์เนื้อหาจำกัดความกว้างไว้เพื่อการอ่าน แม้จอจะกว้างแค่ไหน */
+    .fd-body > * { width: 100%; max-width: 480px; margin-left: auto; margin-right: auto; }
+
+    .fd-tags { margin-bottom: 1.5rem; }
+    .fd-tag { font-size: 0.8rem; padding: 0.32rem 0.85rem; }
+
+    .fd-info-row { grid-template-columns: repeat(3, 1fr); gap: 0.85rem; margin-bottom: 1.75rem; }
+    .fd-info-block { padding: 1rem 0.9rem; }
+    .fd-info-icon { font-size: 1.2rem; }
+    .fd-info-label { font-size: 0.68rem; white-space: nowrap; }
+    .fd-info-value { font-size: 1rem; }
+
+    .fd-desc-wrap { padding: 1.25rem 1.4rem; margin-bottom: 1.75rem; }
+    .fd-desc { font-size: 0.92rem; }
+
+    .fd-similar-card { flex: 0 0 128px; }
+    .fd-similar-img, .fd-similar-emoji { height: 92px; }
+
+    .fd-cta { margin-top: 0.5rem; }
+    .fd-btn-messenger, .fd-btn-disabled { padding: 1.05rem; font-size: 1.05rem; }
+
+    /* ปุ่มปิด/หัวใจ ขยับให้เข้ากับสัดส่วนรูปที่ใหญ่ขึ้น */
+    #fishModal .modal-close, #csModal .modal-close { top: 1.5rem; right: 1.5rem; width: 42px; height: 42px; font-size: 1.2rem; }
+    .fd-wish-fab { top: 1.5rem; left: 1.5rem; width: 42px; height: 42px; font-size: 1.2rem; }
   }
   
   
