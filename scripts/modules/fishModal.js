@@ -1,4 +1,5 @@
 import { fishData } from './fishData.js';
+import { isWishlisted } from '../shared/wishlist.js';
 import { MESSENGER_ICON } from '../shared/utils.js';
 
 // ── Modal ปลาปกติ ──
@@ -15,17 +16,20 @@ export function openFishDetail(id) {
   const displayTags = isEn && f.tags_en?.length ? f.tags_en : f.tags_th;
 
   const outOfStock = f.stock === 0;
+  const liked = isWishlisted(f.id);
 
   // ── แปลคำศัพท์ UI ในป๊อปอัป ──
   const txtPrice = isEn ? 'Price' : 'ราคา';
   const txtStock = isEn ? 'Stock' : 'สต็อก';
-  const txtOut = isEn ? '<i class="ph ph-x-circle"></i> Out of stock' : '<i class="ph ph-x-circle"></i> หมดแล้ว';
-  const txtLow = isEn ? `<i class="ph ph-warning"></i> Only ${f.stock} left` : `<i class="ph ph-warning"></i> เหลือ ${f.stock} ตัว`;
-  const txtIn = isEn ? `<i class="ph ph-check-circle"></i> ${f.stock} in stock` : `<i class="ph ph-check-circle"></i> ${f.stock} ตัว`;
+  const txtLevelLabel = isEn ? 'Care Level' : 'ระดับการเลี้ยง';
+  const txtOut = isEn ? 'Out of stock' : 'หมดแล้ว';
+  const txtLow = isEn ? `Only ${f.stock} left` : `เหลือ ${f.stock} ตัว`;
+  const txtIn = isEn ? `${f.stock} in stock` : `${f.stock} ตัว`;
   const txtDescTitle = isEn ? '<i class="ph ph-book-open"></i> Details' : '<i class="ph ph-book-open"></i> รายละเอียด';
   const txtOrder = isEn ? 'Order via Messenger' : 'สั่งซื้อผ่าน Messenger';
   const txtDisabled = isEn ? 'Out of stock' : 'หมดสต็อก';
   const txtOutRibbon = isEn ? 'Out of stock' : 'หมดสต็อก';
+  const txtSimilar = isEn ? '<i class="ph ph-fish"></i> You may also like' : '<i class="ph ph-fish"></i> ปลาที่คล้ายกัน';
   const fallbackIcon = `<i class="ph ph-fish"></i>`;
   const fallbackIconEsc = `<i class=&quot;ph ph-fish&quot;></i>`;
 
@@ -39,6 +43,24 @@ export function openFishDetail(id) {
     if (f.level === 'ผู้เชี่ยวชาญ') displayLevel = 'Expert';
   }
 
+  // ── ปลาที่คล้ายกัน: ใช้ข้อมูลจริงเท่านั้น จับคู่จาก species เดียวกันก่อน แล้วค่อย fallback เป็น level เดียวกัน ──
+  const bySpecies = fishData.filter(x => x.id !== f.id && x.species && x.species === f.species);
+  const byLevel   = fishData.filter(x => x.id !== f.id && x.level === f.level);
+  const similar = (bySpecies.length ? bySpecies : byLevel).slice(0, 8);
+
+  const similarHtml = similar.map(s => {
+    const sName = isEn && s.name_en ? s.name_en : s.name_th;
+    return `
+      <div class="fd-similar-card" onclick="openFishDetail('${s.id}')">
+        ${s.image
+          ? `<img src="${s.image}" alt="${sName}" class="fd-similar-img" onerror="this.outerHTML='<div class=fd-similar-emoji>${s.emoji || fallbackIconEsc}</div>'">`
+          : `<div class="fd-similar-emoji">${s.emoji || fallbackIcon}</div>`
+        }
+        <div class="fd-similar-name">${sName}</div>
+        <div class="fd-similar-price">฿${s.priceMin.toLocaleString()}</div>
+      </div>`;
+  }).join('');
+
   document.getElementById('fishDetailContent').innerHTML = `
     <div class="fd-hero">
       ${f.image
@@ -46,6 +68,9 @@ export function openFishDetail(id) {
         : `<div class="fd-hero-emoji">${f.emoji || fallbackIcon}</div>`
       }
       ${outOfStock ? `<div class="fd-out-ribbon">${txtOutRibbon}</div>` : ''}
+      <button class="fd-wish-fab ${liked ? 'active' : ''}" onclick="onWishToggle('${f.id}', this, event)" aria-label="${liked ? 'นำออกจากรายการโปรด' : 'เพิ่มในรายการโปรด'}" aria-pressed="${liked}">
+        <i class="${liked ? 'ph-fill' : 'ph'} ph-heart"></i>
+      </button>
       <div class="fd-hero-grad"></div>
       <div class="fd-hero-bottom">
         <div class="fd-name">${displayName}</div>
@@ -55,16 +80,17 @@ export function openFishDetail(id) {
     <div class="fd-body">
       <div class="fd-tags">
         ${(displayTags || []).map(t => `<span class="fd-tag">${t}</span>`).join('')}
-        ${displayLevel ? `<span class="fd-tag fd-tag--level" style="--lc:${lc}">${displayLevel}</span>` : ''}
       </div>
       <div class="fd-info-row">
         <div class="fd-info-block">
+          <div class="fd-info-icon"><i class="ph ph-tag"></i></div>
           <div class="fd-info-label">${txtPrice}</div>
           <div class="fd-info-value ${outOfStock ? 'fd-price--dim' : ''}">
             ฿${f.priceMin.toLocaleString()}${f.priceMax ? '<span class="fd-price-sep">–</span>฿' + f.priceMax.toLocaleString() : ''}
           </div>
         </div>
         <div class="fd-info-block">
+          <div class="fd-info-icon"><i class="ph ph-package"></i></div>
           <div class="fd-info-label">${txtStock}</div>
           <div class="fd-info-value">
             ${f.stock === 0
@@ -75,11 +101,21 @@ export function openFishDetail(id) {
             }
           </div>
         </div>
+        <div class="fd-info-block">
+          <div class="fd-info-icon" style="color:var(--lc,#6b7280)"><i class="ph ph-gauge"></i></div>
+          <div class="fd-info-label">${txtLevelLabel}</div>
+          <div class="fd-info-value" style="--lc:${lc};color:${lc}">${displayLevel || '—'}</div>
+        </div>
       </div>
       ${displayDesc ? `
         <div class="fd-desc-wrap">
           <div class="fd-desc-title">${txtDescTitle}</div>
           <div class="fd-desc">${displayDesc}</div>
+        </div>` : ''}
+      ${similar.length ? `
+        <div class="fd-similar-wrap">
+          <div class="fd-similar-title">${txtSimilar}</div>
+          <div class="fd-similar-rail">${similarHtml}</div>
         </div>` : ''}
       <div class="fd-cta">
         ${f.stock > 0

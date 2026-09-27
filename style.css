@@ -787,12 +787,30 @@
     color: var(--royal-blue);
   }
   #editModal .modal { max-width: 480px; }
+
+  /* ══════════════════════════════════════════════
+     FISH DETAIL MODAL — responsive redesign
+     Mobile   : bottom-sheet, hero on top, single column (เดิม)
+     Tablet   : centered card, hero on top แต่กว้าง/สูงขึ้น
+     Desktop  : two-column — hero รูปคงที่ด้านซ้าย, เนื้อหา scroll ด้านขวา
+     ══════════════════════════════════════════════ */
   #fishModal .modal { max-width: 440px; padding: 0; overflow: hidden; border-radius: 24px; }
   #fishModal .modal-close {
     top: 0.85rem; right: 0.85rem; z-index: 10;
     background: rgba(0,0,0,0.35); color: white; backdrop-filter: blur(6px);
   }
   #fishModal .modal-close:hover { background: rgba(0,0,0,0.55); }
+
+  /* ปุ่มลอยเพิ่มเติม (wishlist) เหนือรูป มุมซ้ายบน — คู่กับ .modal-close (X) ที่อยู่มุมขวาบนอยู่แล้ว */
+  .fd-wish-fab {
+    position: absolute; top: 0.85rem; left: 0.85rem; z-index: 10;
+    width: 34px; height: 34px; border-radius: 50%; border: none; cursor: pointer;
+    background: rgba(0,0,0,0.35); color: white; backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center; font-size: 1rem;
+    transition: background 0.2s, color 0.2s;
+  }
+  .fd-wish-fab:hover { background: rgba(0,0,0,0.55); }
+  .fd-wish-fab.active { background: white; color: #ef4444; }
   
   
   /* ── FISH DETAIL MODAL ── */
@@ -826,10 +844,11 @@
     background: color-mix(in srgb, var(--lc, #6b7280) 15%, white);
     color: var(--lc, #6b7280);
   }
-  .fd-info-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.25rem; }
-  .fd-info-block { background: #f8faff; border-radius: 12px; padding: 0.75rem 1rem; }
-  .fd-info-label { font-size: 0.7rem; color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem; }
-  .fd-info-value { font-weight: 600; font-size: 0.9rem; }
+  .fd-info-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; margin-bottom: 1.25rem; }
+  .fd-info-block { background: #f8faff; border-radius: 12px; padding: 0.7rem 0.85rem; }
+  .fd-info-icon { font-size: 1rem; color: var(--royal-blue); margin-bottom: 0.35rem; }
+  .fd-info-label { font-size: 0.66rem; color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem; }
+  .fd-info-value { font-weight: 600; font-size: 0.85rem; }
   .fd-price { font-family: var(--font-display); font-size: 1.2rem; color: var(--royal-blue); }
   .fd-price--dim { color: var(--gray); }
   .fd-desc-wrap { background: #f0f4ff; border-radius: 12px; padding: 1rem 1.1rem; margin-bottom: 1.25rem; }
@@ -841,6 +860,44 @@
     background: #f3f4f6; color: #9ca3af;
     border-radius: 12px; cursor: not-allowed;
     font-size: 0.95rem; font-family: var(--font-body);
+  }
+
+  /* ── "ปลาที่คล้ายกัน" — ใช้ข้อมูลปลาจริงจาก fishData เท่านั้น (ไม่มีข้อมูลสมมติ) ── */
+  .fd-similar-wrap { margin-top: 0.25rem; }
+  .fd-similar-title { font-size: 0.8rem; font-weight: 700; color: var(--dark-navy, #1e293b); margin-bottom: 0.7rem; display: flex; align-items: center; gap: 0.4rem; }
+  .fd-similar-rail {
+    display: flex; gap: 0.7rem; overflow-x: auto; padding-bottom: 0.35rem;
+    scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch;
+  }
+  .fd-similar-rail::-webkit-scrollbar { height: 5px; }
+  .fd-similar-rail::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+  .fd-similar-card {
+    flex: 0 0 108px; scroll-snap-align: start; cursor: pointer;
+    border: 1px solid #eef1f8; border-radius: 14px; overflow: hidden;
+    background: white; transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .fd-similar-card:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(26,58,143,0.1); }
+  .fd-similar-img { width: 100%; height: 76px; object-fit: cover; display: block; background: #f0f4ff; }
+  .fd-similar-emoji { width: 100%; height: 76px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; background: #f0f4ff; }
+  .fd-similar-name { font-size: 0.7rem; font-weight: 600; padding: 0.4rem 0.5rem 0.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fd-similar-price { font-size: 0.68rem; color: var(--royal-blue); font-weight: 600; padding: 0 0.5rem 0.5rem; }
+
+  /* ── TABLET (641–1024px): การ์ดใหญ่ขึ้น หัวรูปสูงขึ้น ยังเรียงแนวตั้งเหมือนมือถือ ── */
+  @media (min-width: 641px) and (max-width: 1024px) {
+    #fishModal .modal, #csModal .modal { max-width: 640px; }
+    .fd-hero { height: 320px; }
+    .fd-body { padding: 1.75rem 2.25rem 2.25rem; }
+    .fd-name { font-size: 1.9rem; }
+  }
+
+  /* ── DESKTOP (≥1025px): สองคอลัมน์ — รูปคงที่ซ้าย / เนื้อหา scroll ขวา ── */
+  @media (min-width: 1025px) {
+    #fishModal .modal, #csModal .modal { max-width: 900px; max-height: 640px; }
+    .fish-detail-body { display: flex; align-items: stretch; min-height: 560px; max-height: 640px; }
+    .fd-hero { flex: 0 0 42%; height: auto; }
+    .fd-body { flex: 1; min-width: 0; overflow-y: auto; padding: 2rem 2.5rem 2.25rem; }
+    .fd-name { font-size: 1.65rem; }
+    .fd-info-row { grid-template-columns: repeat(3, 1fr); }
   }
   
   
