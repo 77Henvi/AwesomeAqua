@@ -198,10 +198,17 @@ export function renderFishGrid() {
     const lang = localStorage.getItem('aqua-lang') || 'th';
     const isEn = lang === 'en';
     const bentoName = document.getElementById('bentoFeaturedName');
+    const bentoDesc = document.getElementById('bentoFeaturedDesc');
     const bentoPrice = document.getElementById('bentoFeaturedPrice');
     const bentoImg = document.getElementById('bentoFeaturedImg');
     const bentoCard = document.getElementById('bentoFeaturedCard');
     if (bentoName) bentoName.textContent = isEn && featured.name_en ? featured.name_en : featured.name_th;
+    // มีคำอธิบายจริงของปลาตัวนี้ค่อยทับข้อความ default (ที่มาจาก data-i18n) —
+    // ถ้าปลายังไม่มีคำอธิบายให้กรอก ปล่อยให้ข้อความ default ที่แปลไว้แล้วแสดงแทน
+    if (bentoDesc) {
+      const desc = isEn && featured.desc_en ? featured.desc_en : featured.desc_th;
+      if (desc) bentoDesc.textContent = desc;
+    }
     if (bentoPrice) bentoPrice.textContent = `฿${featured.priceMin.toLocaleString()}${featured.priceMax ? ' – ฿' + featured.priceMax.toLocaleString() : ''}`;
     if (bentoImg && featured.image) bentoImg.src = featured.image;
     if (bentoCard) {
