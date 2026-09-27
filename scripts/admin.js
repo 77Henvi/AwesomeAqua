@@ -24,7 +24,6 @@ import { addFish as _addFish, updateAddFishTotal, clearForm, handleComingSoon,
          openEditModal as _openEditModal, closeEditModal,
          saveEdit as _saveEdit, toggleSyncTag,
          viewPriceHistory, closePriceHistoryModal } from './modules/fishForm.js';
-import { loadTodos, bindTodoWindowFunctions } from './modules/todo.js';
 import { openFishStatsModal as _openFishStatsModal, closeFishStatsModal } from './modules/fishStats.js';
 
 // ── Expose ไว้บน window ──
@@ -60,7 +59,6 @@ window.openFishStatsModal  = openFishStatsModal;
 window.closeFishStatsModal = closeFishStatsModal;
 
 bindFinanceWindowFunctions(); // ผูก onFinMonthChange, setFinFilter, openFinanceModal ฯลฯ (ดู modules/finance.js)
-bindTodoWindowFunctions();    // ผูก openTodoModal, addTodo, toggleTodo ฯลฯ (ดู modules/todo.js)
 
 // ── Expose ใหม่สำหรับ Quick Restock และ Calendar ──
 window.openRestockModal = openRestockModal;
@@ -147,7 +145,6 @@ function showDashboard() {
   _setDateHeaders();
   loadFishFromDB();
   refreshFinance();
-  loadTodos();
 }
 
 // ════════════════════════════════════════════
