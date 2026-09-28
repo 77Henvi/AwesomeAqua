@@ -809,6 +809,8 @@
     display: flex; align-items: center; justify-content: center; font-size: 1rem;
     transition: background 0.2s, color 0.2s;
   }
+  .fish-detail-body { max-height: 90vh; overflow-y: auto; overscroll-behavior: contain; }
+  .fd-desc, .fd-tag, .fd-name { overflow-wrap: anywhere; }
   .fd-wish-fab:hover { background: rgba(0,0,0,0.55); }
   .fd-wish-fab.active { background: white; color: #ef4444; }
   
@@ -882,67 +884,198 @@
   .fd-similar-name { font-size: 0.7rem; font-weight: 600; padding: 0.4rem 0.5rem 0.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .fd-similar-price { font-size: 0.68rem; color: var(--royal-blue); font-weight: 600; padding: 0 0.5rem 0.5rem; }
 
-  /* ── TABLET (641–1024px): การ์ดใหญ่ขึ้น หัวรูปสูงขึ้น ยังเรียงแนวตั้งเหมือนมือถือ ── */
-  @media (min-width: 641px) and (max-width: 1024px) {
-    #fishModal .modal, #csModal .modal { max-width: 640px; }
-    .fd-hero { height: 320px; }
-    .fd-body { padding: 1.75rem 2.25rem 2.25rem; }
-    .fd-name { font-size: 1.9rem; }
+  /* ══════════════════════════════════════════════════════════════
+     FISH DETAIL — ธีมมืด (.fx-*)   ทั้งหมด scope ใต้ #fishModal
+     Desktop ≥1025 : เวทีเต็มจอ + rail ขวา (แนวภาพ 1)
+     Tablet 641–1024: การ์ดกลางจอแนวตั้ง (โครงเดียวกับมือถือ)
+     Mobile ≤640    : เต็มจอ แนวตั้ง (แนวภาพ 2)
+     ══════════════════════════════════════════════════════════════ */
+  #fishModal {
+    --fx-bg: #061c22; --fx-bg2: #0a2a32;
+    --fx-line: rgba(255,255,255,.10); --fx-glass: rgba(255,255,255,.06);
+    --fx-text: #f3fbfb; --fx-mut: rgba(230,246,246,.68);
+    --fx-acc: #2CACAD; --fx-acc2: #75E2E0; --fx-ok: #4ade80; --fx-low: #fbbf24; --fx-out: #f87171;
+  }
+  #fishModal.modal-overlay { background: rgba(2,10,13,.72); }
+  #fishModal .modal {
+    padding: 0; background: transparent; box-shadow: none; border-radius: 0; overflow: visible;
+    max-width: none; max-height: none; width: 100%; animation: none;
+  }
+  #fishModal .modal > .modal-close { display: none; }
+  #fishDetailContent { max-height: none; overflow: visible; display: block; }
+
+  .fx { position: relative; color: var(--fx-text); background: var(--fx-bg); overflow: hidden; overflow: clip;
+        font-family: var(--font-body); isolation: isolate; }
+  .fx *, .fx *::before, .fx *::after { box-sizing: border-box; }
+  .fx button { font-family: inherit; color: inherit; cursor: pointer; }
+  .fx :focus-visible { outline: 2px solid var(--fx-acc2); outline-offset: 2px; }
+  .fx-bg-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2;
+               filter: blur(38px) saturate(1.15); opacity: .34; pointer-events: none; }
+  .fx-shade { position: absolute; inset: 0; z-index: -1; pointer-events: none;
+              background: linear-gradient(160deg, rgba(6,28,34,.55), var(--fx-bg) 78%); }
+
+  .fx-top { position: absolute; z-index: 20; top: max(16px, env(safe-area-inset-top)); left: 16px; right: 16px;
+            display: flex; justify-content: space-between; pointer-events: none; }
+  .fx-top > * { pointer-events: auto; }
+  .fx-iconbtn { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--fx-line);
+                background: rgba(8,30,36,.55); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+                display: inline-flex; align-items: center; justify-content: center; font-size: 1.15rem;
+                transition: background .15s, transform .15s; flex: none; }
+  .fx-iconbtn:hover { background: rgba(44,172,173,.28); }
+  .fx-iconbtn:active { transform: scale(.94); }
+  .fx-wish.active { background: #fff; color: #ef4444; }
+
+  .fx-stage { min-width: 0; min-height: 0; height: 100%; position: relative; }
+  .fx-scroll { height: 100%; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+               scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.2) transparent; }
+  .fx-content, .fx-cta { position: relative; z-index: 2; }
+
+  .fx-media { z-index: 0; overflow: hidden; }
+  .fx-photo { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; user-select: none; }
+  .fx-media::after { content: ''; position: absolute; inset: 0; pointer-events: none; }
+  .fx-fallback { display: none; }
+  .is-broken > .fx-fallback, .fx.no-img .fx-media > .fx-fallback { display: flex; }
+  .fx-media > .fx-fallback { position: absolute; inset: 0; align-items: center; justify-content: center;
+                             font-size: 5rem; color: rgba(117,226,224,.35); }
+
+  .fx-eyebrow { font-style: italic; color: var(--fx-acc2); font-size: .95rem; letter-spacing: .02em; overflow-wrap: anywhere; }
+  .fx-title { margin: .25rem 0 .6rem; font-family: var(--font-display); font-weight: 700; line-height: 1.12;
+              overflow-wrap: anywhere; word-break: break-word; }
+  .fx-price { display: flex; align-items: baseline; flex-wrap: wrap; gap: .1rem .5rem; }
+  .fx-price-main { font-weight: 700; letter-spacing: -.01em; color: #fff; }
+  .fx-price-to { color: var(--fx-mut); font-size: 1.05rem; }
+
+  .fx-tags { display: flex; flex-wrap: wrap; gap: .45rem; margin-bottom: 1.1rem; }
+  .fx-tag { padding: .28rem .8rem; border: 1px solid var(--fx-line); background: var(--fx-glass);
+            border-radius: 999px; font-size: .8rem; color: var(--fx-mut); overflow-wrap: anywhere; }
+  .fx-sechead { display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin: 1.2rem 0 .7rem; }
+  .fx-sechead h3 { margin: 0; font-size: 1.05rem; font-weight: 500; color: var(--fx-text); font-family: var(--font-body); }
+  .fx-chip { display: inline-flex; align-items: center; gap: .45rem; padding: .3rem .8rem; border-radius: 999px;
+             background: var(--fx-glass); border: 1px solid var(--fx-line); font-size: .82rem; font-weight: 600; white-space: nowrap; }
+  .fx-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+  .s-ok { color: var(--fx-ok); } .s-low { color: var(--fx-low); } .s-out { color: var(--fx-out); }
+
+  .fx-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; }
+  .fx-tile { padding: .8rem .95rem; border-radius: 16px; border: 1px solid var(--fx-line);
+             background: linear-gradient(160deg, rgba(255,255,255,.09), rgba(255,255,255,.03)); min-width: 0; }
+  .fx-tile-lb { display: flex; align-items: center; gap: .4rem; font-size: .74rem; color: var(--fx-mut); margin-bottom: .3rem; }
+  .fx-tile-val { display: block; font-size: 1.05rem; font-weight: 600; overflow-wrap: anywhere; }
+  .fx-tile.st-ok .fx-tile-val { color: var(--fx-ok); } .fx-tile.st-low .fx-tile-val { color: var(--fx-low); } .fx-tile.st-out .fx-tile-val { color: var(--fx-out); }
+  .fx-tile.lv-easy .fx-tile-val { color: var(--fx-ok); } .fx-tile.lv-mid .fx-tile-val { color: var(--fx-low); } .fx-tile.lv-hard .fx-tile-val { color: var(--fx-out); }
+
+  .fx-desc { margin: 0; color: var(--fx-mut); line-height: 1.8; font-size: .95rem; overflow-wrap: anywhere; white-space: pre-line; }
+
+  .fx-simrail { display: flex; gap: .7rem; overflow-x: auto; padding-bottom: .4rem; scroll-snap-type: x proximity;
+                scrollbar-width: none; } .fx-simrail::-webkit-scrollbar { display: none; }
+  .fx-simcard { flex: 0 0 112px; text-align: left; padding: 0; border: 1px solid var(--fx-line); border-radius: 16px;
+                background: var(--fx-glass); overflow: hidden; scroll-snap-align: start; transition: transform .15s, border-color .15s; }
+  .fx-simcard:hover { transform: translateY(-2px); border-color: var(--fx-acc); }
+  .fx-simimg, .fx-nextimg { position: relative; display: block; width: 100%; background: var(--fx-bg2); overflow: hidden; }
+  .fx-simimg { height: 78px; }
+  .fx-thumb { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .fx-simimg > .fx-fallback, .fx-nextimg > .fx-fallback { position: absolute; inset: 0; align-items: center; justify-content: center; color: rgba(117,226,224,.4); font-size: 1.6rem; }
+  .fx-simname { display: block; padding: .45rem .6rem 0; font-size: .78rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fx-simprice { display: block; padding: .1rem .6rem .55rem; font-size: .74rem; color: var(--fx-acc2); }
+
+  .fx-cta { display: flex; align-items: center; gap: .75rem; }
+  .fx-nav { display: none; gap: .5rem; }
+  .fx-order { flex: 1; min-width: 0; min-height: 56px; display: flex; align-items: center; gap: .8rem; padding: .35rem .4rem .35rem .4rem;
+              border: 0; border-radius: 999px; background: linear-gradient(90deg, var(--fx-acc), var(--fx-acc2)); color: #04222a;
+              font-weight: 700; font-size: 1rem; transition: filter .15s, transform .15s; }
+  .fx-order:hover { filter: brightness(1.06); } .fx-order:active { transform: scale(.985); }
+  .fx-order-ic { width: 44px; height: 44px; border-radius: 50%; background: #062a31; display: inline-flex; align-items: center; justify-content: center; flex: none; }
+  .fx-order-tx { flex: 1; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .fx-order-arrow { margin-right: 1rem; opacity: .7; }
+  .fx-order.is-disabled { justify-content: center; background: rgba(255,255,255,.1); color: var(--fx-mut); cursor: not-allowed; padding: .35rem 1.2rem; }
+
+  .fx-rail, .fx-bar { display: none; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    #fishModal.open .fx { animation: fxIn .28s ease-out both; }
+    @keyframes fxIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
   }
 
-  /* ══════════════════════════════════════════════
-     DESKTOP (≥1025px): FULL-SCREEN TAKEOVER
-     พื้นที่กว้างพอ ไม่จำเป็นต้องเลียนแบบ "การ์ดลอยแคบๆ" แบบมือถือ —
-     ใช้พื้นที่ทั้งจอ: รูปใหญ่เต็มความสูงซ้าย / เนื้อหาเป็นคอลัมน์อ่านง่ายขวา
-     พร้อม gutter ว่างสองข้างของคอลัมน์เนื้อหาเพื่อไม่ให้บรรทัดยาวเกินไป
-     ══════════════════════════════════════════════ */
+  /* ── MOBILE / TABLET (โครงเดียวกัน แนวภาพ 2) ── */
+  @media (max-width: 1024px) {
+    #fishModal .modal { display: flex; justify-content: center; }
+    #fishDetailContent { width: 100%; display: flex; justify-content: center; }
+    .fx { width: min(600px, 100%); height: min(92vh, 920px); height: min(92dvh, 920px); border-radius: 28px;
+          display: block; box-shadow: 0 30px 80px rgba(0,0,0,.5); }
+    .fx-scroll { position: relative; padding-bottom: 8px; }
+    .fx-media { position: absolute; top: 0; right: 0; width: 82%; height: 380px; }
+    .fx-media::after { background: linear-gradient(90deg, var(--fx-bg) 0%, rgba(6,28,34,.35) 40%, transparent 70%),
+                                   linear-gradient(0deg, var(--fx-bg) 0%, transparent 45%); }
+    .fx-headline { padding: 92px 22px 0; min-height: 300px; max-width: 66%; }
+    .fx-title { font-size: clamp(1.9rem, 7vw, 2.6rem); }
+    .fx-price-main { font-size: clamp(1.8rem, 6.5vw, 2.3rem); }
+    .fx-panel { padding: 0 22px 18px; }
+    .fx-simcard { flex-basis: 132px; } .fx-simimg { height: 90px; }
+    .fx-cta { position: sticky; bottom: 0; padding: 34px 18px calc(16px + env(safe-area-inset-bottom));
+              background: linear-gradient(0deg, var(--fx-bg) 68%, transparent); }
+    .fx-railsim { display: none; }
+    .fx-tiles > .fx-tile:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  }
+  @media (max-width: 640px) {
+    #fishModal.modal-overlay { padding: 0; }
+    .fx { width: 100%; height: 100vh; height: 100dvh; border-radius: 0; box-shadow: none; }
+    .fx-media { width: 78%; height: 330px; }
+    .fx-media::after { background: linear-gradient(90deg, var(--fx-bg) 0%, rgba(6,28,34,.6) 30%, transparent 62%), linear-gradient(0deg, var(--fx-bg) 0%, transparent 42%); }
+    .fx-headline { max-width: 58%; padding-top: 92px; min-height: 290px; }
+    .fx-tile-val { font-size: 1rem; }
+  }
+
+  /* ── DESKTOP (แนวภาพ 1): เวทีเต็มจอ + rail ขวา ── */
   @media (min-width: 1025px) {
-    #fishModal.modal-overlay, #csModal.modal-overlay { padding: 0; align-items: stretch; }
-    #fishModal .modal, #csModal .modal {
-      max-width: none; width: 100vw; height: 100vh; max-height: none;
-      border-radius: 0; animation: fadeInFull 0.2s ease;
-    }
-    @keyframes fadeInFull { from { opacity: 0; } to { opacity: 1; } }
+    #fishModal.modal-overlay { padding: 0; background: var(--fx-bg); backdrop-filter: none; -webkit-backdrop-filter: none; }
+    #fishModal .modal { height: 100vh; height: 100dvh; }
+    .fx { width: 100vw; height: 100vh; height: 100dvh; border-radius: 0; display: grid;
+          grid-template-columns: minmax(0, 1fr) clamp(300px, 24vw, 380px);
+          grid-template-rows: minmax(0, 1fr) auto; grid-template-areas: "stage rail" "bar rail"; }
+    .fx-top { right: calc(clamp(300px, 24vw, 380px) + 16px); }
+    .fx-top { justify-content: flex-end; gap: 10px; }
+    .fx-top .fx-close { order: 2; } .fx-top .fx-wish { order: 1; }
+    .fx-stage { grid-area: stage; overflow: hidden; }
+    .fx-scroll { display: flex; flex-direction: column; position: static; padding: 88px 0 24px clamp(40px, 6vw, 110px); }
+    .fx-media { position: absolute; top: 0; right: 0; bottom: 0; width: 62%; }
+    .fx-media::after { background: linear-gradient(90deg, var(--fx-bg) 0%, rgba(6,28,34,.72) 22%, rgba(6,28,34,.15) 58%, transparent 80%),
+                                   linear-gradient(0deg, rgba(6,28,34,.7), transparent 30%); }
+    .fx-content { margin-top: auto; width: min(560px, 54%); }
+    .fx-title { font-size: clamp(2.8rem, 5.4vw, 5.2rem); letter-spacing: -.01em; margin-bottom: .9rem; }
+    .fx-price-main { font-size: clamp(1.9rem, 2.6vw, 2.6rem); }
+    .fx-panel { padding-top: 1.4rem; }
+    .fx-tiles { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+    .fx-sim { display: none; }
+    .fx-cta { position: static; margin-top: 1.6rem; margin-bottom: auto; width: min(560px, 54%); padding: 0; background: none; }
+    .fx-nav { display: flex; }
+    .fx-order { max-width: 420px; }
 
-    .fish-detail-body { display: flex; align-items: stretch; height: 100vh; }
+    .fx-rail { grid-area: rail; display: block; overflow-y: auto; padding: 88px 24px 24px; border-left: 1px solid var(--fx-line);
+               background: rgba(4,20,25,.72); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+               scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.2) transparent; }
+    .fx-rail-head { display: flex; justify-content: space-between; align-items: center; font-size: .78rem; letter-spacing: .14em;
+                    text-transform: uppercase; color: var(--fx-mut); margin: 0 0 .8rem; }
+    .fx-rail-head:not(:first-child) { margin-top: 1.8rem; }
+    .fx-nextcard { display: block; width: 100%; text-align: left; padding: 0; border: 1px solid var(--fx-line); border-radius: 18px;
+                   overflow: hidden; background: var(--fx-glass); transition: border-color .15s, transform .15s; }
+    .fx-nextcard:hover { border-color: var(--fx-acc); transform: translateY(-2px); }
+    .fx-nextimg { aspect-ratio: 16 / 10; }
+    .fx-nextname { display: block; padding: .8rem 1rem 0; font-weight: 700; font-size: 1.05rem; overflow-wrap: anywhere; }
+    .fx-nextsp { display: block; padding: .15rem 1rem 1rem; font-size: .82rem; font-style: italic; color: var(--fx-mut); }
+    .fx-railsim { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; }
+    .fx-railsim .fx-simcard { flex: none; } .fx-railsim .fx-simimg { height: 84px; }
 
-    .fd-hero { flex: 0 0 56%; height: 100vh; }
-    .fd-hero-bottom { padding: 2.5rem 3.5rem; }
-    .fd-name { font-size: 2.4rem; }
-    .fd-species { font-size: 1rem; }
-
-    .fd-body {
-      flex: 1; min-width: 0; height: 100vh; overflow-y: auto;
-      display: flex; flex-direction: column; justify-content: center;
-      padding: 3rem 4vw;
-    }
-    /* คอลัมน์เนื้อหาจำกัดความกว้างไว้เพื่อการอ่าน แม้จอจะกว้างแค่ไหน */
-    .fd-body > * { width: 100%; max-width: 480px; margin-left: auto; margin-right: auto; }
-
-    .fd-tags { margin-bottom: 1.5rem; }
-    .fd-tag { font-size: 0.8rem; padding: 0.32rem 0.85rem; }
-
-    .fd-info-row { grid-template-columns: repeat(3, 1fr); gap: 0.85rem; margin-bottom: 1.75rem; }
-    .fd-info-block { padding: 1rem 0.9rem; }
-    .fd-info-icon { font-size: 1.2rem; }
-    .fd-info-label { font-size: 0.68rem; white-space: nowrap; }
-    .fd-info-value { font-size: 1rem; }
-
-    .fd-desc-wrap { padding: 1.25rem 1.4rem; margin-bottom: 1.75rem; }
-    .fd-desc { font-size: 0.92rem; }
-
-    .fd-similar-card { flex: 0 0 128px; }
-    .fd-similar-img, .fd-similar-emoji { height: 92px; }
-
-    .fd-cta { margin-top: 0.5rem; }
-    .fd-btn-messenger, .fd-btn-disabled { padding: 1.05rem; font-size: 1.05rem; }
-
-    /* ปุ่มปิด/หัวใจ ขยับให้เข้ากับสัดส่วนรูปที่ใหญ่ขึ้น */
-    #fishModal .modal-close, #csModal .modal-close { top: 1.5rem; right: 1.5rem; width: 42px; height: 42px; font-size: 1.2rem; }
-    .fd-wish-fab { top: 1.5rem; left: 1.5rem; width: 42px; height: 42px; font-size: 1.2rem; }
+    .fx-bar { grid-area: bar; display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; padding: 16px clamp(40px, 6vw, 110px) 20px;
+              border-top: 1px solid var(--fx-line); background: rgba(4,20,25,.55); position: relative; z-index: 3; }
+    .fx-barinfo { display: inline-flex; align-items: center; gap: .45rem; color: var(--fx-mut); font-size: .9rem; }
   }
-  
-  
+  /* จอเตี้ย (แล็ปท็อป) — บีบระยะเพื่อให้เห็นปุ่มสั่งซื้อโดยไม่ต้องเลื่อนมาก */
+  @media (min-width: 1025px) and (max-height: 760px) {
+    .fx-scroll { padding-top: 72px; }
+    .fx-title { font-size: clamp(2.2rem, 4vw, 3.6rem); }
+    .fx-tiles .fx-tile { padding: .6rem .8rem; }
+  }
+
+
   /* ── COMING SOON CARDS ── */
   .fish-card--coming { cursor: default; border-color: #bfe4e0; background: #f7fdfc; }
   .fish-img--coming {

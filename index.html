@@ -24,7 +24,7 @@
 
   <!-- เพิ่ม Playfair Display ที่ขาดหายไป -->
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@300;400;500&family=Playfair+Display:wght@700&family=Noto+Serif+Thai:wght@600;700&family=Noto+Sans+Thai:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=4">
   <link rel="stylesheet" href="ads.css">
   <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
 </head>
@@ -423,7 +423,7 @@
 
 <!-- ========== MODAL รายละเอียดปลา ========== -->
 <div class="modal-overlay" id="fishModal" onclick="closeFishModalOutside(event)">
-  <div class="modal" style="max-width:460px">
+  <div class="modal">
     <button class="modal-close" onclick="closeFishModal()"><i class="ph ph-x"></i></button>
     <div class="fish-detail-body" id="fishDetailContent"></div>
   </div>
@@ -431,7 +431,7 @@
 
 <!-- ========== MODAL Coming Soon ========== -->
 <div class="modal-overlay" id="csModal" onclick="closeCsModalOutside(event)">
-  <div class="modal" style="max-width:460px">
+  <div class="modal">
     <button class="modal-close" onclick="closeCsModal()"><i class="ph ph-x"></i></button>
     <div class="fish-detail-body" id="csModalContent"></div>
   </div>
