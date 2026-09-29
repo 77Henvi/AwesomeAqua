@@ -245,15 +245,15 @@
       <input type="text" placeholder="ค้นหาชื่อปลา หรือสายพันธุ์..." oninput="filterFish(this.value)">
     </div>
     
-    <div class="filter-chips">
-      <button class="chip active" onclick="setFishChip('ทั้งหมด', this)">ทั้งหมด</button>
-      <button class="chip" onclick="setFishChip('น้ำจืด', this)">น้ำจืด</button>
-      <button class="chip" onclick="setFishChip('ทะเล', this)">ทะเล</button>
-      <button class="chip" onclick="setFishChip('มือใหม่', this)">มือใหม่</button>
-      <button class="chip" onclick="setFishChip('สีสวย', this)">สีสวย</button>
-      <button class="chip" onclick="setFishChip('ถูกใจ', this)"><i class="ph ph-heart"></i> ถูกใจ</button>
+    <div class="filter-chips" role="group" aria-label="เรียงลำดับ / Sort">
+      <button class="chip active" data-sort="default"    aria-pressed="true"  onclick="setFishSort('default', this)">ทั้งหมด</button>
+      <button class="chip"        data-sort="price-desc" aria-pressed="false" onclick="setFishSort('price-desc', this)">ราคาสูง → ต่ำ</button>
+      <button class="chip"        data-sort="price-asc"  aria-pressed="false" onclick="setFishSort('price-asc', this)">ราคาต่ำ → สูง</button>
+      <button class="chip"        data-sort="level-asc"  aria-pressed="false" onclick="setFishSort('level-asc', this)">เลี้ยงง่ายสุด → ยากสุด</button>
+      <button class="chip"        data-sort="level-desc" aria-pressed="false" onclick="setFishSort('level-desc', this)">เลี้ยงยากสุด → ง่ายสุด</button>
     </div>
   </div>
+  <div class="store-group-head" id="fishInHead" hidden></div>
   <div class="fish-grid" id="fishGrid">
       <div class="fish-card is-skeleton" aria-hidden="true">
         <div class="fish-card-img-wrap skeleton-shimmer"></div>
@@ -320,6 +320,13 @@
         </div>
       </div>
     </div>
+
+  <!-- ── กลุ่มสินค้าหมด (แยกออกจากสินค้าพร้อมจำหน่าย) — ถูกเติมโดย render.js ── -->
+  <div id="fishOutSection" hidden>
+    <div class="store-group-head store-group-head--out" id="fishOutHead"></div>
+    <div class="fish-grid" id="fishOutGrid"></div>
+  </div>
+
 </section>
 
 <!-- ========== ABOUT ========== -->

@@ -30,8 +30,12 @@
 ## คุณสมบัติหลัก (Features)
 
 ### 🛍️ หน้าร้าน (Storefront)
-- แสดงรายการปลาที่มีจำหน่าย พร้อมระบบค้นหาและตัวกรอง (search + filter chips)
-- บันทึกรายการโปรด (Wishlist)
+- แสดงรายการปลา พร้อมระบบค้นหา และเรียงลำดับได้ 4 แบบ (ราคาสูง→ต่ำ / ต่ำ→สูง / เลี้ยงง่ายสุด→ยากสุด / ยากสุด→ง่ายสุด)
+- แยกกลุ่ม "พร้อมจำหน่าย" กับ "สินค้าหมด" ชัดเจน สินค้าหมดไม่ปนอยู่กลางรายการ
+- แสดงยอดขายสไตล์ Shopee ("ขายแล้ว 10+ ตัว") บนการ์ดและใน modal
+- ป้ายอัตโนมัติจากข้อมูลยอดขายจริง: **ยอดนิยม / HOT** สำหรับปลาขายดี และ **ลดหนัก / Super Discount**
+  (พร้อมราคาก่อนลดแบบขีดฆ่า) สำหรับปลาที่ขายไม่ออกหรือค้างสต็อกนาน — ตั้งค่าเกณฑ์และดู SQL ที่ต้องรันได้ที่
+  [`docs/SALES_STATS_SETUP.md`](docs/SALES_STATS_SETUP.md)
 - รองรับ 2 ภาษา (ไทย/อังกฤษ)
 - ติดต่อสั่งซื้อผ่าน Messenger ได้ทันที พร้อมแนบข้อมูลปลาให้อัตโนมัติ
 - ออกแบบให้เข้าถึงง่าย (รองรับการใช้งานผ่านคีย์บอร์ด และ screen reader)
@@ -107,6 +111,7 @@ node --test tests/*.test.mjs
 |---|---|
 | [`docs/STAGING_SETUP.md`](docs/STAGING_SETUP.md) | ตั้งค่าสภาพแวดล้อมทดสอบ (Staging) แยกจากฐานข้อมูลจริง |
 | [`docs/ERROR_MONITORING_SETUP.md`](docs/ERROR_MONITORING_SETUP.md) | ตั้งค่าระบบแจ้งเตือนข้อผิดพลาดผ่าน Discord/Line |
+| [`docs/SALES_STATS_SETUP.md`](docs/SALES_STATS_SETUP.md) | ตั้งค่า view สถิติยอดขาย + ปรับเกณฑ์ป้าย HOT / ลดหนัก (ต้องรัน SQL ก่อนใช้งาน) |
 | [`docs/RESTOCK_ALERTS_SETUP.md`](docs/RESTOCK_ALERTS_SETUP.md) | ตั้งค่าระบบแจ้งเตือนลูกค้าเมื่อสินค้ากลับมามีสต็อก |
 | [`docs/SHIPPING_CHECKLIST_SETUP.md`](docs/SHIPPING_CHECKLIST_SETUP.md) | ตั้งค่าระบบเช็คลิสต์การจัดส่ง (ต้องรัน SQL ก่อนใช้งาน) |
 | [`docs/MESSENGER_APP_REVIEW.md`](docs/MESSENGER_APP_REVIEW.md) | ขั้นตอนขอเปิดใช้งานแอป Messenger สำหรับผู้ใช้งานทั่วไป |

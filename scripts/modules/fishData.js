@@ -3,11 +3,23 @@ import { storeEmpty } from '../shared/utils.js';
 
 export let fishData = [];
 
+// ดึงสถิติยอดขาย (view fish_sales_stats — ดู docs/SALES_STATS_SETUP.md)
+// ถ้ายังไม่ได้สร้าง view / ดึงไม่สำเร็จ → คืน null แล้วหน้าร้านจะทำงานต่อได้ปกติ (แค่ไม่มีป้าย/ยอดขาย)
+async function loadSalesStats() {
+  try {
+    const { data, error } = await supabase.from('fish_sales_stats').select('*');
+    if (error || !Array.isArray(data)) return null;
+    return new Map(data.map(r => [String(r.fish_id), r]));
+  } catch {
+    return null;
+  }
+}
+
 export async function loadFishFromDB() {
-  const { data, error } = await supabase
-    .from('fish_public')
-    .select('*')
-    .order('created_at', { ascending: false });
+  const [{ data, error }, salesMap] = await Promise.all([
+    supabase.from('fish_public').select('*').order('created_at', { ascending: false }),
+    loadSalesStats(),
+  ]);
 
   if (error) {
     console.error(error);
@@ -21,7 +33,9 @@ export async function loadFishFromDB() {
 
   fishData = data
     .filter(f => !f.is_archived) // กันไว้ชั้นหนึ่ง เผื่อ view fish_public ยังไม่ได้กรองที่ DB
-    .map(f => ({
+    .map(f => {
+      const s = salesMap?.get(String(f.id));
+      return {
       id:       f.id,
       name_th:  f.name_th,    
       name_en:  f.name_en,    
@@ -37,8 +51,16 @@ export async function loadFishFromDB() {
       desc_th:  f.desc_th,   
       desc_en:  f.desc_en,    
       tags_th:  f.tags_th || [], 
-      tags_en:  f.tags_en || []  
-  }));
+      tags_en:  f.tags_en || [],
+      // ── ข้อมูลยอดขาย (สำหรับป้าย HOT / ลดหนัก และ "ขายแล้ว X+") ──
+      createdAt:     f.created_at || null,
+      salesKnown:    !!s,
+      soldTotal:     Number(s?.sold_total) || 0,
+      sold30d:       Number(s?.sold_30d) || 0,
+      lastSoldAt:    s?.last_sold_at || null,
+      lastRestockAt: s?.last_restock_at || null,
+      };
+    });
 
   const { renderFishGrid } = await import('./render.js');
   renderFishGrid();

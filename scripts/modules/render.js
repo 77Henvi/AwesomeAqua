@@ -1,27 +1,46 @@
 // scripts/modules/render.js
 import { fishData } from './fishData.js';
 import { MESSENGER_ICON, storeEmpty } from '../shared/utils.js';
-import { isWishlisted } from '../shared/wishlist.js'; // นำเข้าฟังก์ชัน wishlist
+import { describeSales, sortFish } from '../shared/fishSales.js';
 
 // --- State Management ---
-let currentFilter = 'ทั้งหมด';
+let sortMode = 'default';
 let searchQuery = '';
+let displayedFish = []; // ลำดับที่แสดงบนหน้าจอจริง (พร้อมจำหน่าย → หมดสต็อก) ใช้ให้ปุ่ม ถัดไป/ก่อนหน้า ใน modal เดินตามลำดับที่ลูกค้าเห็น
 
-export function getCurrentFilter() {
-    return currentFilter;
+const isEnLang = () => (localStorage.getItem('aqua-lang') || 'th') === 'en';
+
+const SORT_LABELS = {
+  th: { 'default': 'ทั้งหมด', 'price-desc': 'ราคาสูง → ต่ำ', 'price-asc': 'ราคาต่ำ → สูง', 'level-asc': 'เลี้ยงง่ายสุด → ยากสุด', 'level-desc': 'เลี้ยงยากสุด → ง่ายสุด' },
+  en: { 'default': 'All',     'price-desc': 'Price: High → Low', 'price-asc': 'Price: Low → High', 'level-asc': 'Easiest → Hardest', 'level-desc': 'Hardest → Easiest' },
+};
+
+const GROUP_TEXT = {
+  th: { inStock: 'พร้อมจำหน่าย', outStock: 'สินค้าหมดชั่วคราว', noResult: 'ไม่พบผลลัพธ์ที่ค้นหา' },
+  en: { inStock: 'In Stock',     outStock: 'Out of Stock',      noResult: 'No results found' },
+};
+
+export function getDisplayedFish() {
+  return displayedFish;
 }
 
-export function setFishChip(filterValue, btnElement) {
-    currentFilter = filterValue;
-    
-    // จัดการ UI ของ Chip
-    const chips = document.querySelectorAll('.filter-chips .chip');
-    chips.forEach(c => c.classList.remove('active'));
-    if (btnElement) {
-        btnElement.classList.add('active');
-    }
-    
-    renderFishGrid();
+export function getCurrentSort() {
+  return sortMode;
+}
+
+/** เปลี่ยนการเรียงลำดับ (กดชิปเดิมซ้ำ = กลับไปลำดับปกติ) */
+export function setFishSort(mode, btnElement) {
+  sortMode = (mode === sortMode && mode !== 'default') ? 'default' : mode;
+  _syncChips();
+  renderFishGrid();
+}
+
+function _syncChips() {
+  document.querySelectorAll('.filter-chips .chip').forEach(c => {
+    const on = c.dataset.sort === sortMode;
+    c.classList.toggle('active', on);
+    c.setAttribute('aria-pressed', String(on));
+  });
 }
 
 export function filterFish(query) {
@@ -32,6 +51,25 @@ export function filterFish(query) {
 
 export function isComingSoon(f) {
   return f.stock === 0 && f.priceMin === 0;
+}
+
+// ── ส่วนประกอบย่อยของการ์ด: ป้ายบนรูป / ราคา (+ราคาขีดฆ่า) / ยอดขาย ──
+function _salesBadgeHtml(sales) {
+  if (sales.kind === 'hot') {
+    return `<div class="sales-badge sales-badge--hot"><i class="ph-fill ph-fire"></i> ${sales.label}</div>`;
+  }
+  if (sales.kind === 'discount') {
+    return `<div class="sales-badge sales-badge--sale"><i class="ph-fill ph-tag"></i> ${sales.label}</div>`;
+  }
+  return '';
+}
+
+function _priceHtml(f, sales, outOfStock) {
+  const range = `฿${f.priceMin.toLocaleString()}${f.priceMax ? ' – ' + f.priceMax.toLocaleString() : ''}`;
+  const old = sales.refMin
+    ? `<s class="fish-price-old" aria-label="ราคาเดิม">฿${sales.refMin.toLocaleString()}${sales.refMax ? ' – ' + sales.refMax.toLocaleString() : ''}</s>`
+    : '';
+  return `<div class="fish-price-wrap">${old}<div class="fish-price ${outOfStock ? 'fish-price--dim' : ''} ${sales.refMin ? 'fish-price--sale' : ''}">${range}</div></div>`;
 }
 
 /// ── การ์ดปลาขายปกติ (เวอร์ชันคลีน) ──
@@ -48,8 +86,7 @@ function _availableCard(f) {
   const txtOut = isEn ? 'Out of stock' : 'หมดสต็อก';
   const txtEmpty = isEn ? '<i class="ph ph-x-circle"></i> Out' : '<i class="ph ph-x-circle"></i> หมด';
 
-  const liked = isWishlisted(f.id);
-  const heartIcon = liked ? `<i class="ph-fill ph-heart"></i>` : `<i class="ph ph-heart"></i>`;
+  const sales = describeSales(f, isEn);
   const fallbackIcon = `<i class="ph ph-fish"></i>`;
   // ใช้เฉพาะใน onerror="..." ที่ซ้อน quote 3 ชั้น (attribute > JS string > HTML tag)
   // ถ้าใส่ fallbackIcon (มี " ตรงๆ) ตรงนี้ จะตัด attribute onerror="..." ก่อนกำหนด ทำให้ HTML พัง
@@ -61,24 +98,21 @@ function _availableCard(f) {
          onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openFishDetail('${f.id}')}">
       <div class="card-spotlight"></div>
       <div class="fish-card-img-wrap">
-          <button class="wishlist-btn ${liked ? 'active' : ''}" onclick="onWishToggle('${f.id}', this, event)" aria-label="${liked ? 'นำออกจากรายการโปรด' : 'เพิ่มในรายการโปรด'}" aria-pressed="${liked}">
-            ${heartIcon}
-          </button>
         ${f.image
           ? `<img src="${f.image}" alt="${displayName}" loading="lazy" onerror="this.parentElement.innerHTML='<span>${f.emoji || fallbackIconEsc}</span>'">`
           : `<span>${f.emoji || fallbackIcon}</span>`
         }
         <div class="card-img-gradient"></div>
         ${outOfStock ? `<div class="out-badge">${txtOut}</div>` : ''}
+        ${_salesBadgeHtml(sales)}
       </div>
       <div class="fish-info">
         <div class="fish-name">${displayName}</div>
         <div class="fish-species">${f.species || '—'}</div>
+        ${sales.soldText ? `<div class="fish-sold"><i class="ph ph-shopping-bag" aria-hidden="true"></i> ${sales.soldText}</div>` : ''}
         
         <div class="fish-meta">
-          <div class="fish-price ${outOfStock ? 'fish-price--dim' : ''}">
-            ฿${f.priceMin.toLocaleString()}${f.priceMax ? ' – ' + f.priceMax.toLocaleString() : ''}
-          </div>
+          ${_priceHtml(f, sales, outOfStock)}
           <div class="fish-stock ${f.stock > 0 && f.stock <= 5 ? 'low' : ''}">
             ${f.stock === 0 ? txtEmpty : f.stock <= 5 ? `<span class="stock-dot stock-dot--low"></span> ${f.stock} ${txtUnit}` : `<span class="stock-dot stock-dot--ok"></span> ${f.stock} ${txtUnit}`}
           </div>
@@ -107,8 +141,6 @@ function _comingSoonCard(f) {
   const tapeSep = '<i class="ph ph-sparkle"></i>';
   const txtTape = isEn ? `${tapeSep} COMING SOON ${tapeSep} ` : `${tapeSep} COMING SOON ${tapeSep} เร็วๆ นี้ ${tapeSep} `;
   
-  const liked = isWishlisted(f.id);
-  const heartIcon = liked ? `<i class="ph-fill ph-heart"></i>` : `<i class="ph ph-heart"></i>`;
   const fallbackIcon = `<i class="ph ph-fish"></i>`;
   const fallbackIconEsc = `<i class=&quot;ph ph-fish&quot;></i>`;
 
@@ -117,9 +149,6 @@ function _comingSoonCard(f) {
          onclick="openComingSoonDetail('${f.id}')"
          onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openComingSoonDetail('${f.id}')}">
       <div class="fish-card-img-wrap fish-img--coming">
-         <button class="wishlist-btn ${liked ? 'active' : ''}" onclick="onWishToggle('${f.id}', this, event)" aria-label="${liked ? 'นำออกจากรายการโปรด' : 'เพิ่มในรายการโปรด'}" aria-pressed="${liked}">
-            ${heartIcon}
-          </button>
         ${f.image
           ? `<img src="${f.image}" alt="${displayName}" loading="lazy" onerror="this.parentElement.innerHTML='<span class=coming-emoji>${f.emoji || fallbackIconEsc}</span>'">`
           : `<span class="coming-emoji">${f.emoji || fallbackIcon}</span>`
@@ -144,55 +173,72 @@ function _comingSoonCard(f) {
 }
 
 // ── Render หลัก ──
+function _groupHead(label, count) {
+  return `<h3 class="store-group-title">${label}</h3><span class="store-group-count">${count}</span>`;
+}
+
 export function renderFishGrid() {
-  const grid = document.getElementById('fishGrid');
+  const grid      = document.getElementById('fishGrid');
+  const inHead    = document.getElementById('fishInHead');
+  const outSec    = document.getElementById('fishOutSection');
+  const outHead   = document.getElementById('fishOutHead');
+  const outGrid   = document.getElementById('fishOutGrid');
   const csSection = document.getElementById('comingSoonSection');
   const csGrid    = document.getElementById('comingSoonGrid');
 
-  // 1. กรองข้อมูล (Apply Filter + Search)
+  const gt = GROUP_TEXT[isEnLang() ? 'en' : 'th'];
+
+  // 1. กรองด้วยคำค้นหา
   const filteredData = fishData.filter(f => {
-      // เช็ค Search
       const nameTh = (f.name_th || '').toLowerCase();
       const nameEn = (f.name_en || '').toLowerCase();
       const species = (f.species || '').toLowerCase();
-      const matchSearch = nameTh.includes(searchQuery) || nameEn.includes(searchQuery) || species.includes(searchQuery);
-
-      // เช็ค Chip
-      let matchChip = false;
-      if (currentFilter === 'ทั้งหมด') {
-          matchChip = true;
-      } else if (currentFilter === 'ถูกใจ') {
-          matchChip = isWishlisted(f.id);
-      } else if (currentFilter === 'มือใหม่') {
-          matchChip = f.level === 'มือใหม่';
-      } else {
-          // หาใน tags array
-          matchChip = (Array.isArray(f.tags_th) && f.tags_th.includes(currentFilter)) || 
-                      (Array.isArray(f.tags_en) && f.tags_en.includes(currentFilter));
-      }
-
-      return matchSearch && matchChip;
+      return nameTh.includes(searchQuery) || nameEn.includes(searchQuery) || species.includes(searchQuery);
   });
 
-  // แยก Available และ Coming Soon จากข้อมูลที่ถูกกรองแล้ว
+  // 2. แยก Available / Coming Soon
   const available  = filteredData.filter(f => !isComingSoon(f));
   const comingSoon = filteredData.filter(f =>  isComingSoon(f));
 
-  // Render Available
+  // 3. แยก "พร้อมจำหน่าย" กับ "หมดสต็อก" ออกจากกัน แล้วเรียงลำดับภายในแต่ละกลุ่ม
+  //    (สินค้าหมดจะไม่ปนอยู่กลางรายการอีก ไม่ว่าจะเลือกเรียงแบบไหน)
+  const inStock  = sortFish(available.filter(f => f.stock > 0),   sortMode);
+  const outStock = sortFish(available.filter(f => !(f.stock > 0)), sortMode);
+  displayedFish  = [...inStock, ...outStock];
+
   if (grid) {
-      if (available.length > 0) {
-          grid.innerHTML = available.map(_availableCard).join('');
+      if (available.length === 0) {
+          grid.style.display = '';
+          grid.innerHTML = storeEmpty('ph ph-magnifying-glass-minus', gt.noResult);
+          if (inHead) inHead.hidden = true;
+      } else if (inStock.length === 0) {
+          // มีแต่ของหมด → ซ่อนกลุ่มพร้อมจำหน่ายไปเลย ไม่ต้องโชว์กล่องว่าง
+          grid.style.display = 'none';
+          grid.innerHTML = '';
+          if (inHead) inHead.hidden = true;
       } else {
-          // Empty State Logic
-          if (currentFilter === 'ถูกใจ' && searchQuery === '') {
-             grid.innerHTML = storeEmpty('ph ph-heart-break', 'ยังไม่มีปลาถูกใจ');
-          } else {
-             grid.innerHTML = storeEmpty('ph ph-magnifying-glass-minus', 'ไม่พบผลลัพธ์ที่ค้นหา');
+          grid.style.display = '';
+          grid.innerHTML = inStock.map(_availableCard).join('');
+          // หัวข้อ "พร้อมจำหน่าย" โชว์เมื่อมีอีกกลุ่มให้แยกเท่านั้น (ถ้าไม่มีของหมดเลยก็ไม่ต้องมีหัวข้อ)
+          if (inHead) {
+              inHead.hidden = outStock.length === 0;
+              inHead.innerHTML = _groupHead(gt.inStock, inStock.length);
           }
       }
   }
 
-  // Update Bento Spotlight if present
+  if (outSec && outGrid) {
+      if (outStock.length > 0) {
+          outSec.hidden = false;
+          if (outHead) outHead.innerHTML = _groupHead(gt.outStock, outStock.length);
+          outGrid.innerHTML = outStock.map(_availableCard).join('');
+      } else {
+          outSec.hidden = true;
+          outGrid.innerHTML = '';
+      }
+  }
+
+  // Update Bento Spotlight if present (ใช้ลำดับเดิมจาก DB ไม่เปลี่ยนตามการเรียง)
   const featured = available.find(f => f.stock > 0 && f.image) || available[0];
   if (featured) {
     const lang = localStorage.getItem('aqua-lang') || 'th';
@@ -289,16 +335,9 @@ window.addEventListener('languageChanged', () => {
       : "ค้นหาชื่อปลา หรือสายพันธุ์...";
   }
 
-  const chipTexts = isEn 
-    ? ['All', 'Freshwater', 'Marine', 'Beginner', 'Colorful', '<i class="ph ph-heart"></i> Wishlist']
-    : ['ทั้งหมด', 'น้ำจืด', 'ทะเล', 'มือใหม่', 'สีสวย', '<i class="ph ph-heart"></i> ถูกใจ'];
-
-  const chips = document.querySelectorAll('.filter-chips .chip');
-  chips.forEach((chip, index) => {
-    if (chipTexts[index]) {
-      // ใช้ innerHTML แทน textContent เดิม เพราะ chip "ถูกใจ" มี <i> icon อยู่ในข้อความ
-      // (ถ้าใช้ textContent เหมือนเดิม icon จะโดนลบทิ้งทุกครั้งที่สลับภาษา)
-      chip.innerHTML = chipTexts[index];
-    }
+  const labels = SORT_LABELS[isEn ? 'en' : 'th'];
+  document.querySelectorAll('.filter-chips .chip').forEach(chip => {
+    const label = labels[chip.dataset.sort];
+    if (label) chip.textContent = label;
   });
 });

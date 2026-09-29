@@ -801,18 +801,8 @@
   }
   #fishModal .modal-close:hover { background: rgba(0,0,0,0.55); }
 
-  /* ปุ่มลอยเพิ่มเติม (wishlist) เหนือรูป มุมซ้ายบน — คู่กับ .modal-close (X) ที่อยู่มุมขวาบนอยู่แล้ว */
-  .fd-wish-fab {
-    position: absolute; top: 0.85rem; left: 0.85rem; z-index: 10;
-    width: 34px; height: 34px; border-radius: 50%; border: none; cursor: pointer;
-    background: rgba(0,0,0,0.35); color: white; backdrop-filter: blur(6px);
-    display: flex; align-items: center; justify-content: center; font-size: 1rem;
-    transition: background 0.2s, color 0.2s;
-  }
   .fish-detail-body { max-height: 90vh; overflow-y: auto; overscroll-behavior: contain; }
   .fd-desc, .fd-tag, .fd-name { overflow-wrap: anywhere; }
-  .fd-wish-fab:hover { background: rgba(0,0,0,0.55); }
-  .fd-wish-fab.active { background: white; color: #ef4444; }
   
   
   /* ── FISH DETAIL MODAL ── */
@@ -923,7 +913,6 @@
                 transition: background .15s, transform .15s; flex: none; }
   .fx-iconbtn:hover { background: rgba(44,172,173,.28); }
   .fx-iconbtn:active { transform: scale(.94); }
-  .fx-wish.active { background: #fff; color: #ef4444; }
 
   .fx-stage { min-width: 0; min-height: 0; height: 100%; position: relative; }
   .fx-scroll { height: 100%; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
@@ -1033,7 +1022,7 @@
           grid-template-rows: minmax(0, 1fr) auto; grid-template-areas: "stage rail" "bar rail"; }
     .fx-top { right: calc(clamp(300px, 24vw, 380px) + 16px); }
     .fx-top { justify-content: flex-end; gap: 10px; }
-    .fx-top .fx-close { order: 2; } .fx-top .fx-wish { order: 1; }
+    .fx-top .fx-close { order: 2; }
     .fx-stage { grid-area: stage; overflow: hidden; }
     .fx-scroll { display: flex; flex-direction: column; position: static; padding: 88px 0 24px clamp(40px, 6vw, 110px); }
     .fx-media { position: absolute; top: 0; right: 0; bottom: 0; width: 62%; }
@@ -1808,38 +1797,9 @@
   }
   .chip.active:hover { transform: none; color: #04222b; }
   
-  /* --- Wishlist Button --- */
+  /* กล่องรูปการ์ด: ต้องเป็น relative เพื่อให้ป้าย (ของหมด / HOT / ลดหนัก) อิงตำแหน่งจากกล่องนี้ */
   .fish-card-img-wrap {
-    position: relative; /* สำคัญมาก เพื่อให้หัวใจอิงตำแหน่งจากกล่องนี้ */
-  }
-  
-  .wishlist-btn {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(4px);
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 10;
-    box-shadow: 0 2px 8px rgba(2,77,96,0.15);
-    transition: transform 0.2s ease, color 0.2s ease;
-    color: var(--font-body);
-  }
-  
-  .wishlist-btn:hover {
-    transform: scale(1.1);
-  }
-  
-  .wishlist-btn.active {
-    color: #ef4444; /* สีแดงสำหรับหัวใจ */
-    border-color: #fca5a5;
+    position: relative;
   }
   
   /* --- Empty States --- */
@@ -2010,3 +1970,63 @@
   font-size: 0.72rem; font-weight: 600; padding: 4px 10px; border-radius: 999px;
   white-space: nowrap; flex-shrink: 0;
 }
+
+
+/* ════════════════════════════════════════════
+   STORE: กลุ่มสินค้า (พร้อมจำหน่าย / หมด) + ป้ายยอดขาย + ราคาขีดฆ่า
+   ════════════════════════════════════════════ */
+.store-group-head { display: flex; align-items: center; gap: .6rem; margin: 1.5rem 0 .1rem; }
+.store-group-head[hidden] { display: none; }
+.store-group-head--out { margin-top: 2.75rem; padding-top: 1.5rem; border-top: 1px dashed var(--border); }
+.store-group-title { font-family: var(--font-display); font-size: 1.15rem; font-weight: 700; color: var(--ocean-deep); }
+.store-group-head--out .store-group-title { color: var(--gray); }
+.store-group-count {
+  font-size: .78rem; font-weight: 600; padding: .1rem .6rem; border-radius: var(--radius-pill);
+  background: var(--ocean-mist); color: var(--ocean-deep); font-variant-numeric: tabular-nums;
+}
+.store-group-head--out .store-group-count { background: #f3f4f6; color: var(--gray); }
+#fishOutSection[hidden] { display: none; }
+#fishOutSection .fish-card .fish-img,
+#fishOutSection .fish-card .fish-card-img-wrap img { filter: grayscale(.35); }
+
+/* ป้ายบนรูปการ์ด: HOT / ลดหนัก (ทรงริบบิ้นเดียวกับ .out-badge) */
+.sales-badge {
+  position: absolute; top: .75rem; left: 0; z-index: 2;
+  display: inline-flex; align-items: center; gap: .3rem;
+  color: #fff; font-size: .72rem; font-weight: 700; letter-spacing: .02em;
+  padding: .3rem .85rem .3rem .9rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,.18);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 6px) 50%, 100% 100%, 0 100%);
+}
+.sales-badge--hot  { background: linear-gradient(90deg, #f97316, #ef4444); }
+.sales-badge--sale { background: linear-gradient(90deg, #e11d48, #be123c); }
+.out-badge + .sales-badge { top: 2.6rem; } /* ของหมด + HOT พร้อมกัน → ซ้อนกันลงมา */
+
+/* ราคา + ราคาก่อนลด (ขีดฆ่า) */
+.fish-price-wrap { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
+.fish-price-old {
+  font-size: .78rem; font-weight: 500; color: var(--gray);
+  text-decoration: line-through; text-decoration-thickness: 1.5px;
+  font-variant-numeric: tabular-nums;
+}
+.fish-price--sale { color: #dc2626; }
+
+/* ขายแล้ว X+ */
+.fish-sold { display: inline-flex; align-items: center; gap: .3rem; font-size: .78rem; color: var(--gray); margin: -.4rem 0 .8rem; }
+.fish-sold i { color: var(--ocean-teal); font-size: .9rem; }
+
+/* ── ใน modal รายละเอียดปลา (ธีมมืด) ── */
+.fx-salesbadge {
+  display: inline-flex; align-items: center; gap: .4rem;
+  padding: .3rem .85rem; border-radius: 999px; margin-bottom: .6rem;
+  color: #fff; font-size: .78rem; font-weight: 700; letter-spacing: .03em;
+  box-shadow: 0 4px 14px rgba(0,0,0,.3);
+}
+.fx-salesbadge--hot  { background: linear-gradient(90deg, #f97316, #ef4444); }
+.fx-salesbadge--sale { background: linear-gradient(90deg, #ef4444, #be123c); }
+.fx-price-old {
+  color: var(--fx-mut); font-size: 1.05rem; opacity: .85;
+  text-decoration: line-through; text-decoration-thickness: 2px;
+}
+.fx-sold { display: inline-flex; align-items: center; gap: .4rem; margin-top: .45rem; font-size: .9rem; color: var(--fx-mut); }
+.fx-sold i { color: var(--fx-acc2); }

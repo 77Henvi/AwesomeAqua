@@ -1,5 +1,6 @@
 import { fishData } from './fishData.js';
-import { isWishlisted, toggleWishlist } from '../shared/wishlist.js';
+import { describeSales } from '../shared/fishSales.js';
+import { getDisplayedFish } from './render.js';
 import { MESSENGER_ICON, openMessenger } from '../shared/utils.js';
 
 // ══════════════════════════════════════════════════════════════
@@ -20,11 +21,11 @@ const TXT = {
   th: { specs: 'ข้อมูลจำเพาะ', size: 'ขนาด', level: 'ระดับการเลี้ยง', stock: 'สต็อก', price: 'ราคา',
         details: 'รายละเอียด', similar: 'ปลาที่คล้ายกัน', next: 'ถัดไป', prev: 'ก่อนหน้า', close: 'ปิด',
         order: 'สั่งซื้อผ่าน Messenger', sold: 'หมดสต็อก', inch: 'นิ้ว', out: 'หมดแล้ว',
-        low: n => `เหลือ ${n} ตัว`, ok: n => `${n} ตัว`, wish: 'เพิ่มในรายการโปรด', unwish: 'นำออกจากรายการโปรด' },
+        low: n => `เหลือ ${n} ตัว`, ok: n => `${n} ตัว` },
   en: { specs: 'Specifications', size: 'Size', level: 'Care level', stock: 'Stock', price: 'Price',
         details: 'Details', similar: 'Similar species', next: 'Next', prev: 'Previous', close: 'Close',
         order: 'Order via Messenger', sold: 'Out of stock', inch: 'in', out: 'Out of stock',
-        low: n => `Only ${n} left`, ok: n => `${n} in stock`, wish: 'Add to wishlist', unwish: 'Remove from wishlist' }
+        low: n => `Only ${n} left`, ok: n => `${n} in stock` }
 };
 
 let currentFish = null, lastFocus = null, bound = false, savedOverflow = '';
@@ -45,6 +46,8 @@ function buildModel(f, lang) {
     size = (a === b ? `${a}` : `${Math.min(a, b)}–${Math.max(a, b)}`) + ` ${t.inch}`;
   }
   const stock = Math.max(0, Math.floor(num(f.stock) ?? 0));
+  const sales = describeSales(f, isEn);
+  const refPrice = sales.refMin ? baht(sales.refMin) + (sales.refMax ? ` – ${baht(sales.refMax)}` : '') : '';
   const tagsSrc = isEn && Array.isArray(f.tags_en) && f.tags_en.length ? f.tags_en : f.tags_th;
   return {
     id: f.id, t, isEn,
@@ -53,6 +56,7 @@ function buildModel(f, lang) {
     desc: pick(f.desc_en, f.desc_th, isEn),
     tags: (Array.isArray(tagsSrc) ? tagsSrc : []).filter(Boolean),
     image: typeof f.image === 'string' ? f.image.trim() : '',
+    sales, refPrice,
     price: pMin === null ? '—' : baht(pMin),
     priceTo: (pMin !== null && pMax !== null && pMax > pMin) ? baht(pMax) : '',
     size,
@@ -84,15 +88,21 @@ function simCard(s, isEn) {
   </button>`;
 }
 
+// ปุ่ม ถัดไป/ก่อนหน้า เดินตามลำดับที่ลูกค้าเห็นบนหน้าร้าน (รวมการค้นหา/การเรียง) ถ้าไม่เจอค่อย fallback เป็นลำดับเดิม
+function navList(id) {
+  const shown = getDisplayedFish();
+  return shown.some(x => sameId(x.id, id)) ? shown : fishData;
+}
+
 function template(f, m) {
-  const list = fishData, n = list.length;
+  const list = navList(f.id), n = list.length;
   const idx = list.findIndex(x => sameId(x.id, f.id));
   const canNav = n > 1 && idx >= 0;
   const nextF = canNav ? list[(idx + 1) % n] : null;
   const sim = similarOf(f);
   const simHtml = sim.map(s => simCard(s, m.isEn)).join('');
-  const liked = isWishlisted(f.id);
   const t = m.t;
+  const sales = m.sales;
 
   const tiles = [
     m.size  ? ['ph-ruler', t.size, m.size, ''] : null,
@@ -109,8 +119,6 @@ function template(f, m) {
 
     <div class="fx-top">
       <button type="button" class="fx-iconbtn fx-close" data-fx="close" aria-label="${esc(t.close)}"><i class="ph ph-x" aria-hidden="true"></i></button>
-      <button type="button" class="fx-iconbtn fx-wish ${liked ? 'active' : ''}" data-fx="wish" aria-pressed="${liked}"
-        aria-label="${esc(liked ? t.unwish : t.wish)}"><i class="${liked ? 'ph-fill' : 'ph'} ph-heart" aria-hidden="true"></i></button>
     </div>
 
     <div class="fx-stage">
@@ -121,11 +129,13 @@ function template(f, m) {
 
         <div class="fx-content">
           <div class="fx-headline">
+            ${sales.kind !== 'none' ? `<span class="fx-salesbadge fx-salesbadge--${sales.kind === 'hot' ? 'hot' : 'sale'}"><i class="ph-fill ${sales.kind === 'hot' ? 'ph-fire' : 'ph-tag'}" aria-hidden="true"></i>${esc(sales.label)}</span>` : ''}
             ${m.species ? `<div class="fx-eyebrow">${esc(m.species)}</div>` : ''}
             <h2 class="fx-title" id="fxTitle">${esc(m.name)}</h2>
             <div class="fx-price" aria-label="${esc(t.price)}">
-              <span class="fx-price-main">${esc(m.price)}</span>${m.priceTo ? `<span class="fx-price-to">– ${esc(m.priceTo)}</span>` : ''}
+              <span class="fx-price-main">${esc(m.price)}</span>${m.priceTo ? `<span class="fx-price-to">– ${esc(m.priceTo)}</span>` : ''}${m.refPrice ? `<s class="fx-price-old" aria-label="${m.isEn ? 'Original price' : 'ราคาเดิม'}">${esc(m.refPrice)}</s>` : ''}
             </div>
+            ${sales.soldText ? `<div class="fx-sold"><i class="ph ph-shopping-bag" aria-hidden="true"></i>${esc(sales.soldText)}</div>` : ''}
           </div>
 
           <div class="fx-panel">
@@ -199,10 +209,12 @@ function render(f) {
 }
 
 function step(dir) {
-  if (!currentFish || fishData.length < 2) return;
-  const i = fishData.findIndex(x => sameId(x.id, currentFish.id));
+  if (!currentFish) return;
+  const list = navList(currentFish.id);
+  if (list.length < 2) return;
+  const i = list.findIndex(x => sameId(x.id, currentFish.id));
   if (i < 0) return;
-  render(fishData[(i + dir + fishData.length) % fishData.length]);
+  render(list[(i + dir + list.length) % list.length]);
   document.querySelector('#fishDetailContent .fx-content, #fishDetailContent .fx-close')?.focus?.({ preventScroll: true });
 }
 
@@ -224,11 +236,6 @@ function bindOnce() {
         if (f) render(f);
         return;
       }
-      case 'wish':
-        if (typeof window.onWishToggle === 'function') window.onWishToggle(currentFish.id, el, e);
-        else toggleWishlist(currentFish.id);
-        el.setAttribute('aria-pressed', String(el.classList.contains('active')));
-        return;
     }
   });
   document.addEventListener('keydown', e => {
