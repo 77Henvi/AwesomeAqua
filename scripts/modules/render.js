@@ -272,13 +272,17 @@ export function renderFishGrid() {
   }
 
   // Render Coming Soon
-  if (!csSection || !csGrid) return;
-  if (comingSoon.length < 3) {
-    csSection.style.display = 'none';
-    return;
+  if (csSection && csGrid) {
+    if (comingSoon.length < 3) {
+      csSection.style.display = 'none';
+    } else {
+      csSection.style.display = '';
+      csGrid.innerHTML = comingSoon.map(_comingSoonCard).join('');
+    }
   }
-  csSection.style.display = '';
-  csGrid.innerHTML = comingSoon.map(_comingSoonCard).join('');
+
+  // Notify animation engine to trigger staggered entrance and attach 3D tilt
+  window.dispatchEvent(new CustomEvent('fishGridRendered'));
 }
 
 export function renderFishTable() {

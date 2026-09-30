@@ -3,7 +3,7 @@ import { openFishDetail, closeFishModal,
          closeFishModalOutside,
          openComingSoonDetail, closeCsModal,
          closeCsModalOutside }                     from './modules/fishModal.js';
-import { goSlide, injectHeroBubbles }              from './modules/slideshow.js';
+import { goSlide }                                 from './modules/slideshow.js';
 import { injectFishBackgrounds }                   from './modules/fishBackground.js';
 import { setFishSort, filterFish }                 from './modules/render.js';
 import { openMessenger, toggleMobile,
@@ -11,6 +11,7 @@ import { openMessenger, toggleMobile,
 import { toggleTag }                               from './shared/tags.js';
 import { previewEditImage }                        from './shared/image.js';
 import { toggleLanguage, initLanguage }            from './shared/i18n.js';
+import { initAntigravityAnimations }               from './modules/animations.js';
 
 window.setFishSort = setFishSort;
 window.filterFish = filterFish;
@@ -31,19 +32,7 @@ window.closeCsModalOutside  = closeCsModalOutside;
 // ── Nav shadow on scroll ──
 window.addEventListener('scroll', () => {
   document.querySelector('nav').classList.toggle('scrolled', window.scrollY > 40);
-});
-
-// ── Scroll animation ──
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.classList.add('visible');
-      observer.unobserve(e.target);
-    }
-  });
-}, { threshold: 0.1 });
-
-document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+}, { passive: true });
 
 // ════════════════════════════════════════════
 //   LOADING SCREEN CONTROLLER
@@ -55,26 +44,14 @@ window.hideLoader = function() {
 };
 
 // Failsafe: เผื่อโหลดข้อมูลช้าผิดปกติหรือ error ที่ไม่คาดคิด ไม่ให้ loader ค้างตลอดไป
-// (ปกติ loadFishFromDB() ใน fishData.js จะเรียก hideLoader() เองทันทีที่ข้อมูลพร้อมแสดงจริง)
 setTimeout(() => {
   hideLoader();
 }, 4000);
 
 window.toggleLanguage = toggleLanguage;
 
-// ── Card Spotlight Mouse Tracking ──
-document.addEventListener('pointermove', (e) => {
-  const card = e.target.closest('.fish-card, .bento-card');
-  if (!card) return;
-  const rect = card.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
-  card.style.setProperty('--mouse-x', `${x}px`);
-  card.style.setProperty('--mouse-y', `${y}px`);
-}, { passive: true });
-
 // ── Init ──
 initLanguage();
 injectFishBackgrounds();
-injectHeroBubbles();
+initAntigravityAnimations();
 loadFishFromDB();

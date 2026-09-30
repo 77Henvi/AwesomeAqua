@@ -209,20 +209,50 @@
     z-index: 3; pointer-events: none;
     background: linear-gradient(to bottom, transparent 0%, transparent 55%, var(--white) 100%);
   }
-  /* ฟองอากาศลอยขึ้น — สร้าง element ด้วย JS (ดู injectHeroBubbles ใน slideshow.js) */
-  .hero-bubbles { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+  /* ฟองอากาศลอยขึ้น — แสงชีวภาพใต้น้ำ (Bioluminescent Glass Refraction & Interactive Sparkles) */
+  .hero-bubbles { position: absolute; inset: 0; z-index: 2; pointer-events: auto; overflow: hidden; }
   .hero-bubble {
-    position: absolute; bottom: -30px; border-radius: 50%;
-    background: rgba(117,226,224,0.28);
-    animation: heroBubbleRise linear infinite;
+    position: absolute; bottom: -40px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.75) 0%, rgba(117,226,224,0.35) 35%, rgba(44,172,173,0.18) 70%, rgba(117,226,224,0.45) 100%);
+    box-shadow: 0 0 14px rgba(117, 226, 224, 0.4), inset 0 0 6px rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(1.5px);
+    -webkit-backdrop-filter: blur(1.5px);
+    pointer-events: auto;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    will-change: transform, opacity;
   }
-  /* ตั้งชื่อเฉพาะ heroBubbleRise (เดิมชื่อ bubbleRise ชนกับ keyframe ของ .loader-bubble
-     ที่มีอยู่ก่อนแล้วในไฟล์นี้ — CSS ใช้ keyframe ตัวหลังสุดทับตัวแรกเสมอเมื่อชื่อซ้ำกัน
-     ทำให้ฟองของ hero เคยวิ่งด้วย animation ของ loader โดยไม่ตั้งใจ) */
+  .hero-bubble:hover {
+    transform: scale(1.3);
+    box-shadow: 0 0 22px rgba(117, 226, 224, 0.85), inset 0 0 10px rgba(255, 255, 255, 0.9);
+  }
+  .hero-bubble.popping {
+    animation: bubblePop 0.15s cubic-bezier(0.1, 0.9, 0.2, 1) forwards !important;
+  }
+  @keyframes bubblePop {
+    0%   { transform: scale(1); opacity: 1; }
+    50%  { transform: scale(1.5); opacity: 0.7; }
+    100% { transform: scale(2); opacity: 0; }
+  }
+  .bubble-sparkle {
+    position: absolute;
+    width: 4px; height: 4px; border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 0 8px #75E2E0, 0 0 14px #2CACAD;
+    pointer-events: none;
+    z-index: 10;
+    animation: sparkleFly 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @keyframes sparkleFly {
+    0%   { transform: translate(0, 0) scale(1); opacity: 1; }
+    100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+  }
   @keyframes heroBubbleRise {
     0%   { transform: translateY(0) translateX(0); opacity: 0; }
-    10%  { opacity: 0.65; }
-    100% { transform: translateY(-100vh) translateX(18px); opacity: 0; }
+    8%   { opacity: 0.75; }
+    90%  { opacity: 0.75; }
+    100% { transform: translateY(-105vh) translateX(24px); opacity: 0; }
   }
   
   .hero-content { max-width: 580px; z-index: 3; position: relative; }
@@ -1372,15 +1402,132 @@
   .about-contact-visual { display: none; }
   
   
-  /* ── ANIMATIONS ── */
+  /* ════════════════════════════════════════════
+     ANTIGRAVITY 60FPS VISUAL FX & ANIMATION SUITE
+     ════════════════════════════════════════════ */
+
+  /* ── 1. KINETIC SCROLL REVEAL (Unblur + Spring Up) ── */
   .fade-up {
-    opacity: 0; transform: translateY(28px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
+    opacity: 0;
+    transform: translateY(32px) scale(0.98);
+    filter: blur(6px);
+    transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+                filter 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform, filter;
   }
-  .fade-up.visible { opacity: 1; transform: translateY(0); }
-  .fade-up:nth-child(2) { transition-delay: 0.1s; }
-  .fade-up:nth-child(3) { transition-delay: 0.2s; }
-  .fade-up:nth-child(4) { transition-delay: 0.3s; }
+  .fade-up.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+  .fade-up:nth-child(2) { transition-delay: 0.08s; }
+  .fade-up:nth-child(3) { transition-delay: 0.16s; }
+  .fade-up:nth-child(4) { transition-delay: 0.24s; }
+
+  /* ── 2. 3D PERSPECTIVE TILT & SPECULAR GLARE ── */
+  .bento-card, .fish-card, .stats-glass, .about-value-card, .social-card {
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    will-change: transform;
+    position: relative;
+  }
+  .card-glare {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 5;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    mix-blend-mode: overlay;
+    will-change: opacity, background;
+  }
+
+  /* ── 3. CASCADE STAGGERED GRID REVEAL ── */
+  @keyframes cascadeEntrance {
+    0% {
+      opacity: 0;
+      transform: translateY(28px) scale(0.96);
+      filter: blur(8px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
+    }
+  }
+  .fish-card.cascade-reveal {
+    animation: cascadeEntrance 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: calc(var(--stagger-i, 0) * 45ms);
+  }
+
+  /* ── 4. LIQUID RIPPLE MICRO-INTERACTION ── */
+  .btn, .bento-btn-order, .chip, .lang-toggle-btn, .social-card, .bento-card--explore {
+    position: relative;
+    overflow: hidden;
+  }
+  .liquid-ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(117, 226, 224, 0.45) 0%, rgba(44, 172, 173, 0.2) 60%, transparent 80%);
+    pointer-events: none;
+    transform: scale(0);
+    animation: liquidExpand 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    z-index: 10;
+  }
+  @keyframes liquidExpand {
+    0%   { transform: scale(0); opacity: 0.85; }
+    100% { transform: scale(1); opacity: 0; }
+  }
+
+  /* ── 5. AMBIENT BIOLUMINESCENT CURSOR AURA ── */
+  .aqua-cursor-aura {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 440px;
+    height: 440px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    background: radial-gradient(circle, rgba(117, 226, 224, 0.08) 0%, rgba(44, 172, 173, 0.035) 45%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    mix-blend-mode: screen;
+    will-change: transform;
+  }
+
+  /* ── 6. DYNAMIC AURORA BACKDROP ── */
+  .bento-section::before {
+    content: '';
+    position: absolute;
+    top: 5%;
+    right: -5%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(117, 226, 224, 0.12) 0%, rgba(44, 172, 173, 0.04) 50%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    animation: auroraFloat 16s ease-in-out infinite alternate;
+  }
+  @keyframes auroraFloat {
+    0%   { transform: translate(0, 0) scale(1); }
+    50%  { transform: translate(-45px, 35px) scale(1.15); }
+    100% { transform: translate(25px, -25px) scale(0.95); }
+  }
+
+  /* ── 7. ACCESSIBILITY REDUCED MOTION OVERRIDE ── */
+  @media (prefers-reduced-motion: reduce) {
+    .fade-up, .fish-card.cascade-reveal, .hero-bubble, .bento-section::before {
+      animation: none !important;
+      transition: none !important;
+      filter: none !important;
+      transform: none !important;
+      opacity: 1 !important;
+    }
+  }
   
   
   /* ── FISH BACKGROUND (SVG outline) ── */
