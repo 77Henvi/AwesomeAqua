@@ -13,18 +13,28 @@ export const CONTINENTS = [
 ];
 
 export const CONTINENT_META = {
-  'Africa': {
-    id: 'Africa',
-    slug: 'africa',
-    name_en: 'Africa',
-    name_th: 'แอฟริกา',
-    code: 'AF',
-    icon: '🌍',
-    // Geographic center for globe camera focusing
-    lat: 2.0,
-    lon: 22.0,
-    description_en: 'Home to the great rift lakes (Malawi, Tanganyika, Victoria) famous for vibrant cichlids and diverse river basins.',
-    description_th: 'แหล่งกำเนิดของทะเลสาบน้ำจืดขนาดใหญ่และแม่น้ำสายสำคัญ ชุมทางของปลากลุ่มซิคลิิด (Cichlids) หลากสีสัน'
+  'South America': {
+    id: 'South America',
+    slug: 'south-america',
+    name_en: 'South America',
+    name_th: 'อเมริกาใต้',
+    code: 'SA',
+    case_no: 'HABITAT 01',
+    icon: '🌎',
+    lat: -14.0,
+    lon: -60.0,
+    river_basin_en: 'Amazon & Orinoco River Basins',
+    river_basin_th: 'ลุ่มน้ำอเมซอนและโอริโนโก',
+    water_params: 'pH 5.5 - 6.8 · 26 - 30°C · Blackwater',
+    hero_image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=900&q=80',
+    description_en: 'The mighty Amazon and Orinoco basins represent the world epicenter of aquatic biodiversity — native home to Discus, Angelfish, Cardinal Tetras, and Plecos.',
+    description_th: 'ลุ่มน้ำอเมซอนและโอริโนโก แหล่งรวมความหลากหลายทางชีวภาพของปลาสวยงามอันดับ 1 ของโลก เช่น ปอมปาดัวร์ เทวดา เตตร้า และซัคเกอร์',
+    hotspots: [
+      { name: 'Amazon Mainstem', lat: -3.46, lon: -62.21 },
+      { name: 'Rio Negro (Blackwater)', lat: -1.28, lon: -61.64 },
+      { name: 'Orinoco Basin', lat: 8.35, lon: -62.71 },
+      { name: 'Pantanal Wetlands', lat: -16.29, lon: -56.62 }
+    ]
   },
   'Asia': {
     id: 'Asia',
@@ -32,23 +42,45 @@ export const CONTINENT_META = {
     name_en: 'Asia',
     name_th: 'เอเชีย',
     code: 'AS',
+    case_no: 'HABITAT 02',
     icon: '🌏',
-    lat: 30.0,
+    lat: 18.0,
     lon: 100.0,
-    description_en: 'Vast rivers, tropical islands, and freshwater streams hosting bettas, barbs, gouramis, and iconic arowanas.',
-    description_th: 'ลุ่มน้ำเขตร้อนอันอุดมสมบูรณ์ ต้นกำเนิดของปลากัด ปลากระดี่ ปลาซิว และปลามังกรอันทรงคุณค่า'
+    river_basin_en: 'Chao Phraya, Mekong & Sundaland Streams',
+    river_basin_th: 'ลุ่มน้ำเจ้าพระยา แม่โขง และป่าพรุซุนดาแลนด์',
+    water_params: 'pH 6.0 - 7.5 · 24 - 29°C · Tropical Streams',
+    hero_image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=900&q=80',
+    description_en: 'Vast river deltas, peat swamps, and tropical stream networks hosting wild Bettas, Gouramis, Rasboras, Barbs, and legendary Asian Arowanas.',
+    description_th: 'ลุ่มน้ำเขตร้อนอันอุดมสมบูรณ์ ต้นกำเนิดของปลากัด ปลากระดี่ ปลาซิว และปลามังกรอันทรงคุณค่า',
+    hotspots: [
+      { name: 'Chao Phraya Basin', lat: 14.5, lon: 100.5 },
+      { name: 'Mekong River', lat: 15.2, lon: 105.8 },
+      { name: 'Borneo Peat Swamps', lat: 0.5, lon: 114.0 },
+      { name: 'Ganges & Brahmaputra', lat: 24.0, lon: 88.0 }
+    ]
   },
-  'Europe': {
-    id: 'Europe',
-    slug: 'europe',
-    name_en: 'Europe',
-    name_th: 'ยุโรป',
-    code: 'EU',
+  'Africa': {
+    id: 'Africa',
+    slug: 'africa',
+    name_en: 'Africa',
+    name_th: 'แอฟริกา',
+    code: 'AF',
+    case_no: 'HABITAT 03',
     icon: '🌍',
-    lat: 50.0,
-    lon: 15.0,
-    description_en: 'Temperate rivers and lakes known for endemic coldwater species, loaches, and ancient river fishes.',
-    description_th: 'แม่น้ำและทะเลสาบเขตหนาว แหล่งรวมพันธุ์ปลาน้ำเย็นและปลาน้ำจืดพื้นถิ่นยุโรป'
+    lat: 0.0,
+    lon: 22.0,
+    river_basin_en: 'African Great Lakes & Congo Basin',
+    river_basin_th: 'ทะเลสาบเกรตริฟต์และลุ่มน้ำคองโก',
+    water_params: 'pH 7.8 - 8.6 · 24 - 28°C · Hard Alkaline Water',
+    hero_image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80',
+    description_en: 'The spectacular Great Rift Lakes (Malawi, Tanganyika, Victoria) famous for vibrant endemic Cichlids and rapid evolutionary adaptation.',
+    description_th: 'ทะเลสาบน้ำจืดขนาดใหญ่และแม่น้ำสายสำคัญ ชุมทางของปลากลุ่มซิคลิิด (Cichlids) หลากสีสันและปลาคองโกเตตร้า',
+    hotspots: [
+      { name: 'Lake Malawi', lat: -12.18, lon: 34.36 },
+      { name: 'Lake Tanganyika', lat: -6.29, lon: 29.57 },
+      { name: 'Congo River Basin', lat: -0.5, lon: 21.0 },
+      { name: 'Lake Victoria', lat: -1.0, lon: 33.0 }
+    ]
   },
   'North America': {
     id: 'North America',
@@ -56,23 +88,43 @@ export const CONTINENT_META = {
     name_en: 'North America',
     name_th: 'อเมริกาเหนือ',
     code: 'NA',
+    case_no: 'HABITAT 04',
     icon: '🌎',
     lat: 38.0,
     lon: -98.0,
-    description_en: 'Diverse freshwater ecosystems from Mississippi river valleys to Mexican cenotes, home to livebearers, gars, and sunfish.',
-    description_th: 'ระบบนิเวศน้ำจืดตั้งแต่ลุ่มน้ำมิสซิสซิปปีถึงลำธารในอเมริกากลาง แหล่งกำเนิดปลาออกลูกเป็นตัวและปลากลุ่มการ์'
+    river_basin_en: 'Mississippi Drainage & Cenote Springs',
+    river_basin_th: 'ลุ่มน้ำมิสซิสซิปปีและถ้ำน้ำจืดเซโนเต้',
+    water_params: 'pH 7.0 - 8.2 · 20 - 26°C · Clear Mineral Spring',
+    hero_image: 'https://images.unsplash.com/photo-1437622368342-7a3d73a34c8f?auto=format&fit=crop&w=900&q=80',
+    description_en: 'Diverse freshwater habitats from Appalachian creeks to Central American limestone cenotes, home to livebearers, gars, and flagfish.',
+    description_th: 'ระบบนิเวศน้ำจืดตั้งแต่ลำธารหินปูนถึงเซโนเต้ในอเมริกากลาง แหล่งกำเนิดปลาสอด หางนกยูง และปลากลุ่มการ์',
+    hotspots: [
+      { name: 'Mississippi River', lat: 35.0, lon: -90.0 },
+      { name: 'Yucatan Cenotes', lat: 20.6, lon: -89.0 },
+      { name: 'Florida Springs', lat: 28.5, lon: -82.0 }
+    ]
   },
-  'South America': {
-    id: 'South America',
-    slug: 'south-america',
-    name_en: 'South America',
-    name_th: 'อเมริกาใต้',
-    code: 'SA',
-    icon: '🌎',
-    lat: -14.0,
-    lon: -60.0,
-    description_en: 'The mighty Amazon and Orinoco basins, the world epicenter of aquarium biodiversity — Discus, Angelfish, Tetras, and Plecos.',
-    description_th: 'ลุ่มน้ำอเมซอนและโอริโนโก แหล่งรวมความหลากหลายทางชีวภาพของปลาสวยงามอันดับ 1 ของโลก เช่น ปอมปาดัวร์ เทวดา เตตร้า และซัคเกอร์'
+  'Europe': {
+    id: 'Europe',
+    slug: 'europe',
+    name_en: 'Europe',
+    name_th: 'ยุโรป',
+    code: 'EU',
+    case_no: 'HABITAT 05',
+    icon: '🌍',
+    lat: 50.0,
+    lon: 15.0,
+    river_basin_en: 'Danube, Rhine & Alpine Lake Systems',
+    river_basin_th: 'ลุ่มน้ำดานูบ ไรน์ และทะเลสาบอัลไพน์',
+    water_params: 'pH 6.8 - 7.6 · 16 - 22°C · Cold Mountain Stream',
+    hero_image: 'https://images.unsplash.com/photo-1498084393753-b411b2d26b34?auto=format&fit=crop&w=900&q=80',
+    description_en: 'Temperate river networks and cold glacial lakes preserving ancient Sturgeons, European loaches, minnows, and endemic killifish.',
+    description_th: 'แม่น้ำและทะเลสาบเขตหนาว แหล่งรวมพันธุ์ปลาน้ำเย็น สเตอร์เจียน และปลาน้ำจืดพื้นถิ่นยุโรป',
+    hotspots: [
+      { name: 'Danube Delta', lat: 45.2, lon: 29.5 },
+      { name: 'Rhine River', lat: 50.0, lon: 7.6 },
+      { name: 'Alpine Lakes', lat: 46.5, lon: 8.0 }
+    ]
   },
   'Oceania': {
     id: 'Oceania',
@@ -80,11 +132,21 @@ export const CONTINENT_META = {
     name_en: 'Oceania',
     name_th: 'โอเชียเนีย',
     code: 'OC',
+    case_no: 'HABITAT 06',
     icon: '🌏',
     lat: -24.0,
     lon: 135.0,
-    description_en: 'Crystal clear streams and tropical reefs of Australia and New Guinea, legendary for shimmering Rainbowfish and gobies.',
-    description_th: 'แหล่งน้ำบริสุทธิ์ของออสเตรเลียและนิวกินี ถิ่นกำเนิดของปลากลุ่มเรนโบว์ (Rainbowfish) เกล็ดสะท้อนแสงแวววาว'
+    river_basin_en: 'Queensland Rainforest Streams & New Guinea Lakes',
+    river_basin_th: 'ลำธารป่าฝนควีนส์แลนด์และทะเลสาบนิวกินี',
+    water_params: 'pH 6.5 - 7.5 · 23 - 28°C · Crystal Clear Stream',
+    hero_image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80',
+    description_en: 'Isolated crystal streams and ancient rainforest rivers of Australia and Papua, renowned for iridescent Rainbowfish and freshwater gobies.',
+    description_th: 'แหล่งน้ำบริสุทธิ์ของออสเตรเลียและนิวกินี ถิ่นกำเนิดของปลากลุ่มเรนโบว์ (Rainbowfish) เกล็ดสะท้อนแสงแวววาว',
+    hotspots: [
+      { name: 'Lake Kutubu (PNG)', lat: -6.4, lon: 143.4 },
+      { name: 'Queensland Streams', lat: -17.5, lon: 145.5 },
+      { name: 'Murray-Darling Basin', lat: -34.0, lon: 141.0 }
+    ]
   }
 };
 

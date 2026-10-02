@@ -1,6 +1,6 @@
 /**
  * scripts/aqua-world.js
- * Controller for Aqua World page
+ * Controller for Aqua World (Leonardo DiCaprio Foundation Editorial Edition)
  * Awesome Aqua — Explore the World of Fish
  */
 
@@ -21,7 +21,7 @@ window.closeFishModalOutside = closeFishModalOutside;
 
 let allFish = [];
 let globeInstance = null;
-let currentContinent = null;
+let currentContinent = 'South America'; // Default iconic continent
 
 const isEnLang = () => (localStorage.getItem('aqua-lang') || 'th') === 'en';
 
@@ -73,7 +73,7 @@ async function loadPublicFish() {
 function getInitialContinentFromURL() {
   const params = new URLSearchParams(window.location.search);
   const raw = params.get('continent') || params.get('region');
-  return normalizeContinent(raw);
+  return normalizeContinent(raw) || 'South America';
 }
 
 function getInitialSpeciesFromURL() {
@@ -91,152 +91,142 @@ function updateURL(continent) {
   window.history.replaceState({}, '', url);
 }
 
-// ── Render Continent Selector Pills ──
-function renderContinentPills() {
-  const pillWrap = document.getElementById('continentPills');
-  if (!pillWrap) return;
+// ── Render Bottom Habitat Scrubber Timeline ──
+function renderHabitatScrubber() {
+  const scrubber = document.getElementById('habitatScrubber');
+  if (!scrubber) return;
 
   const isEn = isEnLang();
   const counts = countSpeciesByContinent(allFish);
-  const totalSpecies = allFish.length;
 
   let html = `
-    <button class="aqua-pill ${currentContinent === null ? 'active' : ''}" data-continent="all" onclick="window.selectContinent(null)">
-      <span class="aqua-pill-icon">🌍</span>
-      <span class="aqua-pill-name">${isEn ? 'All Continents' : 'ทุกทวีป'}</span>
-      <span class="aqua-pill-count">${totalSpecies}</span>
-    </button>
+    <div class="scrubber-track">
+      <div class="scrubber-line"></div>
+      <div class="scrubber-nodes">
   `;
 
-  for (const c of CONTINENTS) {
+  CONTINENTS.forEach((c, idx) => {
     const meta = CONTINENT_META[c];
-    const count = counts[c] || 0;
     const isSelected = currentContinent === c;
+    const count = counts[c] || 0;
 
     html += `
-      <button class="aqua-pill ${isSelected ? 'active' : ''}" data-continent="${c}" onclick="window.selectContinent('${c}')">
-        <span class="aqua-pill-icon">${meta.icon}</span>
-        <span class="aqua-pill-name">${isEn ? meta.name_en : meta.name_th}</span>
-        <span class="aqua-pill-count">${count}</span>
+      <button class="scrubber-node ${isSelected ? 'active' : ''}" 
+              onclick="window.selectContinent('${c}')" 
+              title="${isEn ? meta.name_en : meta.name_th}">
+        <span class="scrubber-dot"></span>
+        <span class="scrubber-case">${meta.case_no || `0${idx + 1}`}</span>
+        <span class="scrubber-label">${isEn ? meta.name_en : meta.name_th}</span>
+        <span class="scrubber-count">${count}</span>
       </button>
     `;
-  }
+  });
 
-  pillWrap.innerHTML = html;
-}
-
-// ── Render Species Panel (Desktop & Mobile) ──
-function renderSpeciesPanel() {
-  const panel = document.getElementById('speciesPanel');
-  if (!panel) return;
-
-  const isEn = isEnLang();
-
-  if (!currentContinent) {
-    // Overview state (No specific continent selected)
-    const counts = countSpeciesByContinent(allFish);
-
-    panel.innerHTML = `
-      <div class="aqua-panel-card">
-        <div class="aqua-panel-header">
-          <div class="aqua-panel-tag">
-            <i class="ph-bold ph-compass"></i>
-            <span>${isEn ? 'World Atlas' : 'แผนที่โลกชีวภาพ'}</span>
-          </div>
-          <h3 class="aqua-panel-title">${isEn ? 'Explore by Continent' : 'สำรวจตามทวีป'}</h3>
-          <p class="aqua-panel-desc">${isEn ? 'Click any continent on the 3D globe or select from the list above to view species native to that region.' : 'คลิกเลือกทวีปบนลูกโลก 3 มิติ หรือเลือกจากแถบด้านบนเพื่อดูสายพันธุ์ปลาประจำถิ่น'}</p>
-        </div>
-
-        <div class="aqua-continent-summary-grid">
-          ${CONTINENTS.map(c => {
-            const meta = CONTINENT_META[c];
-            const count = counts[c] || 0;
-            return `
-              <div class="aqua-continent-tile" onclick="window.selectContinent('${c}')" role="button" tabindex="0">
-                <div class="tile-top">
-                  <span class="tile-icon">${meta.icon}</span>
-                  <span class="tile-count">${count} ${isEn ? 'species' : 'ชนิด'}</span>
-                </div>
-                <div class="tile-name">${isEn ? meta.name_en : meta.name_th}</div>
-              </div>
-            `;
-          }).join('')}
-        </div>
-      </div>
-    `;
-    return;
-  }
-
-  const meta = CONTINENT_META[currentContinent];
-  const speciesList = filterFishByContinent(allFish, currentContinent);
-  const count = speciesList.length;
-
-  panel.innerHTML = `
-    <div class="aqua-panel-card aqua-panel-card--active">
-      <div class="aqua-panel-header">
-        <div class="aqua-panel-top-row">
-          <div class="aqua-panel-tag">
-            <span class="aqua-tag-icon">${meta.icon}</span>
-            <span>${isEn ? 'Region Collection' : 'คอลเลกชันประจำทวีป'}</span>
-          </div>
-          <button class="aqua-panel-close-btn" onclick="window.selectContinent(null)" title="${isEn ? 'Reset view' : 'กลับสู่ภาพรวม'}">
-            <i class="ph ph-x"></i>
-          </button>
-        </div>
-
-        <h3 class="aqua-panel-title">${isEn ? meta.name_en : meta.name_th}</h3>
-        <div class="aqua-panel-badge-row">
-          <span class="aqua-count-badge">
-            <i class="ph-bold ph-fish"></i>
-            <span>${count} ${isEn ? 'species discovered' : 'ชนิดที่ค้นพบ'}</span>
-          </span>
-        </div>
-        <p class="aqua-panel-desc">${isEn ? meta.description_en : meta.description_th}</p>
-      </div>
-
-      <div class="aqua-species-list-container">
-        ${count === 0 ? `
-          <div class="aqua-empty-state">
-            <i class="ph ph-magnifying-glass-minus"></i>
-            <p>${isEn ? 'No species mapped to this region yet.' : 'ยังไม่มีรายการปลาที่ระบุแหล่งกำเนิดในทวีปนี้'}</p>
-          </div>
-        ` : `
-          <div class="aqua-species-grid">
-            ${speciesList.map(f => {
-              const name = isEn && f.name_en ? f.name_en : f.name_th;
-              const price = f.priceMin ? `฿${f.priceMin.toLocaleString()}` : '';
-              return `
-                <div class="aqua-species-card" onclick="window.openFishDetail('${f.id}')" role="button" tabindex="0">
-                  <div class="species-card-img-wrap">
-                    ${f.image
-                      ? `<img src="${f.image}" alt="${name}" loading="lazy" class="species-card-img">`
-                      : `<div class="species-card-emoji">${f.emoji || '🐟'}</div>`
-                    }
-                  </div>
-                  <div class="species-card-body">
-                    <h4 class="species-card-name">${name}</h4>
-                    <div class="species-card-sub">${f.species || '—'}</div>
-                    ${f.country || f.origin_region ? `
-                      <div class="species-card-origin">
-                        <i class="ph ph-map-pin"></i>
-                        <span>${f.origin_region || f.country}</span>
-                      </div>
-                    ` : ''}
-                    <div class="species-card-foot">
-                      <span class="species-card-price">${price}</span>
-                      <span class="species-card-btn">${isEn ? 'View →' : 'ดูข้อมูล →'}</span>
-                    </div>
-                  </div>
-                </div>
-              `;
-            }).join('')}
-          </div>
-        `}
+  html += `
       </div>
     </div>
   `;
 
-  // Attach 3D card tilt to species cards
+  scrubber.innerHTML = html;
+}
+
+// ── Render Left Editorial Story & Species Panel ──
+function renderEditorialPanel() {
+  const panel = document.getElementById('speciesPanel');
+  if (!panel) return;
+
+  const isEn = isEnLang();
+  const activeCont = currentContinent || 'South America';
+  const meta = CONTINENT_META[activeCont];
+  const speciesList = filterFishByContinent(allFish, activeCont);
+  const count = speciesList.length;
+
+  const basinName = isEn ? (meta.river_basin_en || meta.name_en) : (meta.river_basin_th || meta.name_th);
+  const desc = isEn ? meta.description_en : meta.description_th;
+
+  panel.innerHTML = `
+    <div class="ldf-card fade-in">
+      <!-- Case Header & Indicator -->
+      <div class="ldf-case-header">
+        <span class="ldf-case-num">${meta.case_no || 'HABITAT'}</span>
+        <span class="ldf-case-divider">/</span>
+        <span class="ldf-case-continent">${isEn ? meta.name_en.toUpperCase() : meta.name_th}</span>
+      </div>
+
+      <!-- Hero Habitat Visual -->
+      <div class="ldf-hero-visual">
+        <img src="${meta.hero_image}" alt="${basinName}" class="ldf-hero-img" loading="lazy">
+        <div class="ldf-hero-overlay"></div>
+        <div class="ldf-hero-badge">
+          <i class="ph-fill ph-drop"></i>
+          <span>${meta.water_params || 'Freshwater Ecosystem'}</span>
+        </div>
+      </div>
+
+      <!-- Habitat Title & Editorial Description -->
+      <div class="ldf-story-body">
+        <h2 class="ldf-story-title">${basinName}</h2>
+        <p class="ldf-story-desc">${desc}</p>
+      </div>
+
+      <!-- Hotspots Indicator -->
+      ${meta.hotspots && meta.hotspots.length ? `
+        <div class="ldf-hotspots-row">
+          <span class="ldf-hotspots-label"><i class="ph-bold ph-crosshair"></i> ${isEn ? 'Key Basins:' : 'แหล่งน้ำสำคัญ:'}</span>
+          <div class="ldf-hotspot-tags">
+            ${meta.hotspots.map(h => `<span class="ldf-hotspot-tag">${h.name}</span>`).join('')}
+          </div>
+        </div>
+      ` : ''}
+
+      <!-- Native Species Showcase -->
+      <div class="ldf-species-section">
+        <div class="ldf-section-head">
+          <div class="ldf-section-title">
+            <i class="ph-bold ph-fish-simple"></i>
+            <span>${isEn ? 'Native Species' : 'สายพันธุ์ประจำถิ่น'}</span>
+            <span class="ldf-count-chip">${count}</span>
+          </div>
+        </div>
+
+        <div class="ldf-species-scroll">
+          ${count === 0 ? `
+            <div class="ldf-empty">
+              <i class="ph ph-waves"></i>
+              <p>${isEn ? 'No species recorded in database yet.' : 'ยังไม่มีรายการปลาที่บันทึกในฐานข้อมูล'}</p>
+            </div>
+          ` : `
+            <div class="ldf-species-grid">
+              ${speciesList.map(f => {
+                const name = isEn && f.name_en ? f.name_en : f.name_th;
+                const price = f.priceMin ? `฿${f.priceMin.toLocaleString()}` : '';
+                return `
+                  <div class="ldf-species-item" onclick="window.openFishDetail('${f.id}')" role="button" tabindex="0">
+                    <div class="ldf-item-thumb">
+                      ${f.image
+                        ? `<img src="${f.image}" alt="${name}" loading="lazy" class="ldf-thumb-img">`
+                        : `<div class="ldf-thumb-emoji">${f.emoji || '🐟'}</div>`
+                      }
+                    </div>
+                    <div class="ldf-item-info">
+                      <div class="ldf-item-name">${name}</div>
+                      <div class="ldf-item-sub">${f.species || '—'}</div>
+                      <div class="ldf-item-foot">
+                        <span class="ldf-item-price">${price}</span>
+                        <span class="ldf-item-action">${isEn ? 'Explore →' : 'ดูปลา →'}</span>
+                      </div>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          `}
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Attach 3D card tilt
   setTimeout(() => {
     initCard3DTilt();
   }, 50);
@@ -244,37 +234,20 @@ function renderSpeciesPanel() {
 
 // ── Global Continent Selection Handler ──
 window.selectContinent = function(continentName, fromGlobe = false) {
-  const normalized = normalizeContinent(continentName);
+  const normalized = normalizeContinent(continentName) || 'South America';
   currentContinent = normalized;
 
   if (globeInstance && !fromGlobe) {
-    if (normalized) {
-      globeInstance.selectContinent(normalized, true);
-    } else {
-      globeInstance.resetView();
-    }
+    globeInstance.selectContinent(normalized, true);
   }
 
   updateURL(normalized);
-  renderContinentPills();
-  renderSpeciesPanel();
+  renderHabitatScrubber();
+  renderEditorialPanel();
 };
 
 window.resetGlobeView = function() {
-  window.selectContinent(null);
-};
-
-window.toggleAutoRotate = function() {
-  if (!globeInstance) return;
-  globeInstance.autoRotate = !globeInstance.autoRotate;
-  const btn = document.getElementById('btnAutoRotate');
-  if (btn) {
-    btn.classList.toggle('active', globeInstance.autoRotate);
-    const icon = btn.querySelector('i');
-    if (icon) {
-      icon.className = globeInstance.autoRotate ? 'ph-bold ph-pause' : 'ph-bold ph-play';
-    }
-  }
+  window.selectContinent('South America');
 };
 
 // ── Initialize Aqua World ──
@@ -309,8 +282,8 @@ async function initAquaWorld() {
     });
   }
 
-  renderContinentPills();
-  renderSpeciesPanel();
+  renderHabitatScrubber();
+  renderEditorialPanel();
 
   // Check if direct species ID was requested in URL
   const speciesId = getInitialSpeciesFromURL();
@@ -319,7 +292,7 @@ async function initAquaWorld() {
     if (f) {
       setTimeout(() => {
         openFishDetail(f.id);
-      }, 300);
+      }, 400);
     }
   }
 
@@ -328,8 +301,8 @@ async function initAquaWorld() {
 
 // Re-render when language changes
 window.addEventListener('languageChanged', () => {
-  renderContinentPills();
-  renderSpeciesPanel();
+  renderHabitatScrubber();
+  renderEditorialPanel();
 });
 
 // Start

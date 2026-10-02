@@ -2817,239 +2817,440 @@ nav.scrolled .nav-link-aqua-world.active {
   display: none;
 }
 
-/* ── 7. SPECIES INFORMATION & COLLECTION PANEL ── */
-.aqua-species-panel-wrap {
-  width: 100%;
-}
-.aqua-panel-card {
-  border-radius: 32px;
-  background: rgba(6, 28, 34, 0.75);
-  border: 1px solid rgba(117, 226, 224, 0.22);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
-  padding: 2.2rem;
-  min-height: 520px;
-  display: flex;
-  flex-direction: column;
-}
-.aqua-panel-card--active {
-  border-color: rgba(117, 226, 224, 0.4);
+/* ══════════════════════════════════════════════════════════
+   AQUA WORLD — LEONARDO DICAPRIO FOUNDATION EDITORIAL EDITION
+   ══════════════════════════════════════════════════════════ */
+.aqua-world-body {
+  background-color: #020712 !important;
+  color: #f1fafa;
+  overflow-x: hidden;
 }
 
-.aqua-panel-top-row {
+.aqua-world-main.ldf-experience {
+  position: relative;
+  min-height: 100vh;
+  padding: 80px 2.5rem 2.5rem 4.5rem;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background: radial-gradient(circle at 75% 50%, rgba(14, 46, 74, 0.4) 0%, rgba(2, 7, 18, 0.95) 70%, #020712 100%);
+}
+
+/* 1. Left Vertical Brand Spine (LDF Style) */
+.ldf-spine-tag {
+  position: absolute;
+  left: 1.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+  z-index: 20;
+  pointer-events: none;
+}
+.spine-line {
+  width: 1px;
+  height: 60px;
+  background: rgba(117, 226, 224, 0.35);
+}
+.spine-text {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(117, 226, 224, 0.6);
+}
+
+/* 2. Left Editorial Story Card */
+.ldf-editorial-panel {
+  position: relative;
+  z-index: 25;
+  width: 100%;
+  max-width: 440px;
+  pointer-events: auto;
+}
+
+.ldf-card {
+  border-radius: 24px;
+  background: rgba(4, 16, 30, 0.72);
+  border: 1px solid rgba(117, 226, 224, 0.22);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  padding: 1.6rem 1.6rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Case Code Header */
+.ldf-case-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+.ldf-case-num {
+  color: #ef4444;
+}
+.ldf-case-divider {
+  color: rgba(255, 255, 255, 0.3);
+}
+.ldf-case-continent {
+  color: var(--ocean-sky);
+}
+
+/* Hero Habitat Image (LDF Style) */
+.ldf-hero-visual {
+  position: relative;
+  width: 100%;
+  height: 165px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+.ldf-hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ldf-card:hover .ldf-hero-img {
+  transform: scale(1.05);
+}
+.ldf-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(2, 8, 18, 0.85) 0%, transparent 60%);
+}
+.ldf-hero-badge {
+  position: absolute;
+  bottom: 0.65rem;
+  left: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(6, 28, 48, 0.85);
+  border: 1px solid rgba(117, 226, 224, 0.35);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--ocean-sky);
+}
+
+/* Story Title & Description */
+.ldf-story-title {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.25;
+  margin-bottom: 0.35rem;
+}
+.ldf-story-desc {
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: rgba(241, 250, 250, 0.75);
+}
+
+/* Hotspots row */
+.ldf-hotspots-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.ldf-hotspots-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--ocean-teal);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.ldf-hotspot-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.ldf-hotspot-tag {
+  font-size: 0.7rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(241, 250, 250, 0.85);
+}
+
+/* Species Showcase */
+.ldf-species-section {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 0.75rem;
+}
+.ldf-section-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 0.6rem;
 }
-.aqua-panel-tag {
-  display: inline-flex;
+.ldf-section-title {
+  display: flex;
   align-items: center;
   gap: 0.45rem;
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--ocean-sky);
-}
-.aqua-panel-close-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
   color: #ffffff;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s;
 }
-.aqua-panel-close-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.aqua-panel-title {
-  font-family: var(--font-display);
-  font-size: 1.9rem;
-  font-weight: 700;
-  color: #ffffff;
-  margin-bottom: 0.35rem;
-}
-.aqua-panel-badge-row {
-  margin-bottom: 0.75rem;
-}
-.aqua-count-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.25rem 0.75rem;
+.ldf-count-chip {
+  padding: 0.1rem 0.45rem;
   border-radius: 999px;
   background: rgba(44, 172, 173, 0.25);
   border: 1px solid rgba(117, 226, 224, 0.35);
   color: var(--ocean-sky);
-  font-size: 0.78rem;
-  font-weight: 600;
-}
-.aqua-panel-desc {
-  font-size: 0.88rem;
-  line-height: 1.6;
-  color: rgba(241, 250, 250, 0.75);
-  margin-bottom: 1.5rem;
+  font-size: 0.7rem;
 }
 
-/* Continent Summary Grid (Overview State) */
-.aqua-continent-summary-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.85rem;
-  margin-top: 0.5rem;
-}
-.aqua-continent-tile {
-  padding: 1.1rem;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-.aqua-continent-tile:hover {
-  background: rgba(44, 172, 173, 0.18);
-  border-color: rgba(117, 226, 224, 0.4);
-  transform: translateY(-2px);
-}
-.aqua-continent-tile .tile-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.45rem;
-}
-.aqua-continent-tile .tile-icon { font-size: 1.4rem; }
-.aqua-continent-tile .tile-count {
-  font-size: 0.72rem;
-  color: var(--ocean-sky);
-  font-weight: 600;
-}
-.aqua-continent-tile .tile-name {
-  font-family: var(--font-display);
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: #ffffff;
-}
-
-/* Species List & Cards */
-.aqua-species-list-container {
-  flex: 1;
-  max-height: 400px;
+.ldf-species-scroll {
+  max-height: 200px;
   overflow-y: auto;
-  padding-right: 6px;
+  padding-right: 4px;
 }
-.aqua-species-list-container::-webkit-scrollbar { width: 5px; }
-.aqua-species-list-container::-webkit-scrollbar-thumb {
-  background: rgba(117, 226, 224, 0.25);
-  border-radius: 10px;
+.ldf-species-scroll::-webkit-scrollbar { width: 4px; }
+.ldf-species-scroll::-webkit-scrollbar-thumb {
+  background: rgba(117, 226, 224, 0.3);
+  border-radius: 6px;
 }
 
-.aqua-species-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 0.95rem;
-}
-.aqua-species-card {
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  overflow: hidden;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+.ldf-species-grid {
   display: flex;
   flex-direction: column;
+  gap: 0.5rem;
 }
-.aqua-species-card:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: var(--ocean-sky);
-  transform: translateY(-4px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+.ldf-species-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
-.species-card-img-wrap {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  background: #021a22;
+.ldf-species-item:hover {
+  background: rgba(44, 172, 173, 0.18);
+  border-color: rgba(117, 226, 224, 0.4);
+  transform: translateX(4px);
+}
+.ldf-item-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: #021422;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
-.species-card-img {
+.ldf-thumb-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.4s ease;
 }
-.aqua-species-card:hover .species-card-img {
-  transform: scale(1.08);
-}
-.species-card-emoji { font-size: 2.2rem; }
-.species-card-body {
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
+.ldf-thumb-emoji { font-size: 1.3rem; }
+.ldf-item-info {
   flex: 1;
+  min-width: 0;
 }
-.species-card-name {
+.ldf-item-name {
   font-family: var(--font-display);
-  font-size: 1rem;
+  font-size: 0.88rem;
   font-weight: 700;
   color: #ffffff;
-  margin-bottom: 0.2rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.species-card-sub {
-  font-size: 0.74rem;
+.ldf-item-sub {
+  font-size: 0.7rem;
   color: var(--ocean-sky);
   font-style: italic;
-  margin-bottom: 0.45rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.species-card-origin {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-size: 0.7rem;
-  color: rgba(241, 250, 250, 0.65);
-  margin-bottom: 0.75rem;
-}
-.species-card-foot {
+.ldf-item-foot {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: auto;
-  padding-top: 0.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: 0.2rem;
 }
-.species-card-price {
+.ldf-item-price {
+  font-size: 0.76rem;
   font-weight: 700;
-  font-size: 0.95rem;
   color: var(--ocean-sky);
 }
-.species-card-btn {
-  font-size: 0.75rem;
+.ldf-item-action {
+  font-size: 0.7rem;
   font-weight: 600;
   color: #ffffff;
   transition: color 0.2s;
 }
-.aqua-species-card:hover .species-card-btn {
+.ldf-species-item:hover .ldf-item-action {
   color: var(--ocean-sky);
 }
 
-.aqua-empty-state {
+.ldf-empty {
   text-align: center;
-  padding: 3.5rem 1.5rem;
-  color: rgba(241, 250, 250, 0.6);
+  padding: 1.5rem 0.5rem;
+  color: rgba(241, 250, 250, 0.5);
+  font-size: 0.8rem;
 }
-.aqua-empty-state i {
-  font-size: 2.8rem;
-  color: var(--ocean-teal);
-  margin-bottom: 0.75rem;
+
+/* 3. Right 3D Earth Stage */
+.ldf-globe-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+}
+.aqua-globe-viewport {
+  width: 100%;
+  height: 100%;
+}
+.aqua-globe-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+/* 4. Bottom Habitat Timeline Scrubber (LDF 2000-2030-2060 Style) */
+.ldf-timeline-scrubber {
+  position: absolute;
+  bottom: 2.2rem;
+  left: 4.5rem;
+  right: 18rem;
+  z-index: 25;
+  pointer-events: auto;
+}
+.scrubber-track {
+  position: relative;
+  width: 100%;
+  padding-top: 10px;
+}
+.scrubber-line {
+  position: absolute;
+  top: 17px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.16);
+  z-index: 1;
+}
+.scrubber-nodes {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 2;
+}
+.scrubber-node {
+  background: transparent;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.25s ease;
+}
+.scrubber-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #041424;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  margin-bottom: 0.45rem;
+  transition: all 0.25s ease;
+}
+.scrubber-node:hover .scrubber-dot {
+  border-color: var(--ocean-sky);
+  transform: scale(1.25);
+}
+.scrubber-node.active .scrubber-dot {
+  background: #ef4444;
+  border-color: #ffffff;
+  box-shadow: 0 0 12px #ef4444;
+  transform: scale(1.35);
+}
+.scrubber-case {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.4);
+}
+.scrubber-node.active .scrubber-case {
+  color: #ef4444;
+}
+.scrubber-label {
+  font-family: var(--font-body);
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: rgba(241, 250, 250, 0.7);
+  white-space: nowrap;
+}
+.scrubber-node.active .scrubber-label {
+  color: #ffffff;
+  font-weight: 700;
+}
+.scrubber-count {
+  font-size: 0.65rem;
+  color: var(--ocean-sky);
+  opacity: 0.8;
+}
+
+/* 5. Responsive Breakpoints for LDF Layout */
+@media (max-width: 1024px) {
+  .aqua-world-main.ldf-experience {
+    padding: 85px 1.5rem 6rem 1.5rem;
+    flex-direction: column;
+    align-items: stretch;
+    min-height: auto;
+  }
+  .ldf-spine-tag {
+    display: none;
+  }
+  .ldf-editorial-panel {
+    max-width: 100%;
+    margin-top: 360px;
+  }
+  .ldf-globe-stage {
+    position: absolute;
+    top: 60px;
+    left: 0;
+    right: 0;
+    height: 400px;
+  }
+  .ldf-timeline-scrubber {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    margin-top: 1.5rem;
+  }
 }
 
 /* ── 8. RESPONSIVE BREAKPOINTS ── */

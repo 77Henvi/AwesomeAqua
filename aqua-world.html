@@ -73,46 +73,37 @@
   </div>
 </div>
 
-<!-- ========== AQUA WORLD MAIN EXPERIENCE ========== -->
-<main class="aqua-world-main">
-  <!-- Immersive Deep Ocean Ambient Backdrop -->
+<!-- ========== AQUA WORLD LDF EDITORIAL EXPERIENCE ========== -->
+<main class="aqua-world-main ldf-experience">
+  <!-- Immersive Cosmic Atmosphere & Space Glow -->
   <div class="aqua-world-bg-glow"></div>
 
-  <div class="aqua-world-header">
-    <div class="aqua-world-tag">
-      <span class="aqua-tag-pulse"></span>
-      <i class="ph-bold ph-globe-hemisphere-west"></i>
-      <span data-i18n="aquaWorldTag">AQUA WORLD</span>
-    </div>
-    <h1 class="aqua-world-title" data-i18n="aquaWorldSubtitle">สำรวจถิ่นกำเนิดปลาสวยงามทั่วโลก</h1>
-    <p class="aqua-world-sub" data-i18n="aquaWorldDesc">ค้นพบสายพันธุ์ปลาตามทวีปและลุ่มน้ำธรรมชาติ พร้อมเรียนรู้ถิ่นอาศัยที่แท้จริง</p>
+  <!-- Left Vertical Brand Spine -->
+  <div class="ldf-spine-tag" aria-hidden="true">
+    <span class="spine-line"></span>
+    <span class="spine-text">AQUA WORLD ATLAS — SPECIES & HABITATS</span>
+  </div>
 
-    <!-- Accessible Continent Selection Pills -->
-    <div class="aqua-pills-bar" id="continentPills" role="toolbar" aria-label="เลือกทวีปเพื่อสำรวจปลา">
-      <!-- Injected by scripts/aqua-world.js -->
+  <!-- Left Editorial Discovery Story & Species Panel -->
+  <aside class="ldf-editorial-panel" id="speciesPanel">
+    <!-- Injected dynamically by scripts/aqua-world.js -->
+  </aside>
+
+  <!-- Right Side 3D Earth Stage -->
+  <div class="ldf-globe-stage">
+    <div id="globeViewport" class="aqua-globe-viewport">
+      <!-- 3D Three.js Earth Canvas Injected -->
+    </div>
+
+    <div class="globe-overlay-hint" id="globeHoverText">
+      <i class="ph ph-hand-pointing"></i> <span data-i18n="dragToRotate">ลากเพื่อหมุนลูกโลก · คลิกเลือกทวีป</span>
     </div>
   </div>
 
-  <!-- Stage Area: Interactive 3D Globe + Floating Species Panel -->
-  <div class="aqua-world-stage">
-    
-    <!-- 3D Globe Container -->
-    <div class="aqua-globe-wrapper">
-      <div id="globeViewport" class="aqua-globe-viewport">
-        <!-- Interactive Canvas injected by InteractiveGlobe -->
-      </div>
-
-      <div class="globe-overlay-hint" id="globeHoverText">
-        <i class="ph ph-hand-pointing"></i> <span data-i18n="dragToRotate">ลากเพื่อหมุนลูกโลก · คลิกเลือกทวีป</span>
-      </div>
-    </div>
-
-    <!-- Species Information & Collection Panel -->
-    <aside class="aqua-species-panel-wrap" id="speciesPanel">
-      <!-- Injected by scripts/aqua-world.js -->
-    </aside>
-
-  </div>
+  <!-- Bottom Timeline Habitat Scrubber Bar -->
+  <nav class="ldf-timeline-scrubber" id="habitatScrubber" aria-label="Habitat Scrubber Timeline">
+    <!-- Injected dynamically by scripts/aqua-world.js -->
+  </nav>
 </main>
 
 <!-- ========== FOOTER ========== -->
