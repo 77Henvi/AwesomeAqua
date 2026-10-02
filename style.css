@@ -3615,7 +3615,7 @@ nav.scrolled .nav-link-aqua-world.active {
   }
   .ge-control-bar {
     position: fixed;
-    bottom: 5.8rem;
+    bottom: 7rem;
     right: 1.25rem;
     z-index: 26;
     display: flex;
@@ -3786,7 +3786,7 @@ nav.scrolled .nav-link-aqua-world.active {
   .ge-control-bar {
     position: fixed;
     top: auto !important;
-    bottom: 6rem;
+    bottom: 7.5rem;
     right: 0.85rem;
     left: auto;
     z-index: 26;
