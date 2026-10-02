@@ -3717,7 +3717,7 @@ nav.scrolled .nav-link-aqua-world.active {
   .ldf-reopen-pill {
     position: fixed;
     top: auto !important;
-    bottom: 4.8rem;
+    bottom: 6rem;
     left: 50%;
     right: auto;
     transform: translateX(-50%);
@@ -3729,6 +3729,9 @@ nav.scrolled .nav-link-aqua-world.active {
     max-width: max-content;
     white-space: nowrap;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+  }
+  .ldf-reopen-pill:hover {
+    transform: translateX(-50%) translateY(-2px);
   }
 
   /* Bottom Floating Timeline Scrubber Bar (Google Earth Mobile Style) */
