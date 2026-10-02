@@ -2661,39 +2661,160 @@ nav.scrolled .nav-link-aqua-world.active {
   box-shadow: 0 0 16px rgba(117, 226, 224, 0.3);
 }
 
-.globe-floating-controls {
+/* ── GOOGLE EARTH SUPREMACY HUD CONTROLS ── */
+.ge-supremacy-hud {
   position: absolute;
-  top: 1.25rem;
-  right: 1.25rem;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
   display: flex;
-  gap: 0.5rem;
-  z-index: 5;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 1.25rem;
 }
-.globe-ctrl-btn {
-  width: 38px;
-  height: 38px;
+
+/* Bottom Left Satellite Badge */
+.ge-map-badge {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.35rem 0.75rem 0.35rem 0.35rem;
+  border-radius: 12px;
+  background: rgba(10, 25, 47, 0.75);
+  border: 1px solid rgba(117, 226, 224, 0.3);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+.ge-map-badge:hover {
+  background: rgba(15, 35, 60, 0.9);
+  border-color: var(--ocean-sky);
+  transform: translateY(-2px);
+}
+.ge-map-thumb {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: radial-gradient(circle at 40% 40%, #2cacad 0%, #0a2e58 60%, #031020 100%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: inset 0 0 4px rgba(255, 255, 255, 0.4);
+}
+.ge-map-label {
+  font-family: var(--font-body);
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+}
+
+/* Bottom Right Control Bar */
+.ge-control-bar {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ge-btn {
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: rgba(6, 28, 34, 0.8);
-  border: 1px solid rgba(117, 226, 224, 0.28);
-  color: rgba(241, 250, 250, 0.85);
+  background: rgba(10, 25, 47, 0.75);
+  border: 1px solid rgba(117, 226, 224, 0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #ffffff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.05rem;
   cursor: pointer;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 700;
   transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
 }
-.globe-ctrl-btn:hover {
-  background: rgba(44, 172, 173, 0.28);
-  color: #ffffff;
-  transform: scale(1.08);
-}
-.globe-ctrl-btn.active {
-  background: var(--ocean-teal);
-  color: #04222b;
+.ge-btn:hover {
+  background: rgba(44, 172, 173, 0.35);
   border-color: var(--ocean-sky);
+  color: var(--ocean-sky);
+  transform: scale(1.06);
+}
+.ge-btn:active {
+  transform: scale(0.96);
+}
+
+/* Compass Needle Icon */
+.ge-compass-icon {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease-out;
+}
+.ge-compass-n {
+  position: absolute;
+  top: -2px;
+  font-size: 0.55rem;
+  font-weight: 900;
+  color: #ef4444;
+  line-height: 1;
+}
+.ge-compass-arrow {
+  width: 4px;
+  height: 12px;
+  background: linear-gradient(to bottom, #ef4444 50%, #ffffff 50%);
+  clip-path: polygon(50% 0%, 100% 100%, 50% 80%, 0% 100%);
+  margin-top: 5px;
+}
+
+/* 2D / 3D Mode Button */
+.ge-mode-btn {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+/* Stacked Zoom Control Pill */
+.ge-zoom-group {
+  display: flex;
+  flex-direction: column;
+  background: rgba(10, 25, 47, 0.75);
+  border: 1px solid rgba(117, 226, 224, 0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+.ge-zoom-btn {
+  width: 40px;
+  height: 34px;
+  border-radius: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: #ffffff;
+}
+.ge-zoom-btn:hover {
+  background: rgba(44, 172, 173, 0.35);
+  border-color: transparent;
+}
+.ge-zoom-divider {
+  width: 24px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.15);
+  align-self: center;
+}
+
+/* Fallback / Legacy Controls hide */
+.globe-floating-controls {
+  display: none;
 }
 
 /* ── 7. SPECIES INFORMATION & COLLECTION PANEL ── */

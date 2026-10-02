@@ -251,8 +251,7 @@ window.selectContinent = function(continentName, fromGlobe = false) {
     if (normalized) {
       globeInstance.selectContinent(normalized, true);
     } else {
-      globeInstance.focusContinent('Africa', true); // Neutral center
-      globeInstance.selectedContinent = null;
+      globeInstance.resetView();
     }
   }
 
