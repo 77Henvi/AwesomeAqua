@@ -379,7 +379,8 @@ export class InteractiveGlobe {
       </div>
     `;
 
-    document.body.appendChild(hud);
+    const targetParent = this.container.closest('.ldf-globe-stage') || this.container || document.body;
+    targetParent.appendChild(hud);
 
     document.getElementById('btnGeCompass')?.addEventListener('click', () => this.resetNorth());
     document.getElementById('btnGeTilt')?.addEventListener('click', () => this.toggle2D3D());
