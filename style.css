@@ -2723,7 +2723,7 @@ nav.scrolled .nav-link-aqua-world.active {
 
 .globe-overlay-hint {
   position: absolute;
-  bottom: 1.25rem;
+  bottom: 5.8rem;
   left: 50%;
   transform: translateX(-50%);
   padding: 0.45rem 1.1rem;
@@ -2739,6 +2739,7 @@ nav.scrolled .nav-link-aqua-world.active {
   align-items: center;
   gap: 0.45rem;
   pointer-events: none;
+  z-index: 20;
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 .globe-overlay-hint.visible {
@@ -3614,7 +3615,7 @@ nav.scrolled .nav-link-aqua-world.active {
   }
   .ge-control-bar {
     position: fixed;
-    bottom: 4.8rem;
+    bottom: 5.8rem;
     right: 1.25rem;
     z-index: 26;
     display: flex;
@@ -3785,7 +3786,7 @@ nav.scrolled .nav-link-aqua-world.active {
   .ge-control-bar {
     position: fixed;
     top: auto !important;
-    bottom: 4.8rem;
+    bottom: 6rem;
     right: 0.85rem;
     left: auto;
     z-index: 26;
