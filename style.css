@@ -2336,8 +2336,8 @@ nav.scrolled .nav-link-aqua-world.active {
 }
 .mini-globe-visual {
   position: relative;
-  width: 220px;
-  height: 220px;
+  width: 230px;
+  height: 230px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2347,58 +2347,49 @@ nav.scrolled .nav-link-aqua-world.active {
   inset: -12px;
   border: 1px dashed rgba(117, 226, 224, 0.35);
   border-radius: 50%;
-  animation: ringRotate 24s linear infinite;
+  animation: ringRotate 28s linear infinite;
+  pointer-events: none;
+}
+.mini-globe-ring--inner {
+  inset: -4px;
+  border: 1px dotted rgba(117, 226, 224, 0.22);
+  animation: ringRotateReverse 18s linear infinite;
 }
 @keyframes ringRotate {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
 }
-.mini-globe-sphere {
-  width: 180px;
-  height: 180px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #0e3f4e 0%, #06222b 60%, #021217 100%);
-  border: 1.5px solid rgba(117, 226, 224, 0.5);
-  box-shadow: 0 0 35px rgba(117, 226, 224, 0.25), inset 0 0 20px rgba(117, 226, 224, 0.2);
-  position: relative;
-  overflow: hidden;
+@keyframes ringRotateReverse {
+  from { transform: rotate(360deg); }
+  to   { transform: rotate(0deg); }
 }
-.mini-globe-land {
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(44, 172, 173, 0.28);
-  border: 1px solid rgba(117, 226, 224, 0.45);
+.mini-globe-svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 25px rgba(44, 172, 173, 0.35));
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.land-sa { width: 55px; height: 75px; top: 35%; left: 20%; transform: rotate(-15deg); }
-.land-af { width: 60px; height: 65px; top: 30%; right: 22%; border-radius: 40%; }
-.land-as { width: 70px; height: 50px; top: 12%; right: 10%; border-radius: 45%; }
+.aqua-discovery-card:hover .mini-globe-svg {
+  transform: scale(1.05);
+}
+.globe-land {
+  transition: fill 0.3s ease, stroke 0.3s ease;
+}
+.aqua-discovery-card:hover .globe-land {
+  fill: rgba(44, 172, 173, 0.48);
+  stroke: rgba(117, 226, 224, 0.9);
+}
+.beacon-pulse {
+  transform-origin: center;
+  animation: beaconWave 2.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+.beacon-pulse--delay1 { animation-delay: 0.55s; }
+.beacon-pulse--delay2 { animation-delay: 1.1s; }
+.beacon-pulse--delay3 { animation-delay: 1.65s; }
 
-.mini-globe-pin {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-}
-.pin-sa { top: 48%; left: 36%; }
-.pin-af { top: 42%; right: 40%; }
-.pin-as { top: 26%; right: 28%; }
-.pin-dot {
-  display: block;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #ffffff;
-  box-shadow: 0 0 8px #75E2E0;
-}
-.pin-wave {
-  position: absolute;
-  inset: -4px;
-  border-radius: 50%;
-  border: 1px solid #75E2E0;
-  animation: pinPulse 2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
-}
-@keyframes pinPulse {
-  0% { transform: scale(0.6); opacity: 1; }
-  100% { transform: scale(2.4); opacity: 0; }
+@keyframes beaconWave {
+  0% { transform: scale(0.3); opacity: 1; }
+  100% { transform: scale(2.3); opacity: 0; }
 }
 
 /* ── 4. FISH MODAL ORIGIN STRIP ── */
