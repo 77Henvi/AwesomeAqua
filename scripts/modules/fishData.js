@@ -3,6 +3,10 @@ import { storeEmpty } from '../shared/utils.js';
 
 export let fishData = [];
 
+export function setFishData(data) {
+  fishData = Array.isArray(data) ? data : [];
+}
+
 // ดึงสถิติยอดขาย (view fish_sales_stats — ดู docs/SALES_STATS_SETUP.md)
 // ถ้ายังไม่ได้สร้าง view / ดึงไม่สำเร็จ → คืน null แล้วหน้าร้านจะทำงานต่อได้ปกติ (แค่ไม่มีป้าย/ยอดขาย)
 async function loadSalesStats() {

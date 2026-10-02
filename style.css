@@ -2070,14 +2070,17 @@
     .hero-wave-2 { display: none; }
     .hero-caustic { animation: none; opacity: 0.5; }
   
-    /* การ์ดสต็อกกระจก: 3 คอลัมน์กะทัดรัด (compact single row) ไม่ทับปุ่มและเนื้อหาด้านบน */
+    /* การ์ดสต็อกกระจก: จัดวางต่อเนื่องใน Hero flow พอดี ไม่ลอยทับปุ่ม และไม่มีช่องว่างสีขาวด้านล่าง */
     .stats-float {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      transform: translateY(50%);
-      padding: 0 4%;
+      position: relative;
+      left: auto;
+      right: auto;
+      bottom: auto;
+      transform: none;
+      padding: 0;
+      margin-top: 1.25rem;
+      margin-bottom: 0.75rem;
+      width: 100%;
       z-index: 5;
       display: flex;
       justify-content: center;
@@ -2090,7 +2093,9 @@
       padding: 0.65rem 0.5rem;
       max-width: 95%;
       border-radius: 16px;
-      box-shadow: 0 12px 35px rgba(2,48,70,0.35);
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 12px 35px rgba(2, 48, 70, 0.35);
     }
     .stat {
       padding: 0.25rem 0.35rem;
@@ -2108,7 +2113,7 @@
       margin-top: 2px;
     }
     .stats-float-spacer {
-      height: 48px;
+      display: none;
     }
   
     .fish-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
@@ -2989,7 +2994,7 @@ nav.scrolled .nav-link-aqua-world.active {
   color: rgba(117, 226, 224, 0.5);
 }
 
-/* 2. Left Editorial Story Card (Fixed, Scrollable, No Overlap) */
+/* 2. Left Editorial Story Card (Fixed, Scrollable, Collapsible) */
 .ldf-editorial-panel {
   position: fixed;
   top: 78px;
@@ -3003,11 +3008,51 @@ nav.scrolled .nav-link-aqua-world.active {
   scrollbar-width: thin;
   display: flex;
   flex-direction: column;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+}
+.ldf-editorial-panel.collapsed {
+  transform: translateX(calc(-100% - 5rem));
+  opacity: 0;
+  pointer-events: none;
 }
 .ldf-editorial-panel::-webkit-scrollbar { width: 4px; }
 .ldf-editorial-panel::-webkit-scrollbar-thumb {
   background: rgba(117, 226, 224, 0.25);
   border-radius: 6px;
+}
+
+/* Reopen Floating Pill Button */
+.ldf-reopen-pill {
+  position: fixed;
+  top: 80px;
+  left: 4.2rem;
+  z-index: 28;
+  display: none;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.55rem 1.15rem;
+  border-radius: 999px;
+  background: rgba(3, 14, 26, 0.85);
+  border: 1px solid rgba(117, 226, 224, 0.4);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: #ffffff;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ldf-reopen-pill.visible {
+  display: inline-flex;
+  animation: popIn 0.3s ease;
+}
+.ldf-reopen-pill:hover {
+  background: rgba(44, 172, 173, 0.25);
+  border-color: var(--ocean-sky);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(117, 226, 224, 0.35);
 }
 
 .ldf-card {
@@ -3023,14 +3068,39 @@ nav.scrolled .nav-link-aqua-world.active {
   gap: 0.85rem;
 }
 
-/* Case Code Header */
+/* Case Code Header with Close 'X' Button */
 .ldf-case-header {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: space-between;
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.12em;
+}
+.ldf-case-code {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.ldf-panel-close-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.75);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+.ldf-panel-close-btn:hover {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: #ef4444;
+  color: #ffffff;
+  transform: scale(1.1);
 }
 .ldf-case-num {
   color: #ef4444;
@@ -3371,43 +3441,6 @@ nav.scrolled .nav-link-aqua-world.active {
   pointer-events: none;
   z-index: 30;
 }
-.ge-map-badge {
-  position: absolute;
-  bottom: 1.5rem;
-  left: 1.5rem;
-  z-index: 35;
-  pointer-events: auto;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.3rem 0.7rem 0.3rem 0.3rem;
-  border-radius: 10px;
-  background: rgba(6, 20, 36, 0.75);
-  border: 1px solid rgba(117, 226, 224, 0.25);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
-}
-.ge-map-badge:hover {
-  background: rgba(10, 30, 52, 0.9);
-  border-color: var(--ocean-sky);
-  transform: translateY(-2px);
-}
-.ge-map-thumb {
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  background: radial-gradient(circle at 40% 40%, #2cacad 0%, #0a2e58 60%, #031020 100%);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-}
-.ge-map-label {
-  font-family: var(--font-body);
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: #ffffff;
-}
 
 .ge-control-bar {
   position: absolute;
@@ -3560,6 +3593,14 @@ nav.scrolled .nav-link-aqua-world.active {
     padding: 0 1.25rem 2.5rem;
     overflow-y: visible;
   }
+  .ldf-editorial-panel.collapsed {
+    display: none;
+  }
+  .ldf-reopen-pill {
+    position: fixed;
+    top: 76px;
+    left: 1.5rem;
+  }
   .ldf-card {
     border-radius: 24px;
     padding: 1.5rem;
@@ -3569,13 +3610,6 @@ nav.scrolled .nav-link-aqua-world.active {
     inset: 0;
     pointer-events: none;
     z-index: 10;
-  }
-  .ge-map-badge {
-    position: absolute;
-    top: 0.85rem;
-    left: 0.85rem;
-    bottom: auto;
-    padding: 0.25rem 0.6rem;
   }
   .ge-control-bar {
     position: absolute;
@@ -3678,6 +3712,17 @@ nav.scrolled .nav-link-aqua-world.active {
     margin: 0 auto;
     overflow-y: visible;
   }
+  .ldf-editorial-panel.collapsed {
+    display: none;
+  }
+  .ldf-reopen-pill {
+    position: fixed;
+    top: 68px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.78rem;
+    padding: 0.42rem 1rem;
+  }
   .ldf-card {
     border-radius: 18px;
     padding: 1.15rem 1rem;
@@ -3704,20 +3749,6 @@ nav.scrolled .nav-link-aqua-world.active {
     inset: 0;
     pointer-events: none;
     z-index: 10;
-  }
-  .ge-map-badge {
-    position: absolute;
-    top: 0.55rem;
-    left: 0.55rem;
-    bottom: auto;
-    padding: 0.2rem 0.5rem;
-  }
-  .ge-map-thumb {
-    width: 22px;
-    height: 22px;
-  }
-  .ge-map-label {
-    font-size: 0.65rem;
   }
   .ge-control-bar {
     position: absolute;

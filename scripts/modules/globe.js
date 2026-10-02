@@ -346,11 +346,6 @@ export class InteractiveGlobe {
     const hud = document.createElement('div');
     hud.className = 'ge-supremacy-hud';
     hud.innerHTML = `
-      <div class="ge-map-badge" title="Awesome Aqua Satellite Earth" onclick="window.resetGlobeView()">
-        <div class="ge-map-thumb"></div>
-        <div class="ge-map-label">Satellite 3D</div>
-      </div>
-
       <div class="ge-control-bar">
         <button class="ge-btn ge-compass-btn" id="btnGeCompass" title="Reset North" aria-label="North orientation">
           <div class="ge-compass-icon" id="geCompassNeedle">

@@ -12,6 +12,8 @@ import { InteractiveGlobe } from './modules/globe.js';
 import { openFishDetail, closeFishModal, closeFishModalOutside } from './modules/fishModal.js';
 import { initCard3DTilt } from './modules/animations.js';
 
+import { setFishData } from './modules/fishData.js';
+
 // Expose globals for HTML inline handlers
 window.toggleLanguage = toggleLanguage;
 window.toggleMobile = toggleMobile;
@@ -29,6 +31,21 @@ const isEnLang = () => (localStorage.getItem('aqua-lang') || 'th') === 'en';
 window.hideLoader = function() {
   const loader = document.getElementById('global-loader');
   if (loader) loader.classList.add('hidden');
+};
+
+// ── Toggle / Minimize Habitat Panel (Full Earth Visibility) ──
+window.toggleHabitatPanel = function(show) {
+  const panel = document.getElementById('speciesPanel');
+  const reopenBtn = document.getElementById('btnReopenHabitatCard');
+  if (!panel) return;
+
+  if (show) {
+    panel.classList.remove('collapsed');
+    if (reopenBtn) reopenBtn.classList.remove('visible');
+  } else {
+    panel.classList.add('collapsed');
+    if (reopenBtn) reopenBtn.classList.add('visible');
+  }
 };
 
 async function loadPublicFish() {
@@ -68,6 +85,9 @@ async function loadPublicFish() {
     console.error('Unexpected error loading fish:', err);
     allFish = [];
   }
+
+  // Populate shared fishData so openFishDetail modal works instantly with full details
+  setFishData(allFish);
 }
 
 function getInitialContinentFromURL() {
@@ -146,11 +166,16 @@ function renderEditorialPanel() {
 
   panel.innerHTML = `
     <div class="ldf-card fade-in">
-      <!-- Case Header & Indicator -->
+      <!-- Case Header & Indicator with Close 'X' Button -->
       <div class="ldf-case-header">
-        <span class="ldf-case-num">${meta.case_no || 'HABITAT'}</span>
-        <span class="ldf-case-divider">/</span>
-        <span class="ldf-case-continent">${isEn ? meta.name_en.toUpperCase() : meta.name_th}</span>
+        <div class="ldf-case-code">
+          <span class="ldf-case-num">${meta.case_no || 'HABITAT'}</span>
+          <span class="ldf-case-divider">/</span>
+          <span class="ldf-case-continent">${isEn ? meta.name_en.toUpperCase() : meta.name_th}</span>
+        </div>
+        <button class="ldf-panel-close-btn" onclick="window.toggleHabitatPanel(false)" title="${isEn ? 'Hide panel to view full globe' : 'ปิดการ์ดเพื่อดูโลกเต็มจอ'}" aria-label="Close Habitat Card">
+          <i class="ph-bold ph-x"></i>
+        </button>
       </div>
 
       <!-- Hero Habitat Visual -->
@@ -191,7 +216,7 @@ function renderEditorialPanel() {
                 const name = isEn && f.name_en ? f.name_en : f.name_th;
                 const price = f.priceMin ? `฿${f.priceMin.toLocaleString()}` : '';
                 return `
-                  <div class="ldf-species-item" onclick="window.openFishDetail('${f.id}')" role="button" tabindex="0">
+                  <div class="ldf-species-item" onclick="window.openFishDetail('${f.id}')" role="button" tabindex="0" title="${isEn ? 'Order / View Details' : 'สั่งซื้อ / ดูรายละเอียด'}">
                     <div class="ldf-item-thumb">
                       ${f.image
                         ? `<img src="${f.image}" alt="${name}" loading="lazy" class="ldf-thumb-img">`
@@ -203,7 +228,7 @@ function renderEditorialPanel() {
                       <div class="ldf-item-sub">${f.species || '—'}</div>
                       <div class="ldf-item-foot">
                         <span class="ldf-item-price">${price}</span>
-                        <span class="ldf-item-action">${isEn ? 'Explore →' : 'ดูปลา →'}</span>
+                        <span class="ldf-item-action"><i class="ph-bold ph-shopping-bag-open"></i> ${isEn ? 'Order / View →' : 'สั่งซื้อ / ดูปลา →'}</span>
                       </div>
                     </div>
                   </div>
@@ -232,6 +257,7 @@ window.selectContinent = function(continentName, fromGlobe = false) {
   }
 
   updateURL(normalized);
+  window.toggleHabitatPanel(true); // Auto-reveal panel on continent change
   renderHabitatScrubber();
   renderEditorialPanel();
 };
