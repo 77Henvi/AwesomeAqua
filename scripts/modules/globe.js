@@ -1,79 +1,34 @@
 /**
  * scripts/modules/globe.js
- * 2D Modern Scientific World Atlas Engine — AwesomeAqua (Aqua World)
- * Minimalist 2D Oceanic Map with Dashed Orbital Rings, Translucent Continents,
- * Pulsing Sonar Target Beacons, Smooth Pan/Zoom Physics, and Touch Gestures.
+ * 3D Photorealistic Interactive Earth Engine — AwesomeAqua (Aqua World)
+ * Powered by Three.js WebGL with satellite imagery, atmospheric glow,
+ * floating clouds, cosmic starfield, and 6 locked continent radar target beacons.
  */
 
+import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
 import { CONTINENTS, CONTINENT_META, normalizeContinent } from '../shared/continents.js';
 
-// 2D Normalized Continental Landmass Outlines (Equirectangular / Orthographic projection coords: -1.0 to 1.0)
-const CONTINENT_LANDFORMS = {
-  'South America': {
-    center: { x: -0.36, y: 0.26 },
-    shapes: [
-      // Main continental body
-      [
-        { x: -0.48, y: -0.05 }, { x: -0.32, y: -0.08 }, { x: -0.22, y: 0.05 },
-        { x: -0.20, y: 0.18 }, { x: -0.28, y: 0.35 }, { x: -0.38, y: 0.58 },
-        { x: -0.44, y: 0.62 }, { x: -0.46, y: 0.45 }, { x: -0.52, y: 0.18 },
-        { x: -0.54, y: 0.05 }, { x: -0.48, y: -0.05 }
-      ]
-    ]
-  },
-  'North America': {
-    center: { x: -0.46, y: -0.38 },
-    shapes: [
-      [
-        { x: -0.68, y: -0.62 }, { x: -0.42, y: -0.65 }, { x: -0.26, y: -0.52 },
-        { x: -0.22, y: -0.32 }, { x: -0.32, y: -0.18 }, { x: -0.42, y: -0.10 },
-        { x: -0.48, y: -0.06 }, { x: -0.54, y: -0.15 }, { x: -0.65, y: -0.32 },
-        { x: -0.72, y: -0.50 }, { x: -0.68, y: -0.62 }
-      ]
-    ]
-  },
-  'Africa': {
-    center: { x: 0.04, y: 0.08 },
-    shapes: [
-      [
-        { x: -0.08, y: -0.28 }, { x: 0.12, y: -0.26 }, { x: 0.22, y: -0.12 },
-        { x: 0.26, y: 0.04 }, { x: 0.20, y: 0.25 }, { x: 0.12, y: 0.45 },
-        { x: 0.04, y: 0.48 }, { x: -0.04, y: 0.32 }, { x: -0.12, y: 0.15 },
-        { x: -0.16, y: -0.05 }, { x: -0.12, y: -0.22 }, { x: -0.08, y: -0.28 }
-      ]
-    ]
-  },
-  'Europe': {
-    center: { x: 0.06, y: -0.42 },
-    shapes: [
-      [
-        { x: -0.08, y: -0.58 }, { x: 0.12, y: -0.60 }, { x: 0.22, y: -0.48 },
-        { x: 0.18, y: -0.32 }, { x: 0.08, y: -0.30 }, { x: -0.04, y: -0.32 },
-        { x: -0.10, y: -0.42 }, { x: -0.08, y: -0.58 }
-      ]
-    ]
-  },
-  'Asia': {
-    center: { x: 0.44, y: -0.25 },
-    shapes: [
-      [
-        { x: 0.18, y: -0.62 }, { x: 0.52, y: -0.65 }, { x: 0.74, y: -0.52 },
-        { x: 0.76, y: -0.28 }, { x: 0.65, y: -0.08 }, { x: 0.52, y: 0.08 },
-        { x: 0.42, y: 0.15 }, { x: 0.34, y: 0.02 }, { x: 0.26, y: -0.12 },
-        { x: 0.20, y: -0.35 }, { x: 0.18, y: -0.62 }
-      ]
-    ]
-  },
-  'Oceania': {
-    center: { x: 0.58, y: 0.35 },
-    shapes: [
-      [
-        { x: 0.48, y: 0.24 }, { x: 0.68, y: 0.22 }, { x: 0.74, y: 0.35 },
-        { x: 0.68, y: 0.48 }, { x: 0.54, y: 0.50 }, { x: 0.44, y: 0.40 },
-        { x: 0.48, y: 0.24 }
-      ]
-    ]
-  }
+const TEXTURE_ASSETS = {
+  earthDay: 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/textures/planets/earth_atmos_2048.jpg',
+  earthSpecular: 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/textures/planets/earth_specular_2048.jpg',
+  earthClouds: 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/textures/planets/earth_clouds_1024.png'
+};
+
+const AtmosphereShader = {
+  vertexShader: `
+    varying vec3 vNormal;
+    void main() {
+      vNormal = normalize(normalMatrix * normal);
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+  fragmentShader: `
+    varying vec3 vNormal;
+    void main() {
+      float intensity = pow(0.68 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.0);
+      gl_FragColor = vec4(0.35, 0.70, 1.0, 1.0) * intensity * 1.5;
+    }
+  `
 };
 
 export class InteractiveGlobe {
@@ -85,65 +40,305 @@ export class InteractiveGlobe {
       initialContinent: 'South America'
     }, options);
 
-    this.canvas = document.createElement('canvas');
-    this.canvas.className = 'aqua-globe-canvas';
-    this.canvas.style.display = 'block';
-    this.canvas.style.width = '100%';
-    this.canvas.style.height = '100%';
-    this.ctx = this.canvas.getContext('2d');
-    this.container.appendChild(this.canvas);
+    this.width = this.container.clientWidth || window.innerWidth;
+    this.height = this.container.clientHeight || window.innerHeight;
+    this.globeRadius = 5.0;
 
-    this.width = 0;
-    this.height = 0;
-    this.dpr = Math.min(window.devicePixelRatio || 1, 2);
+    // Camera parameters
+    const isMobile = this.width < 768;
+    this.camDistance = isMobile ? 17.5 : 14.2;
+    this.minDistance = 8.5;
+    this.maxDistance = 26.0;
+    this.targetDistance = this.camDistance;
 
-    // Camera / Pan & Zoom Physics
-    this.scale = 1.0;
-    this.targetScale = 1.0;
-    this.panX = 0;
-    this.panY = 0;
-    this.targetPanX = 0;
-    this.targetPanY = 0;
+    // Rotation angles on the globe pivot (Radians)
+    this.rotX = 0;
+    this.rotY = 0;
+    this.targetRotX = 0;
+    this.targetRotY = 0;
 
-    // Selection & hover
+    // State flags: When continent is selected, lock firmly with zero auto-rotate drift
     this.selectedContinent = this.options.initialContinent ? normalizeContinent(this.options.initialContinent) : 'South America';
     this.hoveredContinent = null;
+    this.isLocked = true;
+    this.autoRotate = false;
+    this.is2DMode = false;
 
-    // Interaction state
-    this.isDragging = false;
+    // Drag interaction
+    this.isUserInteracting = false;
     this.lastPointerX = 0;
     this.lastPointerY = 0;
-    this.touchDistStart = 0;
+    this.touchStartDist = 0;
 
-    this.rafId = null;
-    this.boundResize = this.resize.bind(this);
-    this.boundAnimate = this.animate.bind(this);
-
+    this.initThree();
+    this.initStarfield();
+    this.initEarthSystem();
+    this.initRadarTargetHotspots();
     this.initEvents();
     this.initHUDControls();
+
     this.resize();
 
     if (this.selectedContinent) {
       this.focusContinent(this.selectedContinent, false);
     }
 
-    this.rafId = requestAnimationFrame(this.boundAnimate);
+    this.animate = this.animate.bind(this);
+    this.rafId = requestAnimationFrame(this.animate);
   }
 
-  resize() {
-    const rect = this.container.getBoundingClientRect();
-    this.width = rect.width || window.innerWidth;
-    this.height = rect.height || window.innerHeight;
+  initThree() {
+    this.scene = new THREE.Scene();
 
-    if (this.width === 0 || this.height === 0) return;
+    const aspect = this.width / this.height;
+    this.camera = new THREE.PerspectiveCamera(40, aspect, 0.1, 2000);
+    this.updateCameraPosition();
 
-    this.canvas.width = this.width * this.dpr;
-    this.canvas.height = this.height * this.dpr;
-    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
-    this.ctx.scale(this.dpr, this.dpr);
+    this.renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      alpha: true,
+      powerPreference: 'high-performance'
+    });
+    this.renderer.setSize(this.width, this.height, false);
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    this.renderer.toneMappingExposure = 1.2;
+
+    this.canvas = this.renderer.domElement;
+    this.canvas.className = 'aqua-globe-canvas';
+    this.canvas.style.display = 'block';
+    this.canvas.style.width = '100%';
+    this.canvas.style.height = '100%';
+    this.container.appendChild(this.canvas);
+
+    const ambientLight = new THREE.AmbientLight(0xddeeff, 0.55);
+    this.scene.add(ambientLight);
+
+    this.sunLight = new THREE.DirectionalLight(0xffffff, 2.4);
+    this.sunLight.position.set(16, 12, 16);
+    this.scene.add(this.sunLight);
+
+    const rimLight = new THREE.DirectionalLight(0x2cacad, 0.4);
+    rimLight.position.set(-15, -6, -10);
+    this.scene.add(rimLight);
+
+    this.raycaster = new THREE.Raycaster();
+    this.mouse = new THREE.Vector2(-999, -999);
   }
 
-  // ── HUD Floating Controls ──
+  initStarfield() {
+    const starCount = 1800;
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(starCount * 3);
+    const colors = new Float32Array(starCount * 3);
+
+    for (let i = 0; i < starCount; i++) {
+      const u = Math.random();
+      const v = Math.random();
+      const theta = u * 2.0 * Math.PI;
+      const phi = Math.acos(2.0 * v - 1.0);
+      const r = 350 + Math.random() * 450;
+
+      positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+      positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+      positions[i * 3 + 2] = r * Math.cos(phi);
+
+      const colorType = Math.random();
+      if (colorType > 0.8) {
+        colors[i * 3] = 0.65; colors[i * 3 + 1] = 0.88; colors[i * 3 + 2] = 1.0;
+      } else if (colorType > 0.65) {
+        colors[i * 3] = 1.0; colors[i * 3 + 1] = 0.94; colors[i * 3 + 2] = 0.8;
+      } else {
+        colors[i * 3] = 0.95; colors[i * 3 + 1] = 0.95; colors[i * 3 + 2] = 1.0;
+      }
+    }
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+    const material = new THREE.PointsMaterial({
+      size: 1.35,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.85
+    });
+
+    this.starfield = new THREE.Points(geometry, material);
+    this.scene.add(this.starfield);
+  }
+
+  initEarthSystem() {
+    this.globePivot = new THREE.Group();
+    this.scene.add(this.globePivot);
+
+    const earthGeo = new THREE.SphereGeometry(this.globeRadius, 64, 64);
+    const textureLoader = new THREE.TextureLoader();
+
+    const earthMap = textureLoader.load(TEXTURE_ASSETS.earthDay, () => {
+      this.renderer.render(this.scene, this.camera);
+    }, undefined, () => {
+      this.earthMesh.material.map = this.createFallbackEarthTexture();
+      this.earthMesh.material.needsUpdate = true;
+    });
+
+    const specularMap = textureLoader.load(TEXTURE_ASSETS.earthSpecular, undefined, undefined, () => {});
+
+    this.earthMaterial = new THREE.MeshStandardMaterial({
+      map: earthMap,
+      roughness: 0.62,
+      metalness: 0.05,
+      roughnessMap: specularMap
+    });
+
+    this.earthMesh = new THREE.Mesh(earthGeo, this.earthMaterial);
+    this.globePivot.add(this.earthMesh);
+
+    // Atmosphere Glow
+    const atmosGeo = new THREE.SphereGeometry(this.globeRadius * 1.032, 64, 64);
+    const atmosMat = new THREE.ShaderMaterial({
+      vertexShader: AtmosphereShader.vertexShader,
+      fragmentShader: AtmosphereShader.fragmentShader,
+      blending: THREE.AdditiveBlending,
+      side: THREE.BackSide,
+      transparent: true
+    });
+    this.atmosphereMesh = new THREE.Mesh(atmosGeo, atmosMat);
+    this.globePivot.add(this.atmosphereMesh);
+
+    // Floating Clouds
+    const cloudGeo = new THREE.SphereGeometry(this.globeRadius * 1.014, 64, 64);
+    const cloudMap = textureLoader.load(TEXTURE_ASSETS.earthClouds, undefined, undefined, () => {});
+    this.cloudMat = new THREE.MeshStandardMaterial({
+      map: cloudMap,
+      transparent: true,
+      opacity: 0.44,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    this.cloudMesh = new THREE.Mesh(cloudGeo, this.cloudMat);
+    this.globePivot.add(this.cloudMesh);
+  }
+
+  initRadarTargetHotspots() {
+    this.hotspotMeshes = [];
+
+    for (const continent of CONTINENTS) {
+      const meta = CONTINENT_META[continent];
+      const pos = this.latLonToVector3(meta.lat, meta.lon, this.globeRadius * 1.02);
+
+      const spotRoot = new THREE.Group();
+      spotRoot.position.copy(pos);
+      spotRoot.lookAt(pos.clone().multiplyScalar(2));
+      spotRoot.userData = { continent, meta };
+
+      // 1. Center Solid Dot
+      const dotGeo = new THREE.CircleGeometry(0.18, 24);
+      const dotMat = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.95
+      });
+      const dotMesh = new THREE.Mesh(dotGeo, dotMat);
+      spotRoot.add(dotMesh);
+
+      // 2. Inner Sharp White Ring
+      const innerRingGeo = new THREE.RingGeometry(0.26, 0.35, 32);
+      const innerRingMat = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.85
+      });
+      const innerRingMesh = new THREE.Mesh(innerRingGeo, innerRingMat);
+      spotRoot.add(innerRingMesh);
+
+      // 3. Outer Pulsating Radar Wave Ring
+      const radarRingGeo = new THREE.RingGeometry(0.50, 0.78, 32);
+      const radarRingMat = new THREE.MeshBasicMaterial({
+        color: 0x75e2e0,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.65,
+        blending: THREE.AdditiveBlending
+      });
+      const radarRingMesh = new THREE.Mesh(radarRingGeo, radarRingMat);
+      spotRoot.add(radarRingMesh);
+
+      // 4. Hitbox for smooth raycasting
+      const hitGeo = new THREE.SphereGeometry(1.2, 12, 12);
+      const hitMat = new THREE.MeshBasicMaterial({ visible: false });
+      const hitMesh = new THREE.Mesh(hitGeo, hitMat);
+      hitMesh.userData = { continent, meta };
+      spotRoot.add(hitMesh);
+
+      this.globePivot.add(spotRoot);
+
+      this.hotspotMeshes.push({
+        root: spotRoot,
+        dot: dotMesh,
+        innerRing: innerRingMesh,
+        radarRing: radarRingMesh,
+        hitbox: hitMesh,
+        continent,
+        meta
+      });
+    }
+  }
+
+  latLonToVector3(lat, lon, radius) {
+    const phi = THREE.MathUtils.degToRad(90 - lat);
+    const theta = THREE.MathUtils.degToRad(lon + 180);
+
+    const x = -radius * Math.sin(phi) * Math.cos(theta);
+    const z = radius * Math.sin(phi) * Math.sin(theta);
+    const y = radius * Math.cos(phi);
+
+    return new THREE.Vector3(x, y, z);
+  }
+
+  createFallbackEarthTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1024;
+    canvas.height = 512;
+    const ctx = canvas.getContext('2d');
+
+    const grad = ctx.createLinearGradient(0, 0, 0, 512);
+    grad.addColorStop(0, '#061c36');
+    grad.addColorStop(0.5, '#0a2e58');
+    grad.addColorStop(1, '#05182e');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 1024, 512);
+
+    ctx.fillStyle = '#26543b';
+    ctx.beginPath();
+    ctx.ellipse(260, 260, 70, 130, 0.2, 0, Math.PI * 2);
+    ctx.ellipse(540, 260, 90, 120, 0, 0, Math.PI * 2);
+    ctx.ellipse(750, 200, 140, 100, 0, 0, Math.PI * 2);
+    ctx.ellipse(820, 360, 60, 45, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    return new THREE.CanvasTexture(canvas);
+  }
+
+  updateCameraPosition() {
+    this.camera.position.set(0, 0, this.camDistance);
+
+    const isDesktop = (this.width || window.innerWidth) >= 1024;
+    const lookOffsetX = isDesktop ? -1.8 : 0;
+    this.camera.lookAt(lookOffsetX, 0, 0);
+
+    this.updateCompass();
+  }
+
+  updateCompass() {
+    const compassNeedle = document.getElementById('geCompassNeedle');
+    if (compassNeedle) {
+      const headingDeg = THREE.MathUtils.radToDeg(this.rotY);
+      compassNeedle.style.transform = `rotate(${headingDeg + 90}deg)`;
+    }
+  }
+
   initHUDControls() {
     const existing = document.querySelector('.ge-supremacy-hud');
     if (existing) existing.remove();
@@ -151,14 +346,21 @@ export class InteractiveGlobe {
     const hud = document.createElement('div');
     hud.className = 'ge-supremacy-hud';
     hud.innerHTML = `
-      <div class="ge-map-badge" title="Awesome Aqua World Atlas" onclick="window.resetGlobeView()">
+      <div class="ge-map-badge" title="Awesome Aqua Satellite Earth" onclick="window.resetGlobeView()">
         <div class="ge-map-thumb"></div>
-        <div class="ge-map-label">2D Atlas Map</div>
+        <div class="ge-map-label">Satellite 3D</div>
       </div>
 
       <div class="ge-control-bar">
-        <button class="ge-btn ge-compass-btn" id="btnGeCompass" title="Reset Map Center" aria-label="Center Map">
-          <i class="ph-bold ph-crosshair"></i>
+        <button class="ge-btn ge-compass-btn" id="btnGeCompass" title="Reset North" aria-label="North orientation">
+          <div class="ge-compass-icon" id="geCompassNeedle">
+            <span class="ge-compass-n">N</span>
+            <span class="ge-compass-arrow"></span>
+          </div>
+        </button>
+
+        <button class="ge-btn ge-mode-btn" id="btnGeTilt" title="Toggle 2D / 3D Tilt" aria-label="Toggle 2D/3D">
+          <span id="geModeText">3D</span>
         </button>
 
         <div class="ge-zoom-group">
@@ -171,7 +373,7 @@ export class InteractiveGlobe {
           </button>
         </div>
 
-        <button class="ge-btn ge-home-btn" id="btnGeHome" title="Reset View" aria-label="Reset View">
+        <button class="ge-btn ge-home-btn" id="btnGeHome" title="Reset Camera View" aria-label="Reset Camera">
           <i class="ph-bold ph-arrows-out-cardinal"></i>
         </button>
       </div>
@@ -179,42 +381,65 @@ export class InteractiveGlobe {
 
     document.body.appendChild(hud);
 
-    document.getElementById('btnGeCompass')?.addEventListener('click', () => this.resetView());
-    document.getElementById('btnGeZoomIn')?.addEventListener('click', () => this.zoomStep(0.25));
-    document.getElementById('btnGeZoomOut')?.addEventListener('click', () => this.zoomStep(-0.25));
+    document.getElementById('btnGeCompass')?.addEventListener('click', () => this.resetNorth());
+    document.getElementById('btnGeTilt')?.addEventListener('click', () => this.toggle2D3D());
+    document.getElementById('btnGeZoomIn')?.addEventListener('click', () => this.zoomStep(-2.0));
+    document.getElementById('btnGeZoomOut')?.addEventListener('click', () => this.zoomStep(2.0));
     document.getElementById('btnGeHome')?.addEventListener('click', () => this.resetView());
   }
 
   zoomStep(delta) {
-    this.targetScale = Math.max(0.75, Math.min(2.4, this.targetScale + delta));
+    this.targetDistance = THREE.MathUtils.clamp(this.targetDistance + delta, this.minDistance, this.maxDistance);
+  }
+
+  resetNorth() {
+    this.targetRotX = 0;
+  }
+
+  toggle2D3D() {
+    this.is2DMode = !this.is2DMode;
+    const modeText = document.getElementById('geModeText');
+    if (modeText) modeText.textContent = this.is2DMode ? '2D' : '3D';
+
+    const isMobile = (this.width || window.innerWidth) < 768;
+    if (this.is2DMode) {
+      this.targetRotX = 0;
+      this.targetDistance = isMobile ? 20.0 : 17.5;
+    } else {
+      this.targetDistance = isMobile ? 17.5 : 14.2;
+    }
   }
 
   resetView() {
     this.focusContinent('South America', true);
   }
 
-  // ── Focus on Continent (Smooth 2D Pan & Gentle Zoom) ──
   focusContinent(continentName, animate = true) {
     const normalized = normalizeContinent(continentName) || 'South America';
-    const land = CONTINENT_LANDFORMS[normalized];
-    if (!land) return;
+    const meta = CONTINENT_META[normalized];
+    if (!meta) return;
 
     this.selectedContinent = normalized;
+    this.isLocked = true;
 
-    const isDesktop = this.width >= 1024;
-    // On desktop, shift map center towards the right to make room for the left editorial panel
-    const baseRadius = Math.min(this.width, this.height) * 0.38;
-    const centerOffsetX = isDesktop ? this.width * 0.18 : 0;
+    const desiredRotY = THREE.MathUtils.degToRad(-meta.lon - 90);
+    const desiredRotX = THREE.MathUtils.degToRad(meta.lat);
 
-    // Target pan coordinates
-    this.targetPanX = centerOffsetX - land.center.x * baseRadius * 0.4;
-    this.targetPanY = -land.center.y * baseRadius * 0.4;
-    this.targetScale = isDesktop ? 1.05 : 0.95;
+    const diffY = (desiredRotY - this.targetRotY) % (Math.PI * 2);
+    const shortestDiffY = Math.atan2(Math.sin(diffY), Math.cos(diffY));
+    this.targetRotY = this.targetRotY + shortestDiffY;
+    this.targetRotX = desiredRotX;
+
+    const isMobile = (this.width || window.innerWidth) < 768;
+    this.targetDistance = isMobile ? 16.5 : 13.8;
 
     if (!animate) {
-      this.panX = this.targetPanX;
-      this.panY = this.targetPanY;
-      this.scale = this.targetScale;
+      this.rotX = this.targetRotX;
+      this.rotY = this.targetRotY;
+      this.camDistance = this.targetDistance;
+      this.globePivot.rotation.x = this.rotX;
+      this.globePivot.rotation.y = this.rotY;
+      this.updateCameraPosition();
     }
   }
 
@@ -222,50 +447,52 @@ export class InteractiveGlobe {
     this.focusContinent(continentName, animate);
   }
 
-  // ── Interaction Events (Drag, Wheel, Touch) ──
   initEvents() {
     const el = this.canvas;
 
     el.addEventListener('pointerdown', (e) => {
-      this.isDragging = true;
+      this.isUserInteracting = true;
       this.lastPointerX = e.clientX;
       this.lastPointerY = e.clientY;
       el.setPointerCapture?.(e.pointerId);
     });
 
     el.addEventListener('pointermove', (e) => {
-      if (this.isDragging) {
+      const rect = el.getBoundingClientRect();
+      this.mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      this.mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+      if (this.isUserInteracting) {
         const dx = e.clientX - this.lastPointerX;
         const dy = e.clientY - this.lastPointerY;
 
-        this.targetPanX += dx;
-        this.targetPanY += dy;
+        const sensitivity = 0.005;
+        this.targetRotY += dx * sensitivity;
+        this.targetRotX += dy * sensitivity;
 
-        // Soft boundary clamping
-        const maxPan = this.width * 0.4;
-        this.targetPanX = Math.max(-maxPan, Math.min(maxPan + (this.width * 0.2), this.targetPanX));
-        this.targetPanY = Math.max(-maxPan, Math.min(maxPan, this.targetPanY));
+        this.targetRotX = THREE.MathUtils.clamp(this.targetRotX, -1.2, 1.2);
 
         this.lastPointerX = e.clientX;
         this.lastPointerY = e.clientY;
       } else {
-        this.checkHover(e.clientX, e.clientY);
+        this.checkRaycastHover();
       }
     });
 
-    const stopDrag = (e) => {
-      if (this.isDragging) {
-        this.isDragging = false;
+    const stopInteraction = (e) => {
+      if (this.isUserInteracting) {
+        this.isUserInteracting = false;
         el.releasePointerCapture?.(e?.pointerId);
       }
     };
 
     el.addEventListener('pointerup', (e) => {
-      stopDrag(e);
-      this.checkClick(e.clientX, e.clientY);
+      stopInteraction(e);
+      this.checkRaycastClick();
     });
-    el.addEventListener('pointercancel', stopDrag);
+    el.addEventListener('pointercancel', stopInteraction);
     el.addEventListener('pointerleave', () => {
+      this.mouse.set(-999, -999);
       if (this.hoveredContinent) {
         this.hoveredContinent = null;
         this.options.onContinentHover(null);
@@ -274,16 +501,15 @@ export class InteractiveGlobe {
 
     el.addEventListener('wheel', (e) => {
       e.preventDefault();
-      const factor = e.deltaY < 0 ? 0.08 : -0.08;
-      this.zoomStep(factor);
+      const zoomFactor = e.deltaY * 0.01;
+      this.targetDistance = THREE.MathUtils.clamp(this.targetDistance + zoomFactor, this.minDistance, this.maxDistance);
     }, { passive: false });
 
-    // Touch pinch
     el.addEventListener('touchstart', (e) => {
       if (e.touches.length === 2) {
         const dx = e.touches[0].clientX - e.touches[1].clientX;
         const dy = e.touches[0].clientY - e.touches[1].clientY;
-        this.touchDistStart = Math.hypot(dx, dy);
+        this.touchStartDist = Math.hypot(dx, dy);
       }
     }, { passive: true });
 
@@ -292,241 +518,119 @@ export class InteractiveGlobe {
         const dx = e.touches[0].clientX - e.touches[1].clientX;
         const dy = e.touches[0].clientY - e.touches[1].clientY;
         const dist = Math.hypot(dx, dy);
-        const diff = (dist - this.touchDistStart) * 0.005;
-        this.zoomStep(diff);
-        this.touchDistStart = dist;
+        const diff = (this.touchStartDist - dist) * 0.04;
+        this.targetDistance = THREE.MathUtils.clamp(this.targetDistance + diff, this.minDistance, this.maxDistance);
+        this.touchStartDist = dist;
       }
     }, { passive: true });
 
-    window.addEventListener('resize', this.boundResize);
+    window.addEventListener('resize', () => this.resize());
   }
 
-  getScreenCoordsForContinent(continent) {
-    const land = CONTINENT_LANDFORMS[continent];
-    if (!land) return null;
+  checkRaycastHover() {
+    if (!this.camera || !this.hotspotMeshes.length) return;
 
-    const isDesktop = this.width >= 1024;
-    const defaultCenterOffset = isDesktop ? this.width * 0.18 : 0;
-    const cx = (this.width / 2) + defaultCenterOffset + this.panX;
-    const cy = (this.height / 2) + this.panY;
-    const baseRadius = Math.min(this.width, this.height) * 0.38 * this.scale;
+    this.raycaster.setFromCamera(this.mouse, this.camera);
+    const hitboxes = this.hotspotMeshes.map(b => b.hitbox);
+    const intersects = this.raycaster.intersectObjects(hitboxes);
 
-    return {
-      x: cx + land.center.x * baseRadius,
-      y: cy + land.center.y * baseRadius,
-      radius: 35 * this.scale
-    };
-  }
-
-  checkHover(clientX, clientY) {
-    const rect = this.canvas.getBoundingClientRect();
-    const mx = clientX - rect.left;
-    const my = clientY - rect.top;
-
-    let found = null;
-    for (const c of CONTINENTS) {
-      const pos = this.getScreenCoordsForContinent(c);
-      if (pos) {
-        const dist = Math.hypot(mx - pos.x, my - pos.y);
-        if (dist <= pos.radius + 15) {
-          found = c;
-          break;
-        }
+    if (intersects.length > 0) {
+      const hit = intersects[0].object;
+      const continent = hit.userData.continent;
+      if (this.hoveredContinent !== continent) {
+        this.hoveredContinent = continent;
+        this.canvas.style.cursor = 'pointer';
+        this.options.onContinentHover(continent);
       }
-    }
-
-    if (this.hoveredContinent !== found) {
-      this.hoveredContinent = found;
-      this.canvas.style.cursor = found ? 'pointer' : (this.isDragging ? 'grabbing' : 'grab');
-      this.options.onContinentHover(found);
-    }
-  }
-
-  checkClick(clientX, clientY) {
-    const rect = this.canvas.getBoundingClientRect();
-    const mx = clientX - rect.left;
-    const my = clientY - rect.top;
-
-    for (const c of CONTINENTS) {
-      const pos = this.getScreenCoordsForContinent(c);
-      if (pos) {
-        const dist = Math.hypot(mx - pos.x, my - pos.y);
-        if (dist <= pos.radius + 20) {
-          this.focusContinent(c, true);
-          this.options.onContinentSelect(c);
-          break;
-        }
+    } else {
+      if (this.hoveredContinent !== null) {
+        this.hoveredContinent = null;
+        this.canvas.style.cursor = 'grab';
+        this.options.onContinentHover(null);
       }
     }
   }
 
-  // ── 60 FPS Canvas 2D Render Loop ──
+  checkRaycastClick() {
+    if (!this.camera || !this.hotspotMeshes.length) return;
+
+    this.raycaster.setFromCamera(this.mouse, this.camera);
+    const hitboxes = this.hotspotMeshes.map(b => b.hitbox);
+    const intersects = this.raycaster.intersectObjects(hitboxes);
+
+    if (intersects.length > 0) {
+      const hit = intersects[0].object;
+      const continent = hit.userData.continent;
+      if (continent) {
+        this.focusContinent(continent, true);
+        this.options.onContinentSelect(continent);
+      }
+    }
+  }
+
+  resize() {
+    const w = this.container.clientWidth || window.innerWidth;
+    const h = this.container.clientHeight || window.innerHeight;
+    if (w === 0 || h === 0) return;
+
+    this.width = w;
+    this.height = h;
+    this.camera.aspect = w / h;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(w, h, false);
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    this.updateCameraPosition();
+  }
+
   animate(timestamp) {
-    this.rafId = requestAnimationFrame(this.boundAnimate);
+    this.rafId = requestAnimationFrame(this.animate);
 
-    // Smooth camera interpolation
     const ease = 0.08;
-    this.panX += (this.targetPanX - this.panX) * ease;
-    this.panY += (this.targetPanY - this.panY) * ease;
-    this.scale += (this.targetScale - this.scale) * ease;
+    this.rotX += (this.targetRotX - this.rotX) * ease;
+    this.rotY += (this.targetRotY - this.rotY) * ease;
+    this.camDistance += (this.targetDistance - this.camDistance) * ease;
 
-    const ctx = this.ctx;
-    const w = this.width;
-    const h = this.height;
+    if (this.globePivot) {
+      this.globePivot.rotation.x = this.rotX;
+      this.globePivot.rotation.y = this.rotY;
+    }
 
-    ctx.clearRect(0, 0, w, h);
+    this.updateCameraPosition();
 
-    const isDesktop = w >= 1024;
-    const defaultCenterOffset = isDesktop ? w * 0.18 : 0;
-    const cx = (w / 2) + defaultCenterOffset + this.panX;
-    const cy = (h / 2) + this.panY;
-    const baseRadius = Math.min(w, h) * 0.38 * this.scale;
+    if (this.cloudMesh) {
+      this.cloudMesh.rotation.y += 0.0003;
+      this.cloudMesh.rotation.x = Math.sin(timestamp * 0.0002) * 0.01;
+    }
 
-    // 1. Deep Space Cosmic Background Glow
-    const bgGrad = ctx.createRadialGradient(cx, cy, baseRadius * 0.2, cx, cy, baseRadius * 1.8);
-    bgGrad.addColorStop(0, 'rgba(10, 38, 56, 0.45)');
-    bgGrad.addColorStop(0.6, 'rgba(4, 18, 28, 0.2)');
-    bgGrad.addColorStop(1, 'rgba(2, 7, 18, 0)');
-    ctx.fillStyle = bgGrad;
-    ctx.beginPath();
-    ctx.arc(cx, cy, baseRadius * 1.8, 0, Math.PI * 2);
-    ctx.fill();
+    const radarScale = 1.0 + (Math.sin(timestamp * 0.004) * 0.5 + 0.5) * 0.8;
+    const radarOpacity = Math.max(0.1, 0.75 - (Math.sin(timestamp * 0.004) * 0.5 + 0.5) * 0.65);
 
-    // 2. Outer Dashed Orbital Ring (Matching user screenshot)
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(cx, cy, baseRadius * 1.28, 0, Math.PI * 2);
-    ctx.setLineDash([5, 8]);
-    ctx.lineDashOffset = -timestamp * 0.01;
-    ctx.strokeStyle = 'rgba(117, 226, 224, 0.35)';
-    ctx.lineWidth = 1.2;
-    ctx.stroke();
-    ctx.restore();
+    for (const spot of this.hotspotMeshes) {
+      const isSelected = this.selectedContinent === spot.continent;
+      const isHovered = this.hoveredContinent === spot.continent;
 
-    // 3. Main Circular Ocean Globe Body
-    const oceanGrad = ctx.createRadialGradient(cx - baseRadius * 0.2, cy - baseRadius * 0.2, baseRadius * 0.1, cx, cy, baseRadius);
-    oceanGrad.addColorStop(0, '#062634');
-    oceanGrad.addColorStop(0.7, '#041620');
-    oceanGrad.addColorStop(1, '#020d14');
+      if (spot.radarRing) {
+        spot.radarRing.scale.set(radarScale, radarScale, radarScale);
+        spot.radarRing.material.opacity = isSelected || isHovered ? radarOpacity * 1.3 : radarOpacity * 0.7;
+      }
 
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(cx, cy, baseRadius, 0, Math.PI * 2);
-    ctx.fillStyle = oceanGrad;
-    ctx.shadowColor = 'rgba(117, 226, 224, 0.3)';
-    ctx.shadowBlur = 24;
-    ctx.fill();
-
-    // Subtle oceanic grid lines
-    ctx.strokeStyle = 'rgba(117, 226, 224, 0.08)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.arc(cx, cy, baseRadius * 0.65, 0, Math.PI * 2);
-    ctx.arc(cx, cy, baseRadius * 0.35, 0, Math.PI * 2);
-    ctx.stroke();
-
-    // Glowing Circular Boundary Rim
-    ctx.strokeStyle = 'rgba(117, 226, 224, 0.65)';
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-    ctx.restore();
-
-    // 4. Clip inside oceanic circle for continents
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(cx, cy, baseRadius, 0, Math.PI * 2);
-    ctx.clip();
-
-    // Render 2D Translucent Continent Shapes
-    for (const continent of CONTINENTS) {
-      const land = CONTINENT_LANDFORMS[continent];
-      if (!land) continue;
-
-      const isSelected = this.selectedContinent === continent;
-      const isHovered = this.hoveredContinent === continent;
-
-      for (const shape of land.shapes) {
-        ctx.beginPath();
-        shape.forEach((pt, idx) => {
-          const px = cx + pt.x * baseRadius;
-          const py = cy + pt.y * baseRadius;
-          if (idx === 0) ctx.moveTo(px, py);
-          else ctx.lineTo(px, py);
-        });
-        ctx.closePath();
-
-        // Organic Translucent Teal Landfill
-        if (isSelected || isHovered) {
-          ctx.fillStyle = 'rgba(44, 172, 173, 0.55)';
-          ctx.strokeStyle = '#75e2e0';
-          ctx.lineWidth = 2.0;
-        } else {
-          ctx.fillStyle = 'rgba(44, 172, 173, 0.28)';
-          ctx.strokeStyle = 'rgba(117, 226, 224, 0.55)';
-          ctx.lineWidth = 1.2;
-        }
-
-        ctx.fill();
-        ctx.stroke();
+      if (isSelected || isHovered) {
+        spot.dot.scale.set(1.4, 1.4, 1.4);
+        spot.innerRing.material.opacity = 1.0;
+      } else {
+        spot.dot.scale.set(1.0, 1.0, 1.0);
+        spot.innerRing.material.opacity = 0.5;
       }
     }
-    ctx.restore();
 
-    // 5. Interactive Pulsing Radar Nodes (Matching User Screenshot)
-    const pulseT = timestamp * 0.003;
-
-    for (const continent of CONTINENTS) {
-      const land = CONTINENT_LANDFORMS[continent];
-      if (!land) continue;
-
-      const nx = cx + land.center.x * baseRadius;
-      const ny = cy + land.center.y * baseRadius;
-
-      const isSelected = this.selectedContinent === continent;
-      const isHovered = this.hoveredContinent === continent;
-
-      // Sonar Pulse Waves (Concentric translucent aura ellipses)
-      const pulse1 = (pulseT % 1.0);
-      const r1 = 12 + pulse1 * 32 * this.scale;
-      const op1 = Math.max(0, 0.6 - pulse1 * 0.6);
-
-      const pulse2 = ((pulseT + 0.5) % 1.0);
-      const r2 = 12 + pulse2 * 32 * this.scale;
-      const op2 = Math.max(0, 0.6 - pulse2 * 0.6);
-
-      // Outer Aura Waves
-      ctx.save();
-      ctx.fillStyle = `rgba(117, 226, 224, ${op1 * (isSelected ? 1.2 : 0.7)})`;
-      ctx.beginPath();
-      ctx.ellipse(nx, ny, r1 * 1.25, r1 * 0.85, isSelected ? 0.2 : 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = `rgba(44, 172, 173, ${op2 * (isSelected ? 1.2 : 0.7)})`;
-      ctx.beginPath();
-      ctx.ellipse(nx, ny, r2 * 1.15, r2 * 0.8, -0.15, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Sharp Inner Target Ring
-      ctx.strokeStyle = isSelected ? '#ffffff' : 'rgba(117, 226, 224, 0.85)';
-      ctx.lineWidth = isSelected ? 1.8 : 1.2;
-      ctx.beginPath();
-      ctx.arc(nx, ny, 10 * this.scale, 0, Math.PI * 2);
-      ctx.stroke();
-
-      // Solid Bright White Center Dot with Bloom Glow
-      ctx.fillStyle = '#ffffff';
-      ctx.shadowColor = '#75e2e0';
-      ctx.shadowBlur = isSelected ? 16 : 8;
-      ctx.beginPath();
-      ctx.arc(nx, ny, (isSelected ? 4.5 : 3.5) * this.scale, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    }
+    this.renderer.render(this.scene, this.camera);
   }
 
   destroy() {
     if (this.rafId) cancelAnimationFrame(this.rafId);
-    window.removeEventListener('resize', this.boundResize);
-    this.canvas?.remove();
+    if (this.renderer) {
+      this.renderer.dispose();
+      this.canvas?.remove();
+    }
   }
 }
