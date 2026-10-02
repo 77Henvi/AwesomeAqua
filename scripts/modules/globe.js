@@ -3,6 +3,9 @@
  * Supremacy Earth 3D Engine — Leonardo DiCaprio Foundation Edition
  * Powered by Three.js WebGL with dual-ring radar target hotspots,
  * satellite earth textures, clouds, atmosphere glow, and cosmic starfield.
+ * 
+ * Features exact polar axis alignment, locked continent target positioning,
+ * zero drift, and silky smooth momentum orbit physics.
  */
 
 import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
@@ -44,45 +47,39 @@ export class InteractiveGlobe {
     this.height = this.container.clientHeight || window.innerHeight;
     this.globeRadius = 5.0;
 
-    // Camera framing parameters
+    // Camera parameters
     const isMobile = this.width < 768;
-    this.camDistance = isMobile ? 18.0 : 15.0;
+    this.camDistance = isMobile ? 17.5 : 14.2;
     this.minDistance = 8.5;
     this.maxDistance = 26.0;
     this.targetDistance = this.camDistance;
 
-    // Target lat/lon (Default South America)
-    this.lat = -14;
-    this.lon = -60;
-    this.targetLat = this.lat;
-    this.targetLon = this.lon;
+    // Rotation angles on the globe pivot (Radians)
+    this.rotX = 0;
+    this.rotY = 0;
+    this.targetRotX = 0;
+    this.targetRotY = 0;
 
-    // View mode & physics
+    // State flags: When continent is selected, lock firmly with zero auto-rotate drift
+    this.selectedContinent = this.options.initialContinent ? normalizeContinent(this.options.initialContinent) : 'South America';
+    this.hoveredContinent = null;
+    this.isLocked = true; // Stay locked on chosen continent
+    this.autoRotate = false;
     this.is2DMode = false;
-    this.autoRotate = true;
-    this.autoRotateSpeed = 0.06;
+
+    // Drag interaction
     this.isUserInteracting = false;
     this.lastPointerX = 0;
     this.lastPointerY = 0;
-    this.velocityLat = 0;
-    this.velocityLon = 0;
-    this.lastInteractionTime = Date.now();
-
-    this.selectedContinent = this.options.initialContinent ? normalizeContinent(this.options.initialContinent) : 'South America';
-    this.hoveredContinent = null;
-
     this.touchStartDist = 0;
 
     this.initThree();
     this.initStarfield();
-    this.initEarth();
-    this.initAtmosphere();
-    this.initClouds();
+    this.initEarthSystem();
     this.initRadarTargetHotspots();
     this.initEvents();
     this.initHUDControls();
 
-    // Trigger initial precise resize
     this.resize();
 
     if (this.selectedContinent) {
@@ -117,7 +114,7 @@ export class InteractiveGlobe {
     this.canvas.style.height = '100%';
     this.container.appendChild(this.canvas);
 
-    const ambientLight = new THREE.AmbientLight(0xddeeff, 0.5);
+    const ambientLight = new THREE.AmbientLight(0xddeeff, 0.55);
     this.scene.add(ambientLight);
 
     this.sunLight = new THREE.DirectionalLight(0xffffff, 2.4);
@@ -173,7 +170,11 @@ export class InteractiveGlobe {
     this.scene.add(this.starfield);
   }
 
-  initEarth() {
+  // ── Unified Earth System Pivot Group (Earth + Atmosphere + Clouds + Markers) ──
+  initEarthSystem() {
+    this.globePivot = new THREE.Group();
+    this.scene.add(this.globePivot);
+
     const earthGeo = new THREE.SphereGeometry(this.globeRadius, 64, 64);
     const textureLoader = new THREE.TextureLoader();
 
@@ -194,10 +195,9 @@ export class InteractiveGlobe {
     });
 
     this.earthMesh = new THREE.Mesh(earthGeo, this.earthMaterial);
-    this.scene.add(this.earthMesh);
-  }
+    this.globePivot.add(this.earthMesh);
 
-  initAtmosphere() {
+    // Atmosphere Glow
     const atmosGeo = new THREE.SphereGeometry(this.globeRadius * 1.032, 64, 64);
     const atmosMat = new THREE.ShaderMaterial({
       vertexShader: AtmosphereShader.vertexShader,
@@ -206,16 +206,12 @@ export class InteractiveGlobe {
       side: THREE.BackSide,
       transparent: true
     });
-
     this.atmosphereMesh = new THREE.Mesh(atmosGeo, atmosMat);
-    this.scene.add(this.atmosphereMesh);
-  }
+    this.globePivot.add(this.atmosphereMesh);
 
-  initClouds() {
+    // Floating Clouds
     const cloudGeo = new THREE.SphereGeometry(this.globeRadius * 1.014, 64, 64);
-    const textureLoader = new THREE.TextureLoader();
     const cloudMap = textureLoader.load(TEXTURE_ASSETS.earthClouds, undefined, undefined, () => {});
-
     this.cloudMat = new THREE.MeshStandardMaterial({
       map: cloudMap,
       transparent: true,
@@ -223,13 +219,12 @@ export class InteractiveGlobe {
       blending: THREE.AdditiveBlending,
       depthWrite: false
     });
-
     this.cloudMesh = new THREE.Mesh(cloudGeo, this.cloudMat);
-    this.scene.add(this.cloudMesh);
+    this.globePivot.add(this.cloudMesh);
   }
 
+  // ── 6 Canonical Continent Beacons Attached to the Earth Sphere ──
   initRadarTargetHotspots() {
-    this.hotspotsGroup = new THREE.Group();
     this.hotspotMeshes = [];
 
     for (const continent of CONTINENTS) {
@@ -241,7 +236,7 @@ export class InteractiveGlobe {
       spotRoot.lookAt(pos.clone().multiplyScalar(2));
       spotRoot.userData = { continent, meta };
 
-      // 1. Center Solid Dot (Pure White)
+      // 1. Center Solid Dot
       const dotGeo = new THREE.CircleGeometry(0.18, 24);
       const dotMat = new THREE.MeshBasicMaterial({
         color: 0xffffff,
@@ -275,14 +270,16 @@ export class InteractiveGlobe {
       const radarRingMesh = new THREE.Mesh(radarRingGeo, radarRingMat);
       spotRoot.add(radarRingMesh);
 
-      // 4. Hitbox for smooth raycasting click & hover
+      // 4. Hitbox for smooth raycasting
       const hitGeo = new THREE.SphereGeometry(1.2, 12, 12);
       const hitMat = new THREE.MeshBasicMaterial({ visible: false });
       const hitMesh = new THREE.Mesh(hitGeo, hitMat);
       hitMesh.userData = { continent, meta };
       spotRoot.add(hitMesh);
 
-      this.hotspotsGroup.add(spotRoot);
+      // Attach spotRoot to globePivot so it rotates in 100% lockstep with the continent!
+      this.globePivot.add(spotRoot);
+
       this.hotspotMeshes.push({
         root: spotRoot,
         dot: dotMesh,
@@ -293,17 +290,16 @@ export class InteractiveGlobe {
         meta
       });
     }
-
-    this.scene.add(this.hotspotsGroup);
   }
 
+  // Exact Cartesian coordinate mapping on sphere
   latLonToVector3(lat, lon, radius) {
-    const phi = (90 - lat) * (Math.PI / 180);
-    const theta = (lon + 180) * (Math.PI / 180);
+    const phi = THREE.MathUtils.degToRad(90 - lat);
+    const theta = THREE.MathUtils.degToRad(lon + 180);
 
-    const x = -(radius * Math.sin(phi) * Math.cos(theta));
-    const z = (radius * Math.sin(phi) * Math.sin(theta));
-    const y = (radius * Math.cos(phi));
+    const x = -radius * Math.sin(phi) * Math.cos(theta);
+    const z = radius * Math.sin(phi) * Math.sin(theta);
+    const y = radius * Math.cos(phi);
 
     return new THREE.Vector3(x, y, z);
   }
@@ -332,18 +328,10 @@ export class InteractiveGlobe {
     return new THREE.CanvasTexture(canvas);
   }
 
-  // ── Camera Position Update (Offset LookAt for Editorial Left Framing) ──
+  // Camera stays positioned firmly at +Z, with slight right-hand lookAt offset on desktop
   updateCameraPosition() {
-    const phi = THREE.MathUtils.degToRad(90 - this.lat);
-    const theta = THREE.MathUtils.degToRad(this.lon);
+    this.camera.position.set(0, 0, this.camDistance);
 
-    const x = this.camDistance * Math.sin(phi) * Math.sin(theta);
-    const y = this.camDistance * Math.cos(phi);
-    const z = this.camDistance * Math.sin(phi) * Math.cos(theta);
-
-    this.camera.position.set(x, y, z);
-
-    // On Desktop, offset lookAt to the left (-1.8) so Earth curves on the right side
     const isDesktop = (this.width || window.innerWidth) >= 1024;
     const lookOffsetX = isDesktop ? -1.8 : 0;
     this.camera.lookAt(lookOffsetX, 0, 0);
@@ -354,8 +342,8 @@ export class InteractiveGlobe {
   updateCompass() {
     const compassNeedle = document.getElementById('geCompassNeedle');
     if (compassNeedle) {
-      const headingDeg = (this.lon % 360);
-      compassNeedle.style.transform = `rotate(${-headingDeg}deg)`;
+      const headingDeg = THREE.MathUtils.radToDeg(this.rotY);
+      compassNeedle.style.transform = `rotate(${headingDeg + 90}deg)`;
     }
   }
 
@@ -411,12 +399,10 @@ export class InteractiveGlobe {
 
   zoomStep(delta) {
     this.targetDistance = THREE.MathUtils.clamp(this.targetDistance + delta, this.minDistance, this.maxDistance);
-    this.lastInteractionTime = Date.now();
   }
 
   resetNorth() {
-    this.targetLon = Math.round(this.targetLon / 360) * 360;
-    this.lastInteractionTime = Date.now();
+    this.targetRotX = 0;
   }
 
   toggle2D3D() {
@@ -426,40 +412,47 @@ export class InteractiveGlobe {
 
     const isMobile = (this.width || window.innerWidth) < 768;
     if (this.is2DMode) {
-      this.targetLat = 0;
+      this.targetRotX = 0;
       this.targetDistance = isMobile ? 20.0 : 17.5;
     } else {
-      this.targetLat = -14;
-      this.targetDistance = isMobile ? 18.0 : 15.0;
+      this.targetDistance = isMobile ? 17.5 : 14.2;
     }
-    this.lastInteractionTime = Date.now();
   }
 
   resetView() {
     this.focusContinent('South America', true);
   }
 
-  // ── Cinematic Fly-To Focus ──
+  // ── Cinematic Focus: Exact Polar Axis Calculation & Fixed Lock ──
   focusContinent(continentName, animate = true) {
     const normalized = normalizeContinent(continentName) || 'South America';
     const meta = CONTINENT_META[normalized];
     if (!meta) return;
 
     this.selectedContinent = normalized;
-    this.targetLat = meta.lat;
-    this.targetLon = meta.lon;
-    
+    this.isLocked = true; // Lock position, zero auto-rotation drift
+
+    // Exact mathematical formula to face the camera at +Z
+    const desiredRotY = THREE.MathUtils.degToRad(-meta.lon - 90);
+    const desiredRotX = THREE.MathUtils.degToRad(meta.lat);
+
+    // Normalize shortest angle jump
+    const diffY = (desiredRotY - this.targetRotY) % (Math.PI * 2);
+    const shortestDiffY = Math.atan2(Math.sin(diffY), Math.cos(diffY));
+    this.targetRotY = this.targetRotY + shortestDiffY;
+    this.targetRotX = desiredRotX;
+
     const isMobile = (this.width || window.innerWidth) < 768;
     this.targetDistance = isMobile ? 16.5 : 13.8;
 
     if (!animate) {
-      this.lat = this.targetLat;
-      this.lon = this.targetLon;
+      this.rotX = this.targetRotX;
+      this.rotY = this.targetRotY;
       this.camDistance = this.targetDistance;
+      this.globePivot.rotation.x = this.rotX;
+      this.globePivot.rotation.y = this.rotY;
       this.updateCameraPosition();
     }
-
-    this.lastInteractionTime = Date.now();
   }
 
   selectContinent(continentName, animate = true) {
@@ -473,9 +466,6 @@ export class InteractiveGlobe {
       this.isUserInteracting = true;
       this.lastPointerX = e.clientX;
       this.lastPointerY = e.clientY;
-      this.velocityLat = 0;
-      this.velocityLon = 0;
-      this.lastInteractionTime = Date.now();
       el.setPointerCapture?.(e.pointerId);
     });
 
@@ -488,21 +478,16 @@ export class InteractiveGlobe {
         const dx = e.clientX - this.lastPointerX;
         const dy = e.clientY - this.lastPointerY;
 
-        const sensitivity = 0.25;
-        this.velocityLon = -dx * sensitivity;
-        this.velocityLat = dy * sensitivity;
+        // User manual drag
+        const sensitivity = 0.005;
+        this.targetRotY += dx * sensitivity;
+        this.targetRotX += dy * sensitivity;
 
-        this.lon += this.velocityLon;
-        this.lat += this.velocityLat;
-        this.targetLon = this.lon;
-        this.targetLat = this.lat;
-
-        this.lat = THREE.MathUtils.clamp(this.lat, -85, 85);
-        this.targetLat = this.lat;
+        // Clamp vertical pitch to prevent inversion
+        this.targetRotX = THREE.MathUtils.clamp(this.targetRotX, -1.2, 1.2);
 
         this.lastPointerX = e.clientX;
         this.lastPointerY = e.clientY;
-        this.lastInteractionTime = Date.now();
       } else {
         this.checkRaycastHover();
       }
@@ -532,7 +517,6 @@ export class InteractiveGlobe {
       e.preventDefault();
       const zoomFactor = e.deltaY * 0.01;
       this.targetDistance = THREE.MathUtils.clamp(this.targetDistance + zoomFactor, this.minDistance, this.maxDistance);
-      this.lastInteractionTime = Date.now();
     }, { passive: false });
 
     el.addEventListener('touchstart', (e) => {
@@ -551,7 +535,6 @@ export class InteractiveGlobe {
         const diff = (this.touchStartDist - dist) * 0.04;
         this.targetDistance = THREE.MathUtils.clamp(this.targetDistance + diff, this.minDistance, this.maxDistance);
         this.touchStartDist = dist;
-        this.lastInteractionTime = Date.now();
       }
     }, { passive: true });
 
@@ -610,24 +593,22 @@ export class InteractiveGlobe {
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(w, h, false);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    this.updateCameraPosition();
   }
 
   animate(timestamp) {
     this.rafId = requestAnimationFrame(this.animate);
 
-    const now = Date.now();
-    const timeSinceInteraction = now - this.lastInteractionTime;
-
-    // Gentle continuous slow orbit
-    if (this.autoRotate && !this.isUserInteracting && timeSinceInteraction > 3000) {
-      this.lon += this.autoRotateSpeed;
-      this.targetLon = this.lon;
-    }
-
+    // Smooth Euler Rotation Interpolation onto Earth Pivot
     const ease = 0.08;
-    this.lat += (this.targetLat - this.lat) * ease;
-    this.lon += (this.targetLon - this.lon) * ease;
+    this.rotX += (this.targetRotX - this.rotX) * ease;
+    this.rotY += (this.targetRotY - this.rotY) * ease;
     this.camDistance += (this.targetDistance - this.camDistance) * ease;
+
+    if (this.globePivot) {
+      this.globePivot.rotation.x = this.rotX;
+      this.globePivot.rotation.y = this.rotY;
+    }
 
     this.updateCameraPosition();
 
