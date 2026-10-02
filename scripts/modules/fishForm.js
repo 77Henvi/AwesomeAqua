@@ -42,7 +42,7 @@ export function updateAddFishTotal() {
 //   CLEAR FORM (ฟอร์มเพิ่มปลาใหม่)
 // ════════════════════════════════════════════
 export function clearForm() {
-  ['newName_th', 'newName_en', 'newSpecies', 'newPriceMin', 'newPriceMax', 'newStock', 'newSizeMin', 'newSizeMax', 'newDesc_th', 'newDesc_en', 'newCost', 'receiveDate', 'newSalePrice', 'newColor', 'newBodyShape', 'newFeedingBehavior', 'newPremiumFactors']
+  ['newName_th', 'newName_en', 'newSpecies', 'newPriceMin', 'newPriceMax', 'newStock', 'newSizeMin', 'newSizeMax', 'newDesc_th', 'newDesc_en', 'newCost', 'receiveDate', 'newSalePrice', 'newColor', 'newBodyShape', 'newFeedingBehavior', 'newPremiumFactors', 'newContinent', 'newCountry', 'newOriginRegion']
     .forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
@@ -104,6 +104,12 @@ export async function addFish(onDone) {
   const premiumFactors = document.getElementById('newPremiumFactors').value.trim()
     ? document.getElementById('newPremiumFactors').value.split(',').map(s => s.trim()).filter(Boolean)
     : null;
+
+  // Geographic origin (Aqua World)
+  const continentRaw = document.getElementById('newContinent')?.value.trim() || null;
+  const countryRaw   = document.getElementById('newCountry')?.value.trim() || null;
+  const regionRaw    = document.getElementById('newOriginRegion')?.value.trim() || null;
+
   const file     = document.getElementById('newImageFile').files[0];
 
   let imageUrl = null;
@@ -131,7 +137,8 @@ export async function addFish(onDone) {
     cost:      cost,
     sale_price: salePrice,
     color, body_shape: bodyShape, feeding_behavior: feedingBehavior,
-    is_premium: isPremium, premium_factors: premiumFactors
+    is_premium: isPremium, premium_factors: premiumFactors,
+    continent: continentRaw, country: countryRaw, origin_region: regionRaw
   }).select();
 
   if (fishError || !newFishData) {
@@ -188,6 +195,11 @@ export function openEditModal(id, fishData) {
   document.getElementById('editFeedingBehavior').value = f.feeding_behavior || '';
   document.getElementById('editIsPremium').checked     = !!f.is_premium;
   document.getElementById('editPremiumFactors').value  = Array.isArray(f.premium_factors) ? f.premium_factors.join(', ') : '';
+
+  // Geographic origin (Aqua World)
+  if (document.getElementById('editContinent'))    document.getElementById('editContinent').value    = f.continent || '';
+  if (document.getElementById('editCountry'))      document.getElementById('editCountry').value      = f.country || '';
+  if (document.getElementById('editOriginRegion')) document.getElementById('editOriginRegion').value = f.origin_region || '';
 
   if (document.getElementById('editCost')) document.getElementById('editCost').value = f.cost || '';
   if (document.getElementById('editSalePrice')) document.getElementById('editSalePrice').value = f.sale_price || '';
@@ -248,6 +260,11 @@ export async function saveEdit(fishData, onDone) {
   const premiumFactorsRaw = document.getElementById('editPremiumFactors').value.trim();
   const premiumFactors   = premiumFactorsRaw ? premiumFactorsRaw.split(',').map(s => s.trim()).filter(Boolean) : null;
 
+  // Geographic origin (Aqua World)
+  const continentRaw = document.getElementById('editContinent')?.value.trim() || null;
+  const countryRaw   = document.getElementById('editCountry')?.value.trim() || null;
+  const regionRaw    = document.getElementById('editOriginRegion')?.value.trim() || null;
+
   const { error } = await supabase.from('fish').update({
     name_th:   document.getElementById('editName_th').value,
     name_en:   document.getElementById('editName_en').value,
@@ -266,7 +283,8 @@ export async function saveEdit(fishData, onDone) {
     cost:      finalCost,
     sale_price: finalSale,
     color: color, body_shape: bodyShape, feeding_behavior: feedingBehavior,
-    is_premium: isPremium, premium_factors: premiumFactors
+    is_premium: isPremium, premium_factors: premiumFactors,
+    continent: continentRaw, country: countryRaw, origin_region: regionRaw
   }).eq('id', id);
 
   if (error) { showToast('<i class="ph-fill ph-x-circle" style="color:#ef4444; font-size:1.1em; vertical-align:-2px;"></i> บันทึกไม่ได้'); return; }

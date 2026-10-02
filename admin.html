@@ -391,6 +391,25 @@
                 <input type="text" id="newPremiumFactors" class="form-input" placeholder="เหตุผล เช่น สายเลือด, ลายพิเศษ, ฟอร์มสวย (คั่นด้วยจุลภาค)" style="flex:1;">
               </label>
             </div>
+
+            <!-- Aqua World Origin Section -->
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label><i class="ph ph-globe-hemisphere-west"></i> แหล่งกำเนิด (Aqua World) <span style="font-weight:400;color:var(--gray);">— ใช้สำหรับระบบแผนที่โลกและหน้าร้าน</span></label>
+              <div class="fish-origin-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:8px;">
+                <select id="newContinent" class="form-input" style="width:100%;">
+                  <option value="">-- เลือกทวีป (Continent) --</option>
+                  <option value="Africa">Africa (แอฟริกา)</option>
+                  <option value="Asia">Asia (เอเชีย)</option>
+                  <option value="Europe">Europe (ยุโรป)</option>
+                  <option value="North America">North America (อเมริกาเหนือ)</option>
+                  <option value="South America">South America (อเมริกาใต้)</option>
+                  <option value="Oceania">Oceania (โอเชียเนีย / ออสเตรเลีย)</option>
+                </select>
+                <input type="text" id="newCountry" class="form-input" placeholder="ประเทศ เช่น บราซิล (ไม่บังคับ)">
+                <input type="text" id="newOriginRegion" class="form-input" placeholder="ลุ่มน้ำ/ภูมิภาค เช่น อเมซอน (ไม่บังคับ)">
+              </div>
+            </div>
+
             <div class="form-group">
               <label>ช่วงราคา</label>
               <div class="price-preview" id="pricePreview">—</div>
@@ -802,6 +821,25 @@
           <input type="text" id="editPremiumFactors" class="form-input" placeholder="เหตุผล เช่น สายเลือด, ลายพิเศษ, ฟอร์มสวย (คั่นด้วยจุลภาค)" style="flex:1;">
         </label>
       </div>
+
+      <!-- Aqua World Origin Section -->
+      <div class="form-group" style="grid-column: 1 / -1;">
+        <label><i class="ph ph-globe-hemisphere-west"></i> แหล่งกำเนิด (Aqua World) <span style="font-weight:400;color:var(--gray);">— ใช้สำหรับระบบแผนที่โลกและหน้าร้าน</span></label>
+        <div class="fish-origin-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:8px;">
+          <select id="editContinent" class="form-input" style="width:100%;">
+            <option value="">-- เลือกทวีป (Continent) --</option>
+            <option value="Africa">Africa (แอฟริกา)</option>
+            <option value="Asia">Asia (เอเชีย)</option>
+            <option value="Europe">Europe (ยุโรป)</option>
+            <option value="North America">North America (อเมริกาเหนือ)</option>
+            <option value="South America">South America (อเมริกาใต้)</option>
+            <option value="Oceania">Oceania (โอเชียเนีย / ออสเตรเลีย)</option>
+          </select>
+          <input type="text" id="editCountry" class="form-input" placeholder="ประเทศ เช่น บราซิล (ไม่บังคับ)">
+          <input type="text" id="editOriginRegion" class="form-input" placeholder="ลุ่มน้ำ/ภูมิภาค เช่น อเมซอน (ไม่บังคับ)">
+        </div>
+      </div>
+
       <div class="form-group">
         <label>เปลี่ยนรูป</label>
         <input type="file" id="editImageFile" accept="image/*" onchange="previewEditImage(this)">

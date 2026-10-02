@@ -2,6 +2,7 @@ import { fishData } from './fishData.js';
 import { describeSales } from '../shared/fishSales.js';
 import { getDisplayedFish } from './render.js';
 import { MESSENGER_ICON, openMessenger } from '../shared/utils.js';
+import { formatContinentName } from '../shared/continents.js';
 
 // ══════════════════════════════════════════════════════════════
 //  FISH DETAIL MODAL (ธีมมืด, namespace .fx-*)
@@ -21,10 +22,12 @@ const TXT = {
   th: { specs: 'ข้อมูลจำเพาะ', size: 'ขนาด', level: 'ระดับการเลี้ยง', stock: 'สต็อก', price: 'ราคา',
         details: 'รายละเอียด', similar: 'ปลาที่คล้ายกัน', next: 'ถัดไป', prev: 'ก่อนหน้า', close: 'ปิด',
         order: 'สั่งซื้อผ่าน Messenger', sold: 'หมดสต็อก', inch: 'นิ้ว', out: 'หมดแล้ว',
+        origin: 'แหล่งกำเนิด', exploreOnAquaWorld: 'ดูบนแผนที่โลก Aqua World',
         low: n => `เหลือ ${n} ตัว`, ok: n => `${n} ตัว` },
   en: { specs: 'Specifications', size: 'Size', level: 'Care level', stock: 'Stock', price: 'Price',
         details: 'Details', similar: 'Similar species', next: 'Next', prev: 'Previous', close: 'Close',
         order: 'Order via Messenger', sold: 'Out of stock', inch: 'in', out: 'Out of stock',
+        origin: 'Origin', exploreOnAquaWorld: 'Explore on Aqua World',
         low: n => `Only ${n} left`, ok: n => `${n} in stock` }
 };
 
@@ -49,6 +52,16 @@ function buildModel(f, lang) {
   const sales = describeSales(f, isEn);
   const refPrice = sales.refMin ? baht(sales.refMin) + (sales.refMax ? ` – ${baht(sales.refMax)}` : '') : '';
   const tagsSrc = isEn && Array.isArray(f.tags_en) && f.tags_en.length ? f.tags_en : f.tags_th;
+
+  // Geographic origin
+  const continent = f.continent ? String(f.continent).trim() : null;
+  const continentName = continent ? formatContinentName(continent, isEn) : '';
+  const originParts = [];
+  if (f.origin_region) originParts.push(f.origin_region);
+  if (f.country) originParts.push(f.country);
+  if (continentName) originParts.push(continentName);
+  const originDisplay = originParts.join(', ');
+
   return {
     id: f.id, t, isEn,
     name: pick(f.name_en, f.name_th, isEn) || '—',
@@ -64,7 +77,10 @@ function buildModel(f, lang) {
     levelKey: { 'มือใหม่': 'easy', 'ปานกลาง': 'mid', 'ผู้เชี่ยวชาญ': 'hard' }[f.level] || 'none',
     stock,
     stockKey: stock === 0 ? 'out' : stock <= 5 ? 'low' : 'ok',
-    stockText: stock === 0 ? t.out : stock <= 5 ? t.low(stock) : t.ok(stock)
+    stockText: stock === 0 ? t.out : stock <= 5 ? t.low(stock) : t.ok(stock),
+    continent,
+    continentName,
+    originDisplay
   };
 }
 
@@ -140,6 +156,22 @@ function template(f, m) {
 
           <div class="fx-panel">
             ${m.tags.length ? `<div class="fx-tags">${m.tags.map(x => `<span class="fx-tag">${esc(x)}</span>`).join('')}</div>` : ''}
+
+            ${m.continent ? `
+            <div class="fx-origin-strip">
+              <div class="fx-origin-main">
+                <span class="fx-origin-icon"><i class="ph ph-globe-hemisphere-west"></i></span>
+                <div class="fx-origin-info">
+                  <span class="fx-origin-lbl">${esc(t.origin)}</span>
+                  <span class="fx-origin-val">${esc(m.originDisplay)}</span>
+                </div>
+              </div>
+              <a href="aqua-world.html?continent=${encodeURIComponent(m.continent)}&species=${encodeURIComponent(m.id)}" class="fx-origin-cta" data-fx="aqua-world">
+                <span>${esc(t.exploreOnAquaWorld)}</span>
+                <i class="ph-bold ph-arrow-up-right"></i>
+              </a>
+            </div>` : ''}
+
             <div class="fx-sechead"><h3>${esc(t.specs)}</h3>
               <span class="fx-chip s-${m.stockKey}"><i class="fx-dot" aria-hidden="true"></i>${esc(m.stockText)}</span></div>
             <div class="fx-tiles">${tiles}</div>

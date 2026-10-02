@@ -2177,3 +2177,817 @@
 }
 .fx-sold { display: inline-flex; align-items: center; gap: .4rem; margin-top: .45rem; font-size: .9rem; color: var(--fx-mut); }
 .fx-sold i { color: var(--fx-acc2); }
+
+/* ══════════════════════════════════════════════════════════════
+   AQUA WORLD — 3D OCEAN DISCOVERY EXPERIENCE
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── 1. NAVBAR AQUA WORLD ACCENT ── */
+.nav-link-aqua-world {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-pill);
+  transition: all 0.3s ease;
+}
+.nav-link-aqua-world i {
+  font-size: 1.1rem;
+  color: var(--ocean-sky);
+}
+nav.scrolled .nav-link-aqua-world i {
+  color: var(--ocean-teal);
+}
+.nav-link-aqua-world:hover {
+  background: rgba(117, 226, 224, 0.15);
+  color: #ffffff !important;
+}
+nav.scrolled .nav-link-aqua-world:hover {
+  background: var(--ocean-mist);
+  color: var(--ocean-deep) !important;
+}
+.nav-link-aqua-world.active {
+  background: rgba(44, 172, 173, 0.22);
+  color: #ffffff !important;
+  border: 1px solid rgba(117, 226, 224, 0.35);
+}
+nav.scrolled .nav-link-aqua-world.active {
+  background: var(--ocean-mist);
+  color: var(--ocean-deep) !important;
+  border: 1px solid rgba(44, 172, 173, 0.4);
+}
+
+/* ── 2. MOBILE MENU AQUA WORLD ITEM ── */
+.mobile-nav-aqua-world {
+  background: linear-gradient(135deg, rgba(2, 77, 96, 0.08) 0%, rgba(44, 172, 173, 0.14) 100%);
+  border: 1px solid rgba(44, 172, 173, 0.3);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1.1rem !important;
+  margin: 0.35rem 0;
+  text-decoration: none;
+  display: block;
+}
+.mobile-nav-aqua-world .mob-aqua-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.mobile-nav-aqua-world .mob-aqua-title {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--ocean-deep);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.mobile-nav-aqua-world .mob-aqua-title i {
+  color: var(--ocean-teal);
+  font-size: 1.25rem;
+}
+.mobile-nav-aqua-world .mob-aqua-sub {
+  font-size: 0.76rem;
+  color: var(--gray);
+  padding-left: 1.75rem;
+}
+.mobile-nav-aqua-world.active {
+  border-color: var(--ocean-teal);
+  background: linear-gradient(135deg, rgba(44, 172, 173, 0.2) 0%, rgba(117, 226, 224, 0.25) 100%);
+}
+
+/* ── 3. HOME PAGE AQUA WORLD DISCOVERY CARD ── */
+.aqua-discovery-section {
+  padding: 2.5rem 5% 4rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.aqua-discovery-card {
+  position: relative;
+  border-radius: 28px;
+  background: linear-gradient(135deg, #051a22 0%, #082d38 50%, #03141b 100%);
+  border: 1px solid rgba(117, 226, 224, 0.28);
+  box-shadow: 0 24px 60px rgba(2, 77, 96, 0.28);
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  align-items: center;
+  padding: 3rem 3.5rem;
+  gap: 2.5rem;
+  color: white;
+}
+.aqua-discovery-glow {
+  position: absolute;
+  top: -30%;
+  right: -10%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(117, 226, 224, 0.18) 0%, rgba(44, 172, 173, 0.05) 50%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+.aqua-discovery-content {
+  position: relative;
+  z-index: 1;
+}
+.aqua-discovery-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.85rem, 3.2vw, 2.6rem);
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0.6rem 0 0.9rem;
+  line-height: 1.2;
+}
+.aqua-discovery-sub {
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.96rem;
+  line-height: 1.65;
+  margin-bottom: 1.85rem;
+  max-width: 520px;
+}
+.aqua-discovery-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+.aqua-discovery-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: linear-gradient(135deg, var(--ocean-teal) 0%, var(--ocean-sky) 100%);
+  color: #04222b !important;
+  font-weight: 700;
+  padding: 0.85rem 2rem;
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+  box-shadow: 0 8px 24px rgba(44, 172, 173, 0.4);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.aqua-discovery-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 12px 32px rgba(117, 226, 224, 0.55);
+}
+
+/* Mini Globe Visual in Discovery Card */
+.aqua-discovery-visual {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.mini-globe-visual {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mini-globe-ring {
+  position: absolute;
+  inset: -12px;
+  border: 1px dashed rgba(117, 226, 224, 0.35);
+  border-radius: 50%;
+  animation: ringRotate 24s linear infinite;
+}
+@keyframes ringRotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.mini-globe-sphere {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #0e3f4e 0%, #06222b 60%, #021217 100%);
+  border: 1.5px solid rgba(117, 226, 224, 0.5);
+  box-shadow: 0 0 35px rgba(117, 226, 224, 0.25), inset 0 0 20px rgba(117, 226, 224, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+.mini-globe-land {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(44, 172, 173, 0.28);
+  border: 1px solid rgba(117, 226, 224, 0.45);
+}
+.land-sa { width: 55px; height: 75px; top: 35%; left: 20%; transform: rotate(-15deg); }
+.land-af { width: 60px; height: 65px; top: 30%; right: 22%; border-radius: 40%; }
+.land-as { width: 70px; height: 50px; top: 12%; right: 10%; border-radius: 45%; }
+
+.mini-globe-pin {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+}
+.pin-sa { top: 48%; left: 36%; }
+.pin-af { top: 42%; right: 40%; }
+.pin-as { top: 26%; right: 28%; }
+.pin-dot {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 8px #75E2E0;
+}
+.pin-wave {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1px solid #75E2E0;
+  animation: pinPulse 2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+@keyframes pinPulse {
+  0% { transform: scale(0.6); opacity: 1; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+
+/* ── 4. FISH MODAL ORIGIN STRIP ── */
+.fx-origin-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.85rem 1.1rem;
+  background: linear-gradient(135deg, rgba(44, 172, 173, 0.12) 0%, rgba(6, 28, 34, 0.6) 100%);
+  border: 1px solid rgba(117, 226, 224, 0.28);
+  border-radius: 16px;
+  margin-bottom: 1.25rem;
+}
+.fx-origin-main {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+.fx-origin-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(117, 226, 224, 0.18);
+  color: var(--fx-acc2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+.fx-origin-info {
+  display: flex;
+  flex-direction: column;
+}
+.fx-origin-lbl {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--fx-mut);
+}
+.fx-origin-val {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+.fx-origin-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--fx-acc2);
+  text-decoration: none;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(117, 226, 224, 0.12);
+  border: 1px solid rgba(117, 226, 224, 0.3);
+  transition: all 0.2s ease;
+}
+.fx-origin-cta:hover {
+  background: rgba(117, 226, 224, 0.25);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+/* ── 5. CORE AQUA WORLD PAGE ── */
+.aqua-world-body {
+  background: #041419;
+  color: #f1fafa;
+  min-height: 100vh;
+}
+.aqua-world-body nav {
+  background: rgba(4, 20, 25, 0.85);
+  border-bottom: 1px solid rgba(117, 226, 224, 0.14);
+}
+.aqua-world-body nav .logo { color: #ffffff; }
+.aqua-world-body nav .logo span { color: var(--ocean-sky); }
+.aqua-world-body nav.scrolled .logo { color: #ffffff; }
+.aqua-world-body nav.scrolled .logo span { color: var(--ocean-sky); }
+.aqua-world-body nav .nav-links a { color: rgba(255, 255, 255, 0.8); }
+.aqua-world-body nav .nav-links a:hover { color: #ffffff; }
+
+.aqua-world-main {
+  position: relative;
+  padding: 100px 5% 4rem;
+  max-width: 1440px;
+  margin: 0 auto;
+  min-height: calc(100vh - 120px);
+}
+.aqua-world-bg-glow {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 900px;
+  height: 600px;
+  background: radial-gradient(ellipse at center, rgba(44, 172, 173, 0.12) 0%, rgba(2, 77, 96, 0.05) 50%, transparent 75%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.aqua-world-header {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto 2.5rem;
+}
+.aqua-world-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 1.1rem;
+  border-radius: 999px;
+  background: rgba(44, 172, 173, 0.18);
+  border: 1px solid rgba(117, 226, 224, 0.35);
+  color: var(--ocean-sky);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin-bottom: 1rem;
+}
+.aqua-tag-pulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ocean-sky);
+  box-shadow: 0 0 8px var(--ocean-sky);
+  animation: tagPulse 2s infinite;
+}
+.aqua-world-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.8rem;
+  line-height: 1.15;
+}
+.aqua-world-sub {
+  color: rgba(241, 250, 250, 0.78);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  max-width: 600px;
+  margin: 0 auto 2rem;
+}
+
+/* Continent Pills Toolbar */
+.aqua-pills-bar {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+}
+.aqua-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 1.05rem;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(241, 250, 250, 0.85);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all 0.25s ease;
+}
+.aqua-pill:hover {
+  background: rgba(117, 226, 224, 0.16);
+  border-color: rgba(117, 226, 224, 0.4);
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+.aqua-pill.active {
+  background: linear-gradient(135deg, rgba(44, 172, 173, 0.35) 0%, rgba(117, 226, 224, 0.4) 100%);
+  border-color: #75E2E0;
+  color: #ffffff;
+  box-shadow: 0 4px 18px rgba(44, 172, 173, 0.3);
+}
+.aqua-pill-count {
+  font-size: 0.72rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--ocean-sky);
+}
+.aqua-pill.active .aqua-pill-count {
+  background: #04222b;
+  color: #ffffff;
+}
+
+/* ── 6. AQUA WORLD STAGE (GLOBE + SPECIES PANEL) ── */
+.aqua-world-stage {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 2.5rem;
+  align-items: start;
+  margin-top: 1.5rem;
+}
+
+/* 3D Globe Container */
+.aqua-globe-wrapper {
+  position: relative;
+  border-radius: 32px;
+  background: radial-gradient(circle at 50% 50%, rgba(6, 32, 40, 0.85) 0%, rgba(2, 18, 23, 0.95) 100%);
+  border: 1px solid rgba(117, 226, 224, 0.22);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  min-height: 520px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.aqua-globe-viewport {
+  width: 100%;
+  height: 100%;
+  min-height: 520px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.aqua-globe-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+.globe-overlay-hint {
+  position: absolute;
+  bottom: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.45rem 1.1rem;
+  background: rgba(4, 20, 25, 0.82);
+  border: 1px solid rgba(117, 226, 224, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: rgba(241, 250, 250, 0.85);
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.globe-overlay-hint.visible {
+  color: var(--ocean-sky);
+  border-color: var(--ocean-sky);
+  box-shadow: 0 0 16px rgba(117, 226, 224, 0.3);
+}
+
+.globe-floating-controls {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  display: flex;
+  gap: 0.5rem;
+  z-index: 5;
+}
+.globe-ctrl-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(6, 28, 34, 0.8);
+  border: 1px solid rgba(117, 226, 224, 0.28);
+  color: rgba(241, 250, 250, 0.85);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.05rem;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all 0.2s ease;
+}
+.globe-ctrl-btn:hover {
+  background: rgba(44, 172, 173, 0.28);
+  color: #ffffff;
+  transform: scale(1.08);
+}
+.globe-ctrl-btn.active {
+  background: var(--ocean-teal);
+  color: #04222b;
+  border-color: var(--ocean-sky);
+}
+
+/* ── 7. SPECIES INFORMATION & COLLECTION PANEL ── */
+.aqua-species-panel-wrap {
+  width: 100%;
+}
+.aqua-panel-card {
+  border-radius: 32px;
+  background: rgba(6, 28, 34, 0.75);
+  border: 1px solid rgba(117, 226, 224, 0.22);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+  padding: 2.2rem;
+  min-height: 520px;
+  display: flex;
+  flex-direction: column;
+}
+.aqua-panel-card--active {
+  border-color: rgba(117, 226, 224, 0.4);
+}
+
+.aqua-panel-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+}
+.aqua-panel-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ocean-sky);
+}
+.aqua-panel-close-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.aqua-panel-close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.aqua-panel-title {
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.35rem;
+}
+.aqua-panel-badge-row {
+  margin-bottom: 0.75rem;
+}
+.aqua-count-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(44, 172, 173, 0.25);
+  border: 1px solid rgba(117, 226, 224, 0.35);
+  color: var(--ocean-sky);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+.aqua-panel-desc {
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: rgba(241, 250, 250, 0.75);
+  margin-bottom: 1.5rem;
+}
+
+/* Continent Summary Grid (Overview State) */
+.aqua-continent-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.85rem;
+  margin-top: 0.5rem;
+}
+.aqua-continent-tile {
+  padding: 1.1rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.aqua-continent-tile:hover {
+  background: rgba(44, 172, 173, 0.18);
+  border-color: rgba(117, 226, 224, 0.4);
+  transform: translateY(-2px);
+}
+.aqua-continent-tile .tile-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.45rem;
+}
+.aqua-continent-tile .tile-icon { font-size: 1.4rem; }
+.aqua-continent-tile .tile-count {
+  font-size: 0.72rem;
+  color: var(--ocean-sky);
+  font-weight: 600;
+}
+.aqua-continent-tile .tile-name {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+/* Species List & Cards */
+.aqua-species-list-container {
+  flex: 1;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+.aqua-species-list-container::-webkit-scrollbar { width: 5px; }
+.aqua-species-list-container::-webkit-scrollbar-thumb {
+  background: rgba(117, 226, 224, 0.25);
+  border-radius: 10px;
+}
+
+.aqua-species-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.95rem;
+}
+.aqua-species-card {
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+}
+.aqua-species-card:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--ocean-sky);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+}
+.species-card-img-wrap {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: #021a22;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.species-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+.aqua-species-card:hover .species-card-img {
+  transform: scale(1.08);
+}
+.species-card-emoji { font-size: 2.2rem; }
+.species-card-body {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.species-card-name {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.2rem;
+}
+.species-card-sub {
+  font-size: 0.74rem;
+  color: var(--ocean-sky);
+  font-style: italic;
+  margin-bottom: 0.45rem;
+}
+.species-card-origin {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.7rem;
+  color: rgba(241, 250, 250, 0.65);
+  margin-bottom: 0.75rem;
+}
+.species-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+.species-card-price {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--ocean-sky);
+}
+.species-card-btn {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #ffffff;
+  transition: color 0.2s;
+}
+.aqua-species-card:hover .species-card-btn {
+  color: var(--ocean-sky);
+}
+
+.aqua-empty-state {
+  text-align: center;
+  padding: 3.5rem 1.5rem;
+  color: rgba(241, 250, 250, 0.6);
+}
+.aqua-empty-state i {
+  font-size: 2.8rem;
+  color: var(--ocean-teal);
+  margin-bottom: 0.75rem;
+}
+
+/* ── 8. RESPONSIVE BREAKPOINTS ── */
+@media (max-width: 1100px) {
+  .aqua-world-stage {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  .aqua-discovery-card {
+    grid-template-columns: 1fr;
+    padding: 2.5rem 2rem;
+    text-align: center;
+  }
+  .aqua-discovery-sub {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .aqua-discovery-actions {
+    justify-content: center;
+  }
+  .aqua-discovery-visual {
+    margin-top: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .aqua-world-main {
+    padding: 85px 4% 3rem;
+  }
+  .aqua-world-title {
+    font-size: 1.85rem;
+  }
+  .aqua-world-sub {
+    font-size: 0.92rem;
+  }
+  .aqua-globe-wrapper {
+    min-height: 380px;
+  }
+  .aqua-globe-viewport {
+    min-height: 380px;
+  }
+  .aqua-panel-card {
+    padding: 1.5rem 1.25rem;
+    min-height: auto;
+    border-radius: 24px;
+  }
+  .aqua-species-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.75rem;
+  }
+  .aqua-continent-summary-grid {
+    grid-template-columns: 1fr;
+  }
+  .fx-origin-strip {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .fx-origin-cta {
+    align-self: flex-end;
+  }
+}
+

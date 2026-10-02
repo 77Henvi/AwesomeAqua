@@ -43,12 +43,12 @@
 
 <!-- ========== NAVBAR ========== -->
 <nav>
-  <div class="logo">Awesome <span>Aqua</span></div>
+  <a href="index.html" class="logo" style="text-decoration:none;">Awesome <span>Aqua</span></a>
   <ul class="nav-links">
     <li><a href="#fish" data-i18n="navFish">ปลาทั้งหมด</a></li>
+    <li><a href="aqua-world.html" class="nav-link-aqua-world"><i class="ph ph-globe-hemisphere-west"></i> <span data-i18n="navAquaWorld">Aqua World</span></a></li>
     <li><a href="#about" data-i18n="navAbout">เกี่ยวกับเรา</a></li>
   </ul>
-  <!-- ตัด nav-contact ออก เหลือแค่ปุ่ม Messenger -->
   <div class="nav-actions">
     <button class="lang-toggle-btn" onclick="toggleLanguage()" id="desktopLangToggle">
       <i class="ph ph-globe"></i>
@@ -61,10 +61,16 @@
   </button>
 </nav>
 
-<!-- เมนูมือถือ — ลบ ℹ ออก -->
+<!-- เมนูมือถือ -->
 <div class="nav-mobile-menu" id="mobileMenu">
-  <a href="#fish" data-i18n="navFish">ปลาทั้งหมด</a>
-  <a href="#about" data-i18n="navAbout">เกี่ยวกับเรา</a>
+  <a href="#fish" data-i18n="navFish" onclick="toggleMobile()">ปลาทั้งหมด</a>
+  <a href="aqua-world.html" class="mobile-nav-aqua-world">
+    <div class="mob-aqua-wrap">
+      <div class="mob-aqua-title"><i class="ph-bold ph-globe-hemisphere-west"></i> <span data-i18n="navAquaWorld">Aqua World</span></div>
+      <div class="mob-aqua-sub" data-i18n="navAquaWorldSub">สำรวจแหล่งกำเนิดปลาทั่วโลก</div>
+    </div>
+  </a>
+  <a href="#about" data-i18n="navAbout" onclick="toggleMobile()">เกี่ยวกับเรา</a>
   <div class="mobile-lang-wrap">
     <button class="lang-toggle-btn" onclick="toggleLanguage()" id="mobileLangToggle">
       <i class="ph ph-globe"></i>
@@ -214,6 +220,37 @@
       <div class="bento-explore-cta">
         <span data-i18n="bentoExploreCta">ดูคอลเลกชันทั้งหมด</span>
         <div class="explore-circle"><i class="ph ph-arrow-down-right"></i></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== AQUA WORLD DISCOVERY ENTRY ========== -->
+<section id="aquaWorldDiscovery" class="aqua-discovery-section">
+  <div class="aqua-discovery-card fade-up">
+    <div class="aqua-discovery-glow"></div>
+    <div class="aqua-discovery-content">
+      <div class="section-tag section-tag--ocean" data-i18n="aquaWorldTag"><i class="ph-bold ph-globe-hemisphere-west"></i> AQUA WORLD</div>
+      <h2 class="aqua-discovery-title" data-i18n="aquaWorldDiscoveryTitle">ปลาของคุณมีถิ่นกำเนิดจากที่ไหน?</h2>
+      <p class="aqua-discovery-sub" data-i18n="aquaWorldDiscoverySub">ร่วมสำรวจสายพันธุ์ปลาสวยงามตามแหล่งกำเนิดและทวีปทั่วโลก ค้นพบเรื่องราวลุ่มน้ำธรรมชาติ</p>
+      <div class="aqua-discovery-actions">
+        <a href="aqua-world.html" class="btn btn-primary aqua-discovery-btn">
+          <i class="ph-bold ph-compass"></i>
+          <span data-i18n="exploreWorld">สำรวจ Aqua World</span>
+        </a>
+      </div>
+    </div>
+    <div class="aqua-discovery-visual" aria-hidden="true">
+      <div class="mini-globe-visual">
+        <div class="mini-globe-ring"></div>
+        <div class="mini-globe-sphere">
+          <div class="mini-globe-land land-sa"></div>
+          <div class="mini-globe-land land-af"></div>
+          <div class="mini-globe-land land-as"></div>
+          <div class="mini-globe-pin pin-sa"><span class="pin-dot"></span><span class="pin-wave"></span></div>
+          <div class="mini-globe-pin pin-af"><span class="pin-dot"></span><span class="pin-wave"></span></div>
+          <div class="mini-globe-pin pin-as"><span class="pin-dot"></span><span class="pin-wave"></span></div>
+        </div>
       </div>
     </div>
   </div>

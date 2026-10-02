@@ -48,10 +48,14 @@ export async function loadFishFromDB() {
       priceMax: f.price_max,
       stock:    f.stock,
       level:    f.level,
-      desc_th:  f.desc_th,   
-      desc_en:  f.desc_en,    
-      tags_th:  f.tags_th || [], 
-      tags_en:  f.tags_en || [],
+      desc_th:       f.desc_th,   
+      desc_en:       f.desc_en,    
+      tags_th:       f.tags_th || [], 
+      tags_en:       f.tags_en || [],
+      // ── แหล่งกำเนิด (Aqua World) ──
+      continent:     f.continent || null,
+      country:       f.country || null,
+      origin_region: f.origin_region || null,
       // ── ข้อมูลยอดขาย (สำหรับป้าย HOT / ลดหนัก และ "ขายแล้ว X+") ──
       createdAt:     f.created_at || null,
       salesKnown:    !!s,
