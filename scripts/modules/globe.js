@@ -471,9 +471,9 @@ export class InteractiveGlobe {
         this.lastPointerX = e.clientX;
         this.lastPointerY = e.clientY;
       } else {
-        this.checkRaycastHover();
+        this.needsRaycast = true;
       }
-    });
+    }, { passive: true });
 
     const stopInteraction = (e) => {
       if (this.isUserInteracting) {
@@ -580,6 +580,12 @@ export class InteractiveGlobe {
 
   animate(timestamp) {
     this.rafId = requestAnimationFrame(this.animate);
+    if (document.hidden) return; // Pause WebGL rendering when tab is in background
+
+    if (this.needsRaycast) {
+      this.needsRaycast = false;
+      this.checkRaycastHover();
+    }
 
     const ease = 0.08;
     this.rotX += (this.targetRotX - this.rotX) * ease;

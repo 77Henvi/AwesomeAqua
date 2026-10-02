@@ -11,6 +11,7 @@ export function goSlide(index) {
 }
 
 function nextSlide() {
+  if (document.hidden) return;
   const slides = document.querySelectorAll('.slide');
   if (!slides.length) return;
   goSlide((currentSlide + 1) % slides.length);

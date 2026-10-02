@@ -22,9 +22,15 @@
   <meta name="twitter:description" content="คัดสรรปลาคุณภาพพร้อมข้อมูลครบ กดสั่งซื้อผ่าน Messenger ได้เลย">
   <meta name="twitter:image" content="https://awesome-aqua.vercel.app/images/logo.png">
 
-  <!-- เพิ่ม Playfair Display ที่ขาดหายไป -->
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@300;400;500&family=Playfair+Display:wght@700&family=Noto+Serif+Thai:wght@600;700&family=Noto+Sans+Thai:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=4">
+  <!-- Performance Resource Preconnects -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://vfihczafjrkcyncnosgj.supabase.co" crossorigin>
+  <link rel="dns-prefetch" href="https://unpkg.com">
+
+  <!-- เพิ่ม Playfair Display ที่ขาดหายไป พร้อม font-display: swap -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@300;400;500;600;700&family=Playfair+Display:wght@700&family=Noto+Serif+Thai:wght@600;700&family=Noto+Sans+Thai:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=6">
   <link rel="stylesheet" href="ads.css">
   <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
 </head>
@@ -516,7 +522,7 @@
 
 </section>
 
-<!-- ========== FOOTER — เพิ่ม CTA ========== -->
+<!-- ========== FOOTER ========== -->
 <footer>
   <div class="footer-wave">
     <svg viewBox="0 0 1200 40" preserveAspectRatio="none"><path d="M0,20 C 200,40 400,0 600,20 C 800,40 1000,0 1200,20 L1200,0 L0,0 Z" fill="#2CACAD" opacity="0.35"/></svg>
@@ -525,6 +531,7 @@
     <div class="footer-logo">Awesome <span>Aqua</span></div>
     <div class="footer-links">
       <a href="#fish" data-i18n="navFish">ปลาทั้งหมด</a>
+      <a href="aqua-world.html" data-i18n="navAquaWorld">Aqua World</a>
       <a href="#about" data-i18n="navAbout">เกี่ยวกับเรา</a>
       <a href="privacy.html">นโยบายความเป็นส่วนตัว</a>
       <a href="terms.html">ข้อกำหนดการใช้บริการ</a>

@@ -99,7 +99,7 @@ function _availableCard(f) {
       <div class="card-spotlight"></div>
       <div class="fish-card-img-wrap">
         ${f.image
-          ? `<img src="${f.image}" alt="${displayName}" loading="lazy" onerror="this.parentElement.innerHTML='<span>${f.emoji || fallbackIconEsc}</span>'">`
+          ? `<img src="${f.image}" alt="${displayName}" loading="lazy" decoding="async" onerror="this.parentElement.innerHTML='<span>${f.emoji || fallbackIconEsc}</span>'">`
           : `<span>${f.emoji || fallbackIcon}</span>`
         }
         <div class="card-img-gradient"></div>
@@ -150,7 +150,7 @@ function _comingSoonCard(f) {
          onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openComingSoonDetail('${f.id}')}">
       <div class="fish-card-img-wrap fish-img--coming">
         ${f.image
-          ? `<img src="${f.image}" alt="${displayName}" loading="lazy" onerror="this.parentElement.innerHTML='<span class=coming-emoji>${f.emoji || fallbackIconEsc}</span>'">`
+          ? `<img src="${f.image}" alt="${displayName}" loading="lazy" decoding="async" onerror="this.parentElement.innerHTML='<span class=coming-emoji>${f.emoji || fallbackIconEsc}</span>'">`
           : `<span class="coming-emoji">${f.emoji || fallbackIcon}</span>`
         }
         

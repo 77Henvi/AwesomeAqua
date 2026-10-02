@@ -1205,43 +1205,72 @@
   .toast.show { opacity: 1; transform: translateY(0); }
   
   
-  /* ── FOOTER — redesign ── */
-  /* อัปเกรด: เปลี่ยนสี Footer ให้เป็น Dark Navy สมูทขึ้น */
-  /* footer ใช้ ocean-deepest (เข้มสุดในกลุ่มสี ocean) ให้ความรู้สึก "ก้นทะเล" ปิดท้ายหน้าเว็บ
-     แทนสีเทาเข้ม generic (#0f172a) เดิมที่ไม่เข้าธีม ocean เลย */
+  /* ── FOOTER — Redesigned Seamless Oceanic Theme ── */
   footer {
-    background: var(--ocean-deepest); color: rgba(255,255,255,0.65);
-    padding: 3rem 5%; font-size: 0.85rem;
-    position: relative; overflow: hidden;
+    background: linear-gradient(180deg, var(--ocean-deepest) 0%, #031226 50%, #010811 100%);
+    color: rgba(255, 255, 255, 0.7);
+    padding: 3.5rem 5% 2.8rem;
+    font-size: 0.85rem;
+    position: relative;
+    overflow: hidden;
   }
-  /* เส้นแบ่งบนสุดของ footer เป็นคลื่นนุ่มๆ (ไม่มี animation) ให้เชื่อมความรู้สึกกับ Hero
-     ด้านบนสุดของหน้าเว็บ — ใช้ SVG แบบ static ไม่กระทบ performance */
   .footer-wave {
-    position: absolute; top: -1px; left: 0; right: 0; height: 40px;
-    line-height: 0; z-index: 1;
+    position: absolute;
+    top: -1px;
+    left: 0;
+    right: 0;
+    height: 38px;
+    line-height: 0;
+    z-index: 1;
+    pointer-events: none;
   }
-  .footer-wave svg { width: 100%; height: 100%; display: block; }
+  .footer-wave svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .footer-wave svg path {
+    fill: var(--ocean-deep);
+    opacity: 0.35;
+  }
+  footer .fish-bg {
+    opacity: 0.12;
+    pointer-events: none;
+  }
   .footer-inner {
-    max-width: 960px; margin: 0 auto;
-    display: flex; flex-direction: column; align-items: center;
-    gap: 1.25rem; text-align: center;
-    position: relative; z-index: 2;
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    text-align: center;
+    position: relative;
+    z-index: 2;
   }
   .footer-logo {
     font-family: var(--font-display);
-    color: white; font-size: 1.35rem; font-weight: 700;
+    color: white;
+    font-size: 1.35rem;
+    font-weight: 700;
   }
   .footer-logo span { color: var(--ocean-sky); }
   .footer-links {
-    display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center;
+    display: flex;
+    gap: 1.75rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
   }
   .footer-links a {
-    color: rgba(255,255,255,0.55); text-decoration: none;
-    font-size: 0.82rem; transition: color 0.2s;
+    color: rgba(255, 255, 255, 0.65);
+    text-decoration: none;
+    font-size: 0.84rem;
+    transition: color 0.2s;
   }
   .footer-links a:hover { color: var(--ocean-sky); }
   .footer-line-btn { font-size: 0.875rem; padding: 0.6rem 1.5rem; }
-  .footer-copy { font-size: 0.72rem; opacity: 0.4; }
+  .footer-copy { font-size: 0.72rem; opacity: 0.45; }
   
   
   /* ── ABOUT HERO ── */
@@ -1333,11 +1362,15 @@
   
   /* ── CONTACT SECTION ── */
   .about-contact-section {
-    background: linear-gradient(135deg, var(--ocean-deep), var(--ocean-deepest));
-    padding: 4rem 5%;
-    display: flex; flex-direction: column;
-    align-items: center; gap: 2.5rem;
+    background: linear-gradient(135deg, var(--ocean-deep) 0%, var(--ocean-deepest) 100%);
+    padding: 4.5rem 5% 5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5rem;
     border-top: none;
+    position: relative;
+    z-index: 2;
   }
   .about-contact-section .section-tag { color: var(--ocean-sky); text-align: center; justify-content: center; }
   .about-contact-section .section-tag::before { background: var(--ocean-teal); }
@@ -3829,5 +3862,38 @@ nav.scrolled .nav-link-aqua-world.active {
   .fx-origin-cta {
     align-self: flex-end;
   }
+}
+
+/* ══════════════════════════════════════════════════════════
+   HIGH-PERFORMANCE RENDERING ENGINE OPTIMIZATIONS
+   ══════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: no-preference) {
+  /* Fast Content-Visibility for Long Offscreen Sections */
+  #about,
+  .about-hero,
+  .about-values,
+  .about-contact-section,
+  #fishOutSection,
+  .ldf-species-scroll {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 500px;
+  }
+}
+
+/* GPU Subpixel Antialiasing & Text Performance */
+body {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Hardware accelerated transitions without layout thrashing */
+.fish-card,
+.bento-card,
+.admin-stat-card,
+.social-card,
+.ge-btn,
+.ldf-species-item {
+  contain: layout style;
 }
 
