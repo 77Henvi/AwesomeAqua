@@ -445,6 +445,7 @@
     padding: 3.5rem 5% 2.5rem;
     background: linear-gradient(180deg, #ffffff 0%, #f4faf9 55%, #ffffff 100%);
     position: relative;
+    overflow: hidden;
   }
   .bento-header-badge {
     display: inline-flex; align-items: center; gap: 0.5rem;
@@ -2001,25 +2002,114 @@
     .nav-actions { display: none; }
     .hamburger { display: flex; }
   
-    .hero { text-align: center; }
-    .hero-content--center { max-width: 100%; padding: 0 4px; }
-    .hero-btns { justify-content: center; }
-    /* dots เป็น position:absolute แล้ว justify-content ใช้ไม่ได้ผล ต้องจัดกลางด้วย left+transform แทน */
-    .slide-dots { left: 50%; transform: translateX(-50%); bottom: 16px; }
+    /* Hero section: balanced mobile viewport with zero collisions */
+    .hero {
+      text-align: center;
+      min-height: 100vh;
+      min-height: 100svh;
+      padding: 75px 4% 100px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+    .hero-content--center {
+      max-width: 100%;
+      padding: 0 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .hero-tag {
+      font-size: 0.75rem;
+      padding: 0.3rem 0.85rem;
+      margin-bottom: 0.75rem;
+    }
+    .hero-content--center h1 {
+      font-size: clamp(1.85rem, 6.5vw, 2.45rem);
+      line-height: 1.2;
+      margin-bottom: 0.6rem;
+      letter-spacing: -0.01em;
+    }
+    .hero p, .hero-content--center p {
+      font-size: 0.86rem;
+      line-height: 1.55;
+      margin-bottom: 1.2rem;
+      max-width: 90%;
+    }
+    .hero-btns {
+      justify-content: center;
+      gap: 0.65rem;
+      margin-bottom: 0.4rem;
+    }
+    .hero .btn-primary {
+      padding: 0.65rem 1.35rem;
+      font-size: 0.85rem;
+    }
+    .btn-glass-secondary {
+      padding: 0.65rem 1.25rem;
+      font-size: 0.85rem;
+    }
+    
+    /* Dots positioned cleanly above stats, never overlapping */
+    .slide-dots {
+      position: relative;
+      left: auto;
+      bottom: auto;
+      transform: none;
+      margin-top: 0.85rem;
+      display: flex;
+      justify-content: center;
+      z-index: 3;
+    }
+    .dot { width: 6px; height: 6px; }
+    .dot.active { width: 18px; height: 6px; }
+
     .hero-overlay { background: rgba(2,30,40,0.78); }
-    /* มือถือ: ลดชั้นตกแต่งที่กินแรงเรนเดอร์ — ปิด wave ชั้นที่ 2 และ caustic shimmer,
-       คงไว้แค่ wave หลัก 1 ชั้น + ฟองอากาศ (เบากว่ามาก) */
     .hero-wave-2 { display: none; }
     .hero-caustic { animation: none; opacity: 0.5; }
   
-    /* การ์ดสต็อกกระจก: เรียงเป็น 1 คอลัมน์บนมือถือ + ลด blur (backdrop-filter หนักบนมือถือ) */
-    .stats-glass {
-      grid-template-columns: 1fr; gap: 4px;
-      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-      padding: 1rem 1.5rem;
+    /* การ์ดสต็อกกระจก: 3 คอลัมน์กะทัดรัด (compact single row) ไม่ทับปุ่มและเนื้อหาด้านบน */
+    .stats-float {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      transform: translateY(50%);
+      padding: 0 4%;
+      z-index: 5;
+      display: flex;
+      justify-content: center;
     }
-    .stat { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.15); padding: 0.6rem 0.5rem; }
-    .stat:last-child { border-bottom: none; }
+    .stats-glass {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      padding: 0.65rem 0.5rem;
+      max-width: 95%;
+      border-radius: 16px;
+      box-shadow: 0 12px 35px rgba(2,48,70,0.35);
+    }
+    .stat {
+      padding: 0.25rem 0.35rem;
+      border-right: 1px solid rgba(255,255,255,0.18);
+      border-bottom: none;
+    }
+    .stat:last-child {
+      border-right: none;
+    }
+    .stat-num {
+      font-size: 1.15rem;
+    }
+    .stat-label {
+      font-size: 0.65rem;
+      margin-top: 2px;
+    }
+    .stats-float-spacer {
+      height: 48px;
+    }
   
     .fish-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
   
