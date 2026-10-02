@@ -169,16 +169,6 @@ function renderEditorialPanel() {
         <p class="ldf-story-desc">${desc}</p>
       </div>
 
-      <!-- Hotspots Indicator -->
-      ${meta.hotspots && meta.hotspots.length ? `
-        <div class="ldf-hotspots-row">
-          <span class="ldf-hotspots-label"><i class="ph-bold ph-crosshair"></i> ${isEn ? 'Key Basins:' : 'แหล่งน้ำสำคัญ:'}</span>
-          <div class="ldf-hotspot-tags">
-            ${meta.hotspots.map(h => `<span class="ldf-hotspot-tag">${h.name}</span>`).join('')}
-          </div>
-        </div>
-      ` : ''}
-
       <!-- Native Species Showcase -->
       <div class="ldf-species-section">
         <div class="ldf-section-head">

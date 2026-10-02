@@ -40,14 +40,15 @@ export class InteractiveGlobe {
       initialContinent: 'South America'
     }, options);
 
-    this.width = this.container.clientWidth || 800;
-    this.height = this.container.clientHeight || 700;
-    this.globeRadius = 5.2;
+    this.width = this.container.clientWidth || window.innerWidth;
+    this.height = this.container.clientHeight || window.innerHeight;
+    this.globeRadius = 5.0;
 
-    // Camera parameters
-    this.camDistance = 12.8;
-    this.minDistance = 7.5;
-    this.maxDistance = 22.0;
+    // Camera framing parameters
+    const isMobile = this.width < 768;
+    this.camDistance = isMobile ? 18.0 : 15.0;
+    this.minDistance = 8.5;
+    this.maxDistance = 26.0;
     this.targetDistance = this.camDistance;
 
     // Target lat/lon (Default South America)
@@ -81,6 +82,9 @@ export class InteractiveGlobe {
     this.initEvents();
     this.initHUDControls();
 
+    // Trigger initial precise resize
+    this.resize();
+
     if (this.selectedContinent) {
       this.focusContinent(this.selectedContinent, false);
     }
@@ -92,7 +96,8 @@ export class InteractiveGlobe {
   initThree() {
     this.scene = new THREE.Scene();
 
-    this.camera = new THREE.PerspectiveCamera(42, this.width / this.height, 0.1, 2000);
+    const aspect = this.width / this.height;
+    this.camera = new THREE.PerspectiveCamera(40, aspect, 0.1, 2000);
     this.updateCameraPosition();
 
     this.renderer = new THREE.WebGLRenderer({
@@ -100,7 +105,7 @@ export class InteractiveGlobe {
       alpha: true,
       powerPreference: 'high-performance'
     });
-    this.renderer.setSize(this.width, this.height);
+    this.renderer.setSize(this.width, this.height, false);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.2;
@@ -223,77 +228,69 @@ export class InteractiveGlobe {
     this.scene.add(this.cloudMesh);
   }
 
-  // ── Dual-Ring Radar Target Hotspots (Leonardo DiCaprio Foundation UI Style) ──
   initRadarTargetHotspots() {
     this.hotspotsGroup = new THREE.Group();
     this.hotspotMeshes = [];
 
     for (const continent of CONTINENTS) {
       const meta = CONTINENT_META[continent];
-      const targetCoords = meta.hotspots && meta.hotspots.length 
-        ? meta.hotspots 
-        : [{ name: meta.name_en, lat: meta.lat, lon: meta.lon }];
+      const pos = this.latLonToVector3(meta.lat, meta.lon, this.globeRadius * 1.02);
 
-      targetCoords.forEach((spot, idx) => {
-        const pos = this.latLonToVector3(spot.lat, spot.lon, this.globeRadius * 1.02);
+      const spotRoot = new THREE.Group();
+      spotRoot.position.copy(pos);
+      spotRoot.lookAt(pos.clone().multiplyScalar(2));
+      spotRoot.userData = { continent, meta };
 
-        const spotRoot = new THREE.Group();
-        spotRoot.position.copy(pos);
-        spotRoot.lookAt(pos.clone().multiplyScalar(2));
-        spotRoot.userData = { continent, meta, spot, isPrimary: idx === 0 };
+      // 1. Center Solid Dot (Pure White)
+      const dotGeo = new THREE.CircleGeometry(0.18, 24);
+      const dotMat = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.95
+      });
+      const dotMesh = new THREE.Mesh(dotGeo, dotMat);
+      spotRoot.add(dotMesh);
 
-        // 1. Center Solid Dot (Pure White)
-        const dotGeo = new THREE.CircleGeometry(0.14, 24);
-        const dotMat = new THREE.MeshBasicMaterial({
-          color: 0xffffff,
-          side: THREE.DoubleSide,
-          transparent: true,
-          opacity: 0.95
-        });
-        const dotMesh = new THREE.Mesh(dotGeo, dotMat);
-        spotRoot.add(dotMesh);
+      // 2. Inner Sharp White Ring
+      const innerRingGeo = new THREE.RingGeometry(0.26, 0.35, 32);
+      const innerRingMat = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.85
+      });
+      const innerRingMesh = new THREE.Mesh(innerRingGeo, innerRingMat);
+      spotRoot.add(innerRingMesh);
 
-        // 2. Inner Sharp White Ring
-        const innerRingGeo = new THREE.RingGeometry(0.20, 0.26, 32);
-        const innerRingMat = new THREE.MeshBasicMaterial({
-          color: 0xffffff,
-          side: THREE.DoubleSide,
-          transparent: true,
-          opacity: 0.8
-        });
-        const innerRingMesh = new THREE.Mesh(innerRingGeo, innerRingMat);
-        spotRoot.add(innerRingMesh);
+      // 3. Outer Pulsating Radar Wave Ring
+      const radarRingGeo = new THREE.RingGeometry(0.50, 0.78, 32);
+      const radarRingMat = new THREE.MeshBasicMaterial({
+        color: 0x75e2e0,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.65,
+        blending: THREE.AdditiveBlending
+      });
+      const radarRingMesh = new THREE.Mesh(radarRingGeo, radarRingMat);
+      spotRoot.add(radarRingMesh);
 
-        // 3. Outer Pulsating Radar Wave Ring
-        const radarRingGeo = new THREE.RingGeometry(0.38, 0.58, 32);
-        const radarRingMat = new THREE.MeshBasicMaterial({
-          color: 0x75e2e0,
-          side: THREE.DoubleSide,
-          transparent: true,
-          opacity: 0.65,
-          blending: THREE.AdditiveBlending
-        });
-        const radarRingMesh = new THREE.Mesh(radarRingGeo, radarRingMat);
-        spotRoot.add(radarRingMesh);
+      // 4. Hitbox for smooth raycasting click & hover
+      const hitGeo = new THREE.SphereGeometry(1.2, 12, 12);
+      const hitMat = new THREE.MeshBasicMaterial({ visible: false });
+      const hitMesh = new THREE.Mesh(hitGeo, hitMat);
+      hitMesh.userData = { continent, meta };
+      spotRoot.add(hitMesh);
 
-        // 4. Hitbox for smooth raycasting click & hover
-        const hitGeo = new THREE.SphereGeometry(0.85, 12, 12);
-        const hitMat = new THREE.MeshBasicMaterial({ visible: false });
-        const hitMesh = new THREE.Mesh(hitGeo, hitMat);
-        hitMesh.userData = { continent, meta, spot };
-        spotRoot.add(hitMesh);
-
-        this.hotspotsGroup.add(spotRoot);
-        this.hotspotMeshes.push({
-          root: spotRoot,
-          dot: dotMesh,
-          innerRing: innerRingMesh,
-          radarRing: radarRingMesh,
-          hitbox: hitMesh,
-          continent,
-          meta,
-          spot
-        });
+      this.hotspotsGroup.add(spotRoot);
+      this.hotspotMeshes.push({
+        root: spotRoot,
+        dot: dotMesh,
+        innerRing: innerRingMesh,
+        radarRing: radarRingMesh,
+        hitbox: hitMesh,
+        continent,
+        meta
       });
     }
 
@@ -346,9 +343,9 @@ export class InteractiveGlobe {
 
     this.camera.position.set(x, y, z);
 
-    // On Desktop, offset lookAt to the left (-1.4) so Earth curves on the right side
+    // On Desktop, offset lookAt to the left (-1.8) so Earth curves on the right side
     const isDesktop = (this.width || window.innerWidth) >= 1024;
-    const lookOffsetX = isDesktop ? -1.4 : 0;
+    const lookOffsetX = isDesktop ? -1.8 : 0;
     this.camera.lookAt(lookOffsetX, 0, 0);
 
     this.updateCompass();
@@ -364,7 +361,7 @@ export class InteractiveGlobe {
 
   // ── HUD Floating Controls ──
   initHUDControls() {
-    const existing = this.container.querySelector('.ge-supremacy-hud');
+    const existing = document.querySelector('.ge-supremacy-hud');
     if (existing) existing.remove();
 
     const hud = document.createElement('div');
@@ -403,7 +400,7 @@ export class InteractiveGlobe {
       </div>
     `;
 
-    this.container.appendChild(hud);
+    document.body.appendChild(hud);
 
     document.getElementById('btnGeCompass')?.addEventListener('click', () => this.resetNorth());
     document.getElementById('btnGeTilt')?.addEventListener('click', () => this.toggle2D3D());
@@ -427,12 +424,13 @@ export class InteractiveGlobe {
     const modeText = document.getElementById('geModeText');
     if (modeText) modeText.textContent = this.is2DMode ? '2D' : '3D';
 
+    const isMobile = (this.width || window.innerWidth) < 768;
     if (this.is2DMode) {
       this.targetLat = 0;
-      this.targetDistance = 16.0;
+      this.targetDistance = isMobile ? 20.0 : 17.5;
     } else {
       this.targetLat = -14;
-      this.targetDistance = 12.8;
+      this.targetDistance = isMobile ? 18.0 : 15.0;
     }
     this.lastInteractionTime = Date.now();
   }
@@ -450,7 +448,9 @@ export class InteractiveGlobe {
     this.selectedContinent = normalized;
     this.targetLat = meta.lat;
     this.targetLon = meta.lon;
-    this.targetDistance = 11.2;
+    
+    const isMobile = (this.width || window.innerWidth) < 768;
+    this.targetDistance = isMobile ? 16.5 : 13.8;
 
     if (!animate) {
       this.lat = this.targetLat;
@@ -488,7 +488,7 @@ export class InteractiveGlobe {
         const dx = e.clientX - this.lastPointerX;
         const dy = e.clientY - this.lastPointerY;
 
-        const sensitivity = 0.26;
+        const sensitivity = 0.25;
         this.velocityLon = -dx * sensitivity;
         this.velocityLat = dy * sensitivity;
 
@@ -555,8 +555,7 @@ export class InteractiveGlobe {
       }
     }, { passive: true });
 
-    this.resizeObserver = new ResizeObserver(() => this.resize());
-    this.resizeObserver.observe(this.container);
+    window.addEventListener('resize', () => this.resize());
   }
 
   checkRaycastHover() {
@@ -601,15 +600,16 @@ export class InteractiveGlobe {
   }
 
   resize() {
-    const w = this.container.clientWidth || 800;
-    const h = this.container.clientHeight || 700;
+    const w = this.container.clientWidth || window.innerWidth;
+    const h = this.container.clientHeight || window.innerHeight;
     if (w === 0 || h === 0) return;
 
     this.width = w;
     this.height = h;
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
-    this.renderer.setSize(w, h);
+    this.renderer.setSize(w, h, false);
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   }
 
   animate(timestamp) {
@@ -663,7 +663,6 @@ export class InteractiveGlobe {
 
   destroy() {
     if (this.rafId) cancelAnimationFrame(this.rafId);
-    if (this.resizeObserver) this.resizeObserver.disconnect();
     if (this.renderer) {
       this.renderer.dispose();
       this.canvas?.remove();
