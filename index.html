@@ -131,7 +131,7 @@
 
 <!-- ========== HERO: SEAGUARD SPLIT-LEVEL LIVING OCEAN ========== -->
 <section class="hero" id="heroOceanSection">
-  <!-- Deep Ocean Environment & Split Water Surface -->
+  <!-- Deep Ocean Environment & Dynamic Water Surface -->
   <div class="hero-ocean-scene">
     <div class="ocean-sky-zone"></div>
     <div class="ocean-depth-bg"></div>
@@ -139,54 +139,67 @@
     <div class="ocean-caustic"></div>
     <div class="hero-bubbles" id="heroBubbles"></div>
     
-    <!-- Water Split Boundary with Animated Waves -->
+    <!-- Seamless Liquid Surface Waves (No harsh horizontal borders) -->
     <div class="ocean-waterline-wrap">
       <div class="waterline-wave waterline-wave--back"></div>
       <div class="waterline-wave waterline-wave--front"></div>
-      <div class="waterline-refraction-line"></div>
     </div>
 
-    <!-- Swimming Fish Elements Traversing the Split Waterline -->
+    <!-- 3D Swimming Fish (Emerging gracefully from background depth to foreground) -->
     <div class="ocean-creatures" id="oceanCreatures">
-      <div class="ocean-swimmer ocean-swimmer--clownfish">
-        <div class="swimmer-body">
-          <svg viewBox="0 0 120 60" class="fish-svg">
+      <!-- Main Depth Swimmer: Clownfish swimming from dark depths up to the surface near typography -->
+      <div class="ocean-swimmer-depth ocean-swimmer--hero-clownfish">
+        <div class="swimmer-body-3d">
+          <svg viewBox="0 0 160 85" class="fish-svg-detailed">
             <defs>
-              <linearGradient id="cfGrad" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stop-color="#FF5722"/>
-                <stop offset="45%" stop-color="#FF9800"/>
-                <stop offset="100%" stop-color="#E64A19"/>
+              <linearGradient id="cfBodyGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#FF3D00"/>
+                <stop offset="35%" stop-color="#FF6E40"/>
+                <stop offset="65%" stop-color="#FF9100"/>
+                <stop offset="100%" stop-color="#E65100"/>
               </linearGradient>
+              <linearGradient id="cfFinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#FFAB91"/>
+                <stop offset="100%" stop-color="#D84315"/>
+              </linearGradient>
+              <filter id="cfGlow" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="rgba(255, 87, 34, 0.45)"/>
+              </filter>
             </defs>
-            <path d="M95,30 C95,30 75,8 45,10 C25,12 8,25 2,30 C8,35 25,48 45,50 C75,52 95,30 95,30 Z" fill="url(#cfGrad)"/>
-            <path d="M48,10 C55,2 68,4 72,12 Z" fill="#FF7043"/>
-            <path d="M45,50 C52,58 64,56 68,48 Z" fill="#FF7043"/>
-            <path d="M95,30 L115,14 C112,25 112,35 115,46 Z" fill="#FF8A65"/>
-            <path d="M38,11 C42,20 42,40 38,49 C33,48 31,43 32,30 C31,17 33,12 38,11 Z" fill="#FFFFFF" stroke="#212121" stroke-width="1.5"/>
-            <path d="M62,14 C65,22 65,38 62,46 C58,45 57,40 58,30 C57,20 58,15 62,14 Z" fill="#FFFFFF" stroke="#212121" stroke-width="1.5"/>
-            <path d="M90,24 C92,27 92,33 90,36 C87,35 87,33 87,30 C87,27 87,25 90,24 Z" fill="#FFFFFF" stroke="#212121" stroke-width="1.2"/>
-            <circle cx="20" cy="27" r="4" fill="#FFFFFF"/>
-            <circle cx="19" cy="27" r="2.2" fill="#212121"/>
-            <circle cx="18" cy="26" r="0.8" fill="#FFFFFF"/>
+            <!-- Tail and Fins -->
+            <path class="fish-tail-wiggle" d="M125,42 L152,18 C146,32 146,52 152,66 Z" fill="url(#cfFinGrad)" stroke="#212121" stroke-width="1.2"/>
+            <path d="M65,14 C75,2 92,5 98,17 Z" fill="url(#cfFinGrad)" stroke="#212121" stroke-width="1.2"/>
+            <path d="M60,68 C70,80 88,78 94,66 Z" fill="url(#cfFinGrad)" stroke="#212121" stroke-width="1.2"/>
+            <!-- Fish Main Body -->
+            <path d="M125,42 C125,42 102,12 62,14 C32,16 10,34 3,42 C10,50 32,68 62,70 C102,72 125,42 125,42 Z" fill="url(#cfBodyGrad)" filter="url(#cfGlow)"/>
+            <!-- White Stripes with smooth black outlines -->
+            <path d="M52,15 C58,28 58,56 52,69 C45,68 42,60 44,42 C42,24 45,16 52,15 Z" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2"/>
+            <path d="M84,18 C88,30 88,54 84,65 C78,64 76,56 78,42 C76,28 78,20 84,18 Z" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2"/>
+            <path d="M118,33 C121,37 121,47 118,51 C114,50 113,47 114,42 C113,37 114,34 118,33 Z" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
+            <!-- Eye -->
+            <circle cx="28" cy="38" r="5.5" fill="#FFFFFF"/>
+            <circle cx="26.5" cy="38" r="3" fill="#1A1A1A"/>
+            <circle cx="25" cy="36.5" r="1.2" fill="#FFFFFF"/>
           </svg>
         </div>
       </div>
 
-      <div class="ocean-swimmer ocean-swimmer--tang">
-        <div class="swimmer-body">
-          <svg viewBox="0 0 100 50" class="fish-svg">
-            <path d="M80,25 C80,25 65,5 35,7 C18,9 6,20 2,25 C6,30 18,41 35,43 C65,45 80,25 80,25 Z" fill="#2563EB"/>
-            <path d="M35,7 C45,1 55,2 60,9 Z" fill="#FBBF24"/>
-            <path d="M80,25 L96,12 C93,21 93,29 96,38 Z" fill="#FBBF24"/>
-            <circle cx="16" cy="22" r="3" fill="#FFFFFF"/>
-            <circle cx="15" cy="22" r="1.8" fill="#0F172A"/>
+      <!-- Secondary Depth Swimmer: Blue Tang gliding in background depth -->
+      <div class="ocean-swimmer-depth ocean-swimmer--hero-tang">
+        <div class="swimmer-body-3d">
+          <svg viewBox="0 0 140 70" class="fish-svg-detailed">
+            <path d="M110,35 C110,35 88,8 48,10 C24,12 8,28 2,35 C8,42 24,58 48,60 C88,62 110,35 110,35 Z" fill="#1D4ED8"/>
+            <path d="M48,10 C62,2 78,4 84,13 Z" fill="#FBBF24"/>
+            <path d="M110,35 L132,18 C128,30 128,42 132,54 Z" fill="#FBBF24"/>
+            <circle cx="22" cy="31" r="4" fill="#FFFFFF"/>
+            <circle cx="20.5" cy="31" r="2.2" fill="#0F172A"/>
           </svg>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Hero Content with Animated Water-Split Typography -->
+  <!-- Hero Content: Clean, Impactful SeaGuard Typography -->
   <div class="hero-content hero-content--center">
     <div class="hero-tag">
       <span class="hero-tag-pulse"></span>
@@ -194,24 +207,24 @@
       <span data-i18n="heroTag">จำหน่ายปลาสวยงามและความรู้</span>
     </div>
 
-    <!-- SeaGuard Style Split-Level Water Typography -->
-    <div class="ocean-text-split-container">
-      <!-- Above Water Layer (Crisp, Sunlit) -->
-      <h1 class="ocean-title-split ocean-title--above" aria-hidden="true">
-        AWESOME AQUA
-      </h1>
-      <!-- Submerged Water Layer (Deep Teal Glow + Wave Undulation) -->
-      <h1 class="ocean-title-split ocean-title--submerged">
-        AWESOME AQUA
-      </h1>
-      <div class="ocean-title-refraction"></div>
+    <!-- Grand SeaGuard Water Wave Typography -->
+    <div class="ocean-text-wrapper">
+      <div class="ocean-brand-heading">
+        <!-- Top Half: Above Water (Crisp Sunlit) -->
+        <span class="ocean-text-layer ocean-text--upper" aria-hidden="true">AWESOME AQUA</span>
+        <!-- Bottom Half: Submerged (Fluid Deep Ocean Wave Fill) -->
+        <span class="ocean-text-layer ocean-text--lower">AWESOME AQUA</span>
+        <!-- Ambient Liquid Wave Flare -->
+        <div class="ocean-wave-flare"></div>
+      </div>
     </div>
 
-    <h2 class="hero-localized-title" data-i18n="heroTitle">
-      ปลาสวยงาม<br/><span>คัดสรรพิเศษ</span><br/>ส่งตรงถึงบ้าน
+    <!-- Clean Subtitle & Description (No duplication / No clutter) -->
+    <h2 class="hero-tagline" data-i18n="heroTitle">
+      คัดสรรปลาสวยงามเกรดพิเศษ ส่งตรงถึงบ้าน
     </h2>
 
-    <p class="hero-sub-desc" data-i18n="heroDesc">
+    <p class="hero-desc" data-i18n="heroDesc">
       คัดสรรปลาสวยงามคุณภาพดี พร้อมความรู้การดูแลรักษาปลาที่ถูกต้อง
     </p>
 
@@ -226,88 +239,7 @@
       </button>
     </div>
   </div>
-
-  <!-- SeaGuard Style Floating Glass Dashboard Dock -->
-  <div class="ocean-dock-wrap fade-up">
-    <div class="ocean-dock-glass">
-      <!-- Left: Key Metrics -->
-      <div class="ocean-dock-col ocean-dock-col--metrics">
-        <div class="dock-metric-header">
-          <div class="dock-header-tag">
-            <span class="live-dot"></span>
-            <span>LIVE METRICS</span>
-          </div>
-          <span class="dock-metric-sub">คัดสรรสายพันธุ์คุณภาพ พร้อมจัดส่ง</span>
-        </div>
-        <div class="dock-metrics-grid">
-          <div class="dock-stat-item">
-            <span class="dock-stat-num">20+</span>
-            <span class="dock-stat-lbl" data-i18n="statTypesLabel">ชนิดปลาในร้าน</span>
-          </div>
-          <div class="dock-stat-item">
-            <span class="dock-stat-num" data-i18n="statExpNum">3 ปี</span>
-            <span class="dock-stat-lbl" data-i18n="statExpLabel">ประสบการณ์</span>
-          </div>
-          <div class="dock-stat-item">
-            <span class="dock-stat-num">100%</span>
-            <span class="dock-stat-lbl" data-i18n="statQualityLabel">คัดสรรคุณภาพ</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Right: Global Origins & Mini Heatmap Preview -->
-      <div class="ocean-dock-col ocean-dock-col--map" onclick="window.location.href='aqua-world.html'" role="button" tabindex="0" title="คลิกเพื่อสำรวจ Aqua World">
-        <div class="dock-map-header">
-          <div class="dock-header-tag dock-header-tag--ocean">
-            <i class="ph-bold ph-globe-hemisphere-west"></i>
-            <span>GLOBAL HABITATS</span>
-          </div>
-          <a href="aqua-world.html" class="dock-map-link">
-            <span>สำรวจแผนที่</span>
-            <i class="ph-bold ph-arrow-up-right"></i>
-          </a>
-        </div>
-        <div class="dock-map-preview">
-          <!-- Mini SVG World Map with Glowing Beacons -->
-          <svg class="dock-map-svg" viewBox="0 0 400 180">
-            <!-- Simplified subtle vector continents -->
-            <path d="M50,45 C65,30 95,25 110,40 C120,50 115,75 100,85 C85,95 70,80 55,65 Z M100,105 C115,100 135,115 130,140 C125,160 110,165 95,145 C90,130 90,115 100,105 Z M180,35 C210,25 240,30 250,55 C245,75 220,80 195,70 C180,65 175,45 180,35 Z M190,85 C220,85 240,110 235,145 C220,165 200,155 185,135 C175,115 180,95 190,85 Z M260,35 C310,25 355,45 365,75 C355,105 320,110 280,95 C265,85 255,55 260,35 Z M310,120 C340,115 360,135 350,160 C335,170 310,165 300,145 C295,135 300,125 310,120 Z" fill="rgba(117, 226, 224, 0.2)" stroke="rgba(117, 226, 224, 0.35)" stroke-width="1"/>
-            <!-- Pulsing Origin Beacons -->
-            <g class="dock-beacon" transform="translate(112, 128)">
-              <circle r="6" class="dock-beacon-pulse"/>
-              <circle r="3" fill="#75E2E0"/>
-            </g>
-            <g class="dock-beacon" transform="translate(295, 78)">
-              <circle r="6" class="dock-beacon-pulse"/>
-              <circle r="3" fill="#75E2E0"/>
-            </g>
-            <g class="dock-beacon" transform="translate(205, 115)">
-              <circle r="6" class="dock-beacon-pulse"/>
-              <circle r="3" fill="#75E2E0"/>
-            </g>
-            <g class="dock-beacon" transform="translate(330, 142)">
-              <circle r="6" class="dock-beacon-pulse"/>
-              <circle r="3" fill="#75E2E0"/>
-            </g>
-          </svg>
-          <div class="dock-map-info">
-            <span class="dock-map-stat">50+ ถิ่นกำเนิดทั่วโลก</span>
-            <span class="dock-map-sub">South America · Asia · Africa · Oceania</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Bottom Oceanic Transition Wave -->
-  <div class="hero-waves">
-    <svg class="hero-wave-2" viewBox="0 0 2400 200" preserveAspectRatio="none"><path d="M0,110 C 300,40 600,160 900,90 C 1200,20 1500,150 1800,90 C 2100,30 2300,120 2400,90 L2400,200 L0,200 Z" fill="#1C4EA7"/></svg>
-    <svg class="hero-wave-1" viewBox="0 0 2400 200" preserveAspectRatio="none"><path d="M0,90 C 300,150 600,40 900,110 C 1200,170 1500,40 1800,110 C 2100,160 2300,80 2400,110 L2400,200 L0,200 Z" fill="#024D60"/></svg>
-  </div>
 </section>
-
-<!-- ========== ADDED SPACER — เผื่อพื้นที่ให้การ์ดกระจกที่ลอยทับขอบล่าง ไม่ให้ทับเนื้อหา section ถัดไป ========== -->
-<div class="stats-float-spacer"></div>
 
 <!-- ========== BENTO SPOTLIGHT SECTION ========== -->
 <section id="bentoSpotlight" class="bento-section">
