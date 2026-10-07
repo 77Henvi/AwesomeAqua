@@ -10,7 +10,7 @@ import { toggleLanguage, initLanguage } from './shared/i18n.js';
 import { toggleMobile, storeEmpty } from './shared/utils.js';
 import { InteractiveGlobe } from './modules/globe.js';
 import { openFishDetail, closeFishModal, closeFishModalOutside } from './modules/fishModal.js';
-import { initCard3DTilt } from './modules/animations.js';
+import { initCard3DTilt, initCinematicLoader } from './modules/animations.js';
 
 import { setFishData } from './modules/fishData.js';
 
@@ -268,6 +268,7 @@ window.resetGlobeView = function() {
 
 // ── Initialize Aqua World ──
 async function initAquaWorld() {
+  initCinematicLoader();
   initLanguage();
 
   await loadPublicFish();

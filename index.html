@@ -36,14 +36,56 @@
 </head>
 <body>
 
-<div id="global-loader" class="global-loader">
-  <div class="loader-content">
-    <div class="loader-logo-wrapper">
-      <div class="sonar-wave"></div>
-      <div class="sonar-wave delay"></div>
-      <img src="images/logo.png" alt="Awesome Aqua Logo" class="loader-logo-img">
+<div id="global-loader" class="global-loader" aria-label="Loading Awesome Aqua">
+  <div class="loader-backdrop">
+    <div class="loader-aurora"></div>
+    <div class="loader-particles">
+      <span class="l-particle p1"></span>
+      <span class="l-particle p2"></span>
+      <span class="l-particle p3"></span>
+      <span class="l-particle p4"></span>
+      <span class="l-particle p5"></span>
+      <span class="l-particle p6"></span>
+      <span class="l-particle p7"></span>
+      <span class="l-particle p8"></span>
     </div>
-    <div class="loader-text" data-i18n="loaderText">กำลังเตรียมน้ำเข้าตู้...</div>
+  </div>
+
+  <div class="loader-content">
+    <div class="loader-portal">
+      <div class="portal-ring portal-ring--outer"></div>
+      <div class="portal-ring portal-ring--mid"></div>
+      <div class="portal-ring portal-ring--pulse"></div>
+      
+      <div class="portal-sonar sonar-1"></div>
+      <div class="portal-sonar sonar-2"></div>
+      <div class="portal-sonar sonar-3"></div>
+
+      <div class="portal-core">
+        <div class="portal-core-glow"></div>
+        <img src="images/logo.png" alt="Awesome Aqua Logo" class="loader-logo-img">
+      </div>
+    </div>
+
+    <div class="loader-brand-wrap">
+      <h1 class="loader-brand">Awesome <span>Aqua</span></h1>
+      <div class="loader-tagline">
+        <span class="loader-sparkle">✦</span>
+        <span class="loader-status-text" data-i18n="loaderText">กำลังเตรียมระบบนิเวศใต้น้ำ...</span>
+        <span class="loader-sparkle">✦</span>
+      </div>
+    </div>
+
+    <div class="loader-progress-box">
+      <div class="loader-progress-track">
+        <div class="loader-progress-bar" id="loaderProgressBar"></div>
+        <div class="loader-progress-glow"></div>
+      </div>
+      <div class="loader-meta-row">
+        <span class="loader-sub-status">AQUATIC ECOSYSTEM READY</span>
+        <span class="loader-percent" id="loaderPercent">0%</span>
+      </div>
+    </div>
   </div>
 </div>
 

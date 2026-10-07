@@ -8,6 +8,57 @@ const isReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce
 const isDesktopPointer = () => window.matchMedia('(pointer: fine)').matches && window.innerWidth >= 768;
 
 // ══════════════════════════════════════════════════════════════
+// 0. CINEMATIC BIOLUMINESCENT AQUATIC LOADER CONTROLLER
+// ══════════════════════════════════════════════════════════════
+let loaderCurrentPercent = 0;
+let loaderTargetPercent = 88;
+let loaderAnimationId = null;
+let isLoaderHiding = false;
+
+export function initCinematicLoader() {
+  const loader = document.getElementById('global-loader');
+  if (!loader) return;
+
+  const bar = document.getElementById('loaderProgressBar');
+  const percentText = document.getElementById('loaderPercent');
+
+  function updateLoaderProgress() {
+    if (!loader || loader.classList.contains('hidden')) return;
+
+    // Smooth physics lerp
+    const ease = isLoaderHiding ? 0.22 : 0.06;
+    loaderCurrentPercent += (loaderTargetPercent - loaderCurrentPercent) * ease;
+
+    if (bar) bar.style.width = `${loaderCurrentPercent.toFixed(1)}%`;
+    if (percentText) percentText.textContent = `${Math.min(100, Math.round(loaderCurrentPercent))}%`;
+
+    if (isLoaderHiding && loaderCurrentPercent >= 99.2) {
+      if (bar) bar.style.width = '100%';
+      if (percentText) percentText.textContent = '100%';
+      setTimeout(() => {
+        loader.classList.add('hidden');
+      }, 160);
+      return;
+    }
+
+    loaderAnimationId = requestAnimationFrame(updateLoaderProgress);
+  }
+
+  loaderAnimationId = requestAnimationFrame(updateLoaderProgress);
+
+  // Global smooth hideLoader hook
+  window.hideLoader = function() {
+    isLoaderHiding = true;
+    loaderTargetPercent = 100;
+  };
+
+  // Safe timeout fallback
+  setTimeout(() => {
+    if (window.hideLoader) window.hideLoader();
+  }, 3500);
+}
+
+// ══════════════════════════════════════════════════════════════
 // 1. 3D MAGNETIC TILT & SPECULAR LIGHT GLARE PHYSICS
 // ══════════════════════════════════════════════════════════════
 const activeTiltCards = new WeakSet();
@@ -397,6 +448,7 @@ export function initKineticScrollReveal() {
 // MASTER INITIALIZER
 // ══════════════════════════════════════════════════════════════
 export function initAntigravityAnimations() {
+  initCinematicLoader();
   initCard3DTilt();
   initInteractiveBubbles();
   initCountUpObserver();
