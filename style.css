@@ -145,74 +145,185 @@
   .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
   
   
-  /* ── HERO ── */
+  /* ── HERO: SEAGUARD SPLIT-LEVEL LIVING OCEAN ── */
   .hero {
     min-height: 100vh;
-    display: flex; align-items: center; justify-content: center;
-    padding: 100px 5% 140px; /* เผื่อพื้นที่ล่างให้การ์ดกระจกที่ลอยทับ ไม่บังปุ่ม CTA */
-    position: relative; overflow: hidden;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 100px 5% 150px;
+    position: relative;
+    overflow: hidden;
   }
-  .hero-slideshow { position: absolute; inset: 0; z-index: 0; }
-  .slide {
-    position: absolute; inset: 0;
-    background-size: cover; background-position: center;
-    opacity: 0; transition: opacity 1.2s ease-in-out;
-    animation: zoomSlow 8s ease-in-out infinite alternate;
+
+  /* Deep Ocean Split Environment */
+  .hero-ocean-scene {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
   }
-  .slide.active { opacity: 1; }
-  @keyframes zoomSlow {
-    from { transform: scale(1); }
-    to   { transform: scale(1.06); }
+  .ocean-sky-zone {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 40%;
+    background: linear-gradient(180deg, #02131e 0%, #032535 55%, #054157 100%);
   }
-  .hero-overlay {
-    position: absolute; inset: 0;
-    /* ไล่เฉดจากบน-ล่างแทนซ้าย-ขวาเดิม ให้เข้ากับ layout จัดกลางแบบใหม่ (มืดขึ้นตรงกลาง-ล่างเพื่อให้ตัวหนังสือชัด) */
-    background: linear-gradient(
-      180deg,
-      rgba(2,30,40,0.55) 0%,
-      rgba(2,30,40,0.45) 35%,
-      rgba(2,30,40,0.72) 75%,
-      rgba(2,30,40,0.88) 100%
+  .ocean-depth-bg {
+    position: absolute;
+    top: 40%;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(180deg, #022e42 0%, #021f2d 45%, #01121c 100%);
+  }
+  .ocean-sunshafts {
+    position: absolute;
+    top: 35%;
+    bottom: 0;
+    left: -20%;
+    right: -20%;
+    background: repeating-linear-gradient(
+      105deg,
+      rgba(117, 226, 224, 0.05) 0px,
+      rgba(117, 226, 224, 0.05) 35px,
+      transparent 35px,
+      transparent 90px
     );
+    filter: blur(8px);
+    animation: sunbeamsShift 12s ease-in-out infinite alternate;
+    pointer-events: none;
   }
-  /* แสงกระเพื่อมใต้น้ำ — ไล่เฉดเบาๆ เคลื่อนไหวช้าๆ ให้ hero มีชีวิตชีวาโดยไม่บดบังรูปปลา */
-  .hero-caustic {
-    position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  @keyframes sunbeamsShift {
+    0% { transform: translateX(0) scaleY(1); opacity: 0.7; }
+    100% { transform: translateX(30px) scaleY(1.08); opacity: 1; }
+  }
+  .ocean-caustic {
+    position: absolute;
+    inset: 0;
     background:
-      radial-gradient(ellipse at 25% 20%, rgba(117,226,224,0.10), transparent 55%),
-      radial-gradient(ellipse at 78% 65%, rgba(44,172,173,0.12), transparent 50%);
-    animation: causticShift 12s ease-in-out infinite alternate;
+      radial-gradient(ellipse at 30% 40%, rgba(117, 226, 224, 0.16), transparent 60%),
+      radial-gradient(ellipse at 72% 65%, rgba(44, 172, 173, 0.14), transparent 55%);
+    animation: causticPulse 9s ease-in-out infinite alternate;
+    pointer-events: none;
   }
-  @keyframes causticShift {
-    from { opacity: 0.6; transform: scale(1) translateY(0); }
-    to   { opacity: 1;   transform: scale(1.08) translateY(-10px); }
+  @keyframes causticPulse {
+    0% { opacity: 0.6; transform: scale(1); }
+    100% { opacity: 1; transform: scale(1.06); }
   }
-  /* คลื่นน้ำที่ขอบล่างของ Hero — ไล่สีต่อเนื่องเข้ากับพื้นเว็บถัดไป */
-  .hero-waves {
-    position: absolute; left: 0; right: 0; bottom: -2px; height: 190px;
-    z-index: 2; pointer-events: none; overflow: hidden;
+
+  /* Waterline Split Boundary */
+  .ocean-waterline-wrap {
+    position: absolute;
+    top: 40%;
+    left: 0;
+    right: 0;
+    height: 40px;
+    transform: translateY(-50%);
+    z-index: 2;
+    pointer-events: none;
+    overflow: hidden;
   }
-  .hero-waves svg { position: absolute; bottom: 0; width: 200%; height: 100%; }
-  .hero-wave-1 { animation: waveMove 16s linear infinite; opacity: 0.5; }
-  .hero-wave-2 { animation: waveMove 10s linear infinite reverse; opacity: 0.35; }
-  @keyframes waveMove {
+  .waterline-wave {
+    position: absolute;
+    width: 200%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 40' preserveAspectRatio='none'%3E%3Cpath d='M0,20 C150,6 350,34 600,20 C850,6 1050,34 1200,20 L1200,40 L0,40 Z' fill='rgba(117,226,224,0.35)'/%3E%3C/svg%3E") repeat-x;
+    background-size: 600px 40px;
+    animation: waveFlow 14s linear infinite;
+  }
+  .waterline-wave--back {
+    opacity: 0.5;
+    animation: waveFlow 22s linear infinite reverse;
+    filter: blur(1.5px);
+  }
+  .waterline-refraction-line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.8) 25%, rgba(117,226,224,0.95) 50%, rgba(255,255,255,0.8) 75%, transparent 100%);
+    box-shadow: 0 0 14px rgba(117, 226, 224, 0.9), 0 0 28px rgba(44, 172, 173, 0.5);
+  }
+  @keyframes waveFlow {
     from { transform: translateX(0); }
     to   { transform: translateX(-50%); }
   }
-  /* ไล่สีให้ขอบล่างสุดของ hero กลืนเข้ากับพื้นขาวของ section ถัดไปแบบนุ่มนวล
-     (เดิมคลื่นตัดเป็นเส้นแข็งพอดีขอบ section ดูสะดุดตา) — วางทับบนคลื่นอีกที (z-index สูงกว่า)
-     stop แรกขยับมาที่ 55% แทน 0% เพื่อให้ยอดคลื่นด้านบนยังเห็นชัด ไม่โดน fade กินตั้งแต่ยอด
-     เอาไว้จางแค่ช่วงโคนคลื่นจริงๆ ที่ติดกับขอบ section ถัดไป */
-  .hero::after {
-    content: '';
-    position: absolute; left: 0; right: 0; bottom: 0; height: 70px;
-    z-index: 3; pointer-events: none;
-    background: linear-gradient(to bottom, transparent 0%, transparent 55%, var(--white) 100%);
+
+  /* Swimming Ocean Creatures */
+  .ocean-creatures {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  /* ฟองอากาศลอยขึ้น — แสงชีวภาพใต้น้ำ (Bioluminescent Glass Refraction & Interactive Sparkles) */
-  .hero-bubbles { position: absolute; inset: 0; z-index: 2; pointer-events: auto; overflow: hidden; }
+  .ocean-swimmer {
+    position: absolute;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.45));
+  }
+  .ocean-swimmer--clownfish {
+    width: 64px;
+    height: 32px;
+    top: 37%;
+    left: -80px;
+    animation: swimCrossScreen 24s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+  .ocean-swimmer--tang {
+    width: 54px;
+    height: 28px;
+    top: 48%;
+    right: -80px;
+    animation: swimCrossScreenReverse 32s cubic-bezier(0.4, 0, 0.2, 1) infinite 6s;
+  }
+  .swimmer-body {
+    width: 100%;
+    height: 100%;
+    animation: fishWiggle 1.4s ease-in-out infinite alternate;
+  }
+  .fish-svg {
+    width: 100%;
+    height: 100%;
+  }
+  @keyframes swimCrossScreen {
+    0%   { transform: translate3d(0, 0, 0) scaleX(1); left: -80px; }
+    48%  { transform: translate3d(calc(100vw + 120px), -15px, 0) scaleX(1); left: -80px; }
+    50%  { transform: translate3d(calc(100vw + 120px), -15px, 0) scaleX(-1); left: -80px; }
+    98%  { transform: translate3d(0, 10px, 0) scaleX(-1); left: -80px; }
+    100% { transform: translate3d(0, 0, 0) scaleX(1); left: -80px; }
+  }
+  @keyframes swimCrossScreenReverse {
+    0%   { transform: translate3d(0, 0, 0) scaleX(-1); right: -80px; }
+    48%  { transform: translate3d(calc(-100vw - 120px), 18px, 0) scaleX(-1); right: -80px; }
+    50%  { transform: translate3d(calc(-100vw - 120px), 18px, 0) scaleX(1); right: -80px; }
+    98%  { transform: translate3d(0, -10px, 0) scaleX(1); right: -80px; }
+    100% { transform: translate3d(0, 0, 0) scaleX(-1); right: -80px; }
+  }
+  @keyframes fishWiggle {
+    0% { transform: rotate(-2.5deg) scaleY(0.96); }
+    100% { transform: rotate(2.5deg) scaleY(1.04); }
+  }
+
+  /* Bioluminescent Hero Bubbles */
+  .hero-bubbles {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: auto;
+    overflow: hidden;
+  }
   .hero-bubble {
-    position: absolute; bottom: -40px; border-radius: 50%;
+    position: absolute;
+    bottom: -40px;
+    border-radius: 50%;
     background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.75) 0%, rgba(117,226,224,0.35) 35%, rgba(44,172,173,0.18) 70%, rgba(117,226,224,0.45) 100%);
     box-shadow: 0 0 14px rgba(117, 226, 224, 0.4), inset 0 0 6px rgba(255, 255, 255, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.4);
@@ -220,6 +331,7 @@
     -webkit-backdrop-filter: blur(1.5px);
     pointer-events: auto;
     cursor: pointer;
+    animation: heroBubbleRise linear infinite;
     transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     will-change: transform, opacity;
   }
@@ -237,7 +349,9 @@
   }
   .bubble-sparkle {
     position: absolute;
-    width: 4px; height: 4px; border-radius: 50%;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
     background: #ffffff;
     box-shadow: 0 0 8px #75E2E0, 0 0 14px #2CACAD;
     pointer-events: none;
@@ -250,30 +364,43 @@
   }
   @keyframes heroBubbleRise {
     0%   { transform: translateY(0) translateX(0); opacity: 0; }
-    8%   { opacity: 0.75; }
-    90%  { opacity: 0.75; }
+    8%   { opacity: 0.8; }
+    90%  { opacity: 0.8; }
     100% { transform: translateY(-105vh) translateX(24px); opacity: 0; }
   }
-  
-  .hero-content { max-width: 580px; z-index: 3; position: relative; }
-  /* จัดกลางแบบ mockup (SeaGuard) — headline ใหญ่ ทุกอย่างกึ่งกลางแนวนอน */
+
+  /* Hero Content Layout */
+  .hero-content {
+    max-width: 860px;
+    z-index: 3;
+    position: relative;
+  }
   .hero-content--center {
-    max-width: 720px;
     text-align: center;
-    display: flex; flex-direction: column; align-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
   .hero-tag {
-    display: inline-flex; align-items: center; gap: 0.5rem;
-    background: rgba(44,172,173,0.18);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(44, 172, 173, 0.18);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    color: var(--ocean-sky); border: 1px solid rgba(117,226,224,0.38);
-    padding: 0.4rem 1.15rem; border-radius: 100px;
-    font-size: 0.82rem; font-weight: 500;
-    margin-bottom: 1.5rem; letter-spacing: 0.5px;
+    color: var(--ocean-sky);
+    border: 1px solid rgba(117, 226, 224, 0.38);
+    padding: 0.4rem 1.15rem;
+    border-radius: 100px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    margin-bottom: 1.25rem;
+    letter-spacing: 0.5px;
   }
   .hero-tag-pulse {
-    width: 7px; height: 7px; border-radius: 50%;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
     background: var(--ocean-sky);
     box-shadow: 0 0 10px var(--ocean-sky);
     animation: tagPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
@@ -282,58 +409,104 @@
     0%, 100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.35; transform: scale(1.3); }
   }
-  .hero h1 {
+
+  /* ── SeaGuard Split-Level Wave Masked Typography ── */
+  .ocean-text-split-container {
+    position: relative;
+    margin: 0 auto 0.6rem;
+    user-select: none;
+  }
+  .ocean-title-split {
     font-family: var(--font-display);
-    font-size: clamp(2.6rem, 5.5vw, 3.8rem);
-    line-height: 1.12; color: #fff;
-    margin-bottom: 1.25rem; font-weight: 700;
-    text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+    font-size: clamp(3rem, 7.5vw, 5.8rem);
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    line-height: 1;
+    text-transform: uppercase;
+    margin: 0;
   }
-  /* headline ใหญ่ขึ้นแบบ mockup เฉพาะ layout จัดกลาง */
-  .hero-content--center h1 {
-    font-size: clamp(3.2rem, 7vw, 5.6rem);
-    letter-spacing: -0.01em;
+  .ocean-title--above {
+    color: #ffffff;
+    clip-path: polygon(0% 0%, 100% 0%, 100% 50%, 0% 50%);
+    text-shadow: 0 4px 25px rgba(0, 0, 0, 0.5), 0 0 40px rgba(165, 243, 252, 0.4);
   }
-  .hero h1 span {
+  .ocean-title--submerged {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, #75E2E0 0%, #2CACAD 45%, #0284c7 95%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    clip-path: polygon(0% 48%, 100% 48%, 100% 100%, 0% 100%);
+    filter: drop-shadow(0 0 24px rgba(44, 172, 173, 0.8));
+    animation: waveSubmergeRipple 4s ease-in-out infinite alternate;
+  }
+  @keyframes waveSubmergeRipple {
+    0% { transform: translateY(0) scaleY(1); }
+    100% { transform: translateY(1.5px) scaleY(0.98); }
+  }
+  .ocean-title-refraction {
+    position: absolute;
+    top: 50%;
+    left: 5%;
+    right: 5%;
+    height: 1.5px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 30%, rgba(117,226,224,1) 50%, rgba(255,255,255,0.9) 70%, transparent 100%);
+    box-shadow: 0 0 12px rgba(117, 226, 224, 0.95);
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  .hero-localized-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3.2vw, 2.4rem);
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.3;
+    margin-bottom: 0.6rem;
+    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.4);
+  }
+  .hero-localized-title span {
     background: linear-gradient(135deg, #ffffff 10%, var(--ocean-sky) 60%, var(--ocean-teal) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
-  .hero p {
-    color: rgba(255,255,255,0.85);
-    font-size: 1.05rem; line-height: 1.7;
-    margin-bottom: 2rem;
+  .hero-sub-desc {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 1rem;
+    line-height: 1.6;
+    max-width: 520px;
+    margin: 0 auto 1.75rem;
   }
-  .hero-content--center p { max-width: 480px; }
-  .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; }
-  .hero-content--center .hero-btns { justify-content: center; }
-  
-  /* ปุ่ม primary เฉพาะใน hero ให้ใช้โทน ocean-teal พร้อมแสง Shimmer */
+  .hero-btns {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
   .hero .btn-primary {
-    background: var(--ocean-teal); color: #04222b;
-    box-shadow: 0 8px 24px rgba(44,172,173,0.35);
-    padding: 0.85rem 2.2rem; border-radius: var(--radius-pill);
-    font-weight: 600; position: relative; overflow: hidden;
+    background: var(--ocean-teal);
+    color: #04222b;
+    box-shadow: 0 8px 24px rgba(44, 172, 173, 0.35);
+    padding: 0.85rem 2.2rem;
+    border-radius: var(--radius-pill);
+    font-weight: 600;
+    position: relative;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
     transition: all 0.3s ease;
   }
   .hero .btn-primary:hover {
     background: var(--ocean-sky);
     transform: translateY(-2px);
-    box-shadow: 0 12px 30px rgba(117,226,224,0.45);
+    box-shadow: 0 12px 30px rgba(117, 226, 224, 0.5);
   }
-  .hero .hero-cta-btn::after {
-    content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-    background: linear-gradient(60deg, transparent 35%, rgba(255,255,255,0.45) 50%, transparent 65%);
-    transform: rotate(30deg) translateX(-100%);
-    transition: transform 0.65s ease;
-  }
-  .hero .hero-cta-btn:hover::after {
-    transform: rotate(30deg) translateX(100%);
-  }
-
-  /* ปุ่ม secondary สไตล์กระจกหรูหรา */
   .btn-glass-secondary {
-    display: inline-flex; align-items: center; gap: 0.55rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
     background: rgba(255, 255, 255, 0.12);
     color: #ffffff;
     border: 1px solid rgba(255, 255, 255, 0.3);
@@ -350,59 +523,231 @@
     background: rgba(255, 255, 255, 0.22);
     border-color: rgba(255, 255, 255, 0.5);
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
   }
-  
-  /* dots ย้ายมาเป็น absolute มุมล่างซ้ายของ hero (แยกจาก hero-content ที่ตอนนี้จัดกลางแล้ว) */
-  .slide-dots {
-    position: absolute; left: 5%; bottom: 28px; z-index: 3;
-    display: flex; gap: 0.5rem;
-  }
-  .dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: rgba(255,255,255,0.35);
-    cursor: pointer; transition: all 0.3s; border: none;
-  }
-  .dot.active { background: #fff; width: 24px; border-radius: 4px; }
-  
-  
-  /* ── STATS: การ์ดกระจก (glass) ลอยทับขอบล่างของ Hero แบบ SeaGuard ref ── */
-  .stats-float {
-    position: absolute; left: 0; right: 0; bottom: 0;
-    transform: translateY(50%);
+
+  /* ── SeaGuard Style Ocean Glass Dashboard Dock ── */
+  .ocean-dock-wrap {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transform: translateY(48%);
     z-index: 4;
-    display: flex; justify-content: center;
+    display: flex;
+    justify-content: center;
     padding: 0 5%;
   }
-  .stats-glass {
-    background: rgba(255,255,255,0.12);
-    border: 1px solid rgba(255,255,255,0.25);
-    backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-    border-radius: 20px;
-    box-shadow: 0 20px 50px rgba(2,48,70,0.35), inset 0 1px 1px rgba(255,255,255,0.35);
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    text-align: center;
-    padding: 1.6rem 2.2rem;
-    max-width: 740px; width: 100%;
+  .ocean-dock-glass {
+    background: linear-gradient(135deg, rgba(3, 24, 34, 0.82) 0%, rgba(2, 16, 23, 0.92) 100%);
+    border: 1px solid rgba(117, 226, 224, 0.32);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    border-radius: 24px;
+    box-shadow: 0 24px 60px rgba(1, 15, 22, 0.6), 0 0 24px rgba(117, 226, 224, 0.15), inset 0 1px 2px rgba(255, 255, 255, 0.25);
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 1.25rem;
+    max-width: 980px;
+    width: 100%;
+    padding: 1.4rem 1.8rem;
     color: white;
   }
-  .stat {
-    padding: 0.5rem 1rem;
-    border-right: 1px solid rgba(255,255,255,0.18);
+  .ocean-dock-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
-  .stat:last-child { border-right: none; }
-  .stat-num {
-    font-family: var(--font-body); 
-    font-size: 1.85rem; font-weight: 700; display: block;
+  .ocean-dock-col--metrics {
+    border-right: 1px solid rgba(117, 226, 224, 0.16);
+    padding-right: 1.25rem;
+  }
+  .dock-metric-header,
+  .dock-map-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.85rem;
+  }
+  .dock-header-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
     color: var(--ocean-sky);
-    text-shadow: 0 0 16px rgba(117,226,224,0.4);
   }
-  .stat-label { font-size: 0.8rem; opacity: 0.85; margin-top: 0.25rem; letter-spacing: 0.2px; }
-  
-  /* พื้นที่เว้นให้การ์ดกระจกที่ล้ำออกมาครึ่งหนึ่ง ไม่ให้ไปทับเนื้อหา section ถัดไป */
-  .stats-float-spacer { height: 70px; }
-  @media (max-width: 768px) {
-    .stats-float-spacer { height: 130px; } /* การ์ดสต็อกซ้อนกัน 3 แถวบนมือถือ เลยสูงกว่า ต้องเผื่อเยอะกว่า */
+  .dock-header-tag--ocean {
+    color: #75E2E0;
+    font-size: 0.75rem;
+  }
+  .dock-metric-sub {
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.55);
+  }
+  .dock-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    text-align: center;
+  }
+  .dock-stat-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(117, 226, 224, 0.18);
+    border-radius: 14px;
+    padding: 0.75rem 0.5rem;
+    transition: all 0.25s ease;
+  }
+  .dock-stat-item:hover {
+    background: rgba(117, 226, 224, 0.12);
+    border-color: rgba(117, 226, 224, 0.45);
+    transform: translateY(-2px);
+  }
+  .dock-stat-num {
+    font-family: var(--font-body);
+    font-size: 1.55rem;
+    font-weight: 700;
+    display: block;
+    color: var(--ocean-sky);
+    text-shadow: 0 0 14px rgba(117, 226, 224, 0.4);
+  }
+  .dock-stat-lbl {
+    font-size: 0.72rem;
+    opacity: 0.82;
+    margin-top: 0.2rem;
+    display: block;
+  }
+
+  /* Right Dock: World Heatmap Preview */
+  .ocean-dock-col--map {
+    cursor: pointer;
+    padding-left: 0.25rem;
+    transition: transform 0.25s ease;
+  }
+  .ocean-dock-col--map:hover .dock-map-link {
+    color: #ffffff;
+    border-color: rgba(117, 226, 224, 0.8);
+    background: rgba(44, 172, 173, 0.35);
+  }
+  .dock-map-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--ocean-sky);
+    background: rgba(44, 172, 173, 0.18);
+    border: 1px solid rgba(117, 226, 224, 0.35);
+    padding: 0.25rem 0.65rem;
+    border-radius: var(--radius-pill);
+    text-decoration: none;
+    transition: all 0.25s ease;
+  }
+  .dock-map-preview {
+    position: relative;
+    background: rgba(1, 14, 20, 0.6);
+    border: 1px solid rgba(117, 226, 224, 0.2);
+    border-radius: 14px;
+    padding: 0.5rem 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    overflow: hidden;
+  }
+  .dock-map-svg {
+    width: 130px;
+    height: 60px;
+    flex-shrink: 0;
+  }
+  .dock-beacon-pulse {
+    fill: none;
+    stroke: #75E2E0;
+    stroke-width: 1.5;
+    animation: beaconWave 2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+    transform-origin: center;
+  }
+  .dock-map-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  .dock-map-stat {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #ffffff;
+  }
+  .dock-map-sub {
+    font-size: 0.68rem;
+    color: rgba(255, 255, 255, 0.6);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Spacer for bottom floating dock */
+  .stats-float-spacer {
+    height: 80px;
+  }
+  @media (max-width: 860px) {
+    .ocean-dock-glass {
+      grid-template-columns: 1fr;
+      padding: 1.2rem;
+    }
+    .ocean-dock-col--metrics {
+      border-right: none;
+      border-bottom: 1px solid rgba(117, 226, 224, 0.16);
+      padding-right: 0;
+      padding-bottom: 1rem;
+    }
+    .ocean-dock-col--map {
+      padding-left: 0;
+      padding-top: 0.5rem;
+    }
+    .stats-float-spacer {
+      height: 180px;
+    }
+  }
+
+  /* Bottom Oceanic Transition Wave */
+  .hero-waves {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -2px;
+    height: 160px;
+    z-index: 2;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .hero-waves svg {
+    position: absolute;
+    bottom: 0;
+    width: 200%;
+    height: 100%;
+  }
+  .hero-wave-1 {
+    animation: waveMove 16s linear infinite;
+    opacity: 0.5;
+  }
+  .hero-wave-2 {
+    animation: waveMove 10s linear infinite reverse;
+    opacity: 0.35;
+  }
+  @keyframes waveMove {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 70px;
+    z-index: 3;
+    pointer-events: none;
+    background: linear-gradient(to bottom, transparent 0%, transparent 55%, var(--white) 100%);
   }
   
   

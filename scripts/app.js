@@ -3,7 +3,6 @@ import { openFishDetail, closeFishModal,
          closeFishModalOutside,
          openComingSoonDetail, closeCsModal,
          closeCsModalOutside }                     from './modules/fishModal.js';
-import { goSlide }                                 from './modules/slideshow.js';
 import { injectFishBackgrounds }                   from './modules/fishBackground.js';
 import { setFishSort, filterFish }                 from './modules/render.js';
 import { openMessenger, toggleMobile,
@@ -13,6 +12,7 @@ import { previewEditImage }                        from './shared/image.js';
 import { toggleLanguage, initLanguage }            from './shared/i18n.js';
 import { initAntigravityAnimations }               from './modules/animations.js';
 import { initMiniVirtualGlobe }                    from './modules/miniGlobe.js';
+import { initOceanHero }                           from './modules/oceanHero.js';
 
 window.setFishSort = setFishSort;
 window.filterFish = filterFish;
@@ -24,7 +24,7 @@ window.openMessenger          = openMessenger;
 window.toggleTag             = toggleTag;
 window.toggleMobile          = toggleMobile;
 window.scrollToSection       = scrollToSection;
-window.goSlide               = goSlide;
+window.goSlide               = () => {}; // Safe stub for backward compatibility
 window.previewEditImage      = previewEditImage;
 window.openComingSoonDetail = openComingSoonDetail;
 window.closeCsModal         = closeCsModal;
@@ -56,4 +56,5 @@ initLanguage();
 injectFishBackgrounds();
 initAntigravityAnimations();
 initMiniVirtualGlobe();
+initOceanHero();
 loadFishFromDB();
