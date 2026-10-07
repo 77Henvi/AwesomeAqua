@@ -12,6 +12,7 @@ import { toggleTag }                               from './shared/tags.js';
 import { previewEditImage }                        from './shared/image.js';
 import { toggleLanguage, initLanguage }            from './shared/i18n.js';
 import { initAntigravityAnimations }               from './modules/animations.js';
+import { initMiniVirtualGlobe }                    from './modules/miniGlobe.js';
 
 window.setFishSort = setFishSort;
 window.filterFish = filterFish;
@@ -54,4 +55,5 @@ window.toggleLanguage = toggleLanguage;
 initLanguage();
 injectFishBackgrounds();
 initAntigravityAnimations();
+initMiniVirtualGlobe();
 loadFishFromDB();

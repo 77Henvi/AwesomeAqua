@@ -288,86 +288,16 @@
         </a>
       </div>
     </div>
-    <div class="aqua-discovery-visual" aria-hidden="true">
-      <div class="mini-globe-visual">
-        <div class="mini-globe-ring"></div>
-        <div class="mini-globe-ring mini-globe-ring--inner"></div>
-        <svg class="mini-globe-svg" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <radialGradient id="globeOceanGrad" cx="35%" cy="35%" r="65%">
-              <stop offset="0%" stop-color="#0f4554"/>
-              <stop offset="50%" stop-color="#072833"/>
-              <stop offset="100%" stop-color="#021319"/>
-            </radialGradient>
-            <radialGradient id="globeAtmosphere" cx="50%" cy="50%" r="50%">
-              <stop offset="82%" stop-color="rgba(117,226,224,0)"/>
-              <stop offset="100%" stop-color="rgba(117,226,224,0.38)"/>
-            </radialGradient>
-            <filter id="globeGlow" x="-30%" y="-30%" width="160%" height="160%">
-              <feGaussianBlur stdDeviation="2.5" result="blur"/>
-              <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-            </filter>
-            <clipPath id="globeClip">
-              <circle cx="120" cy="120" r="90" />
-            </clipPath>
-          </defs>
-
-          <!-- Globe Base Sphere -->
-          <circle cx="120" cy="120" r="90" fill="url(#globeOceanGrad)" stroke="rgba(117, 226, 224, 0.45)" stroke-width="1.5"/>
-
-          <!-- Continents & Graticules inside Globe Clip -->
-          <g clip-path="url(#globeClip)">
-            <!-- Latitude / Longitude Graticules -->
-            <path d="M30 120 H210 M34 85 Q120 100 206 85 M34 155 Q120 140 206 155" stroke="rgba(117, 226, 224, 0.16)" stroke-width="1" stroke-dasharray="3 3"/>
-            <path d="M120 30 V210 M85 34 Q100 120 85 206 M155 34 Q140 120 155 206" stroke="rgba(117, 226, 224, 0.16)" stroke-width="1" stroke-dasharray="3 3"/>
-
-            <!-- 2D World Continents (Clear vector shapes) -->
-            <!-- North America -->
-            <path class="globe-land" d="M48 68 Q55 52 75 50 Q88 48 95 58 Q90 68 82 72 Q86 85 74 95 Q62 90 55 80 Z" fill="rgba(44, 172, 173, 0.35)" stroke="rgba(117, 226, 224, 0.65)" stroke-width="1"/>
-            <!-- South America (Amazon Basin) -->
-            <path class="globe-land" d="M72 104 Q84 102 90 115 Q92 135 84 158 Q75 168 68 155 Q62 135 66 118 Z" fill="rgba(44, 172, 173, 0.35)" stroke="rgba(117, 226, 224, 0.65)" stroke-width="1"/>
-            <!-- Eurasia (Europe & Asia) -->
-            <path class="globe-land" d="M112 56 Q125 45 150 48 Q175 52 188 65 Q195 82 178 96 Q162 92 148 100 Q138 88 122 84 Q114 74 112 56 Z" fill="rgba(44, 172, 173, 0.35)" stroke="rgba(117, 226, 224, 0.65)" stroke-width="1"/>
-            <!-- Africa -->
-            <path class="globe-land" d="M116 92 Q136 88 144 102 Q148 122 138 145 Q126 156 120 142 Q110 125 112 108 Z" fill="rgba(44, 172, 173, 0.35)" stroke="rgba(117, 226, 224, 0.65)" stroke-width="1"/>
-            <!-- Australia & Oceania -->
-            <path class="globe-land" d="M168 135 Q184 132 190 144 Q186 160 172 162 Q162 152 168 135 Z" fill="rgba(44, 172, 173, 0.35)" stroke="rgba(117, 226, 224, 0.65)" stroke-width="1"/>
-            <!-- Islands (SE Asia & Japan) -->
-            <path class="globe-land" d="M182 98 Q186 96 185 104 Q181 106 182 98 Z M160 114 Q166 112 165 118 Q158 122 160 114 Z" fill="rgba(44, 172, 173, 0.4)" stroke="rgba(117, 226, 224, 0.7)" stroke-width="0.8"/>
-
-            <!-- Atmospheric Rim Glow -->
-            <circle cx="120" cy="120" r="90" fill="url(#globeAtmosphere)"/>
-          </g>
-
-          <!-- Pulsing Radar Target Beacons on Key Continental River Basins -->
-          <!-- South America / Amazon River -->
-          <g class="mini-beacon" transform="translate(78, 125)">
-            <circle r="10" class="beacon-pulse" stroke="#75E2E0" stroke-width="1.2" fill="none"/>
-            <circle r="3.5" fill="#ffffff" filter="url(#globeGlow)"/>
-          </g>
-          <!-- Africa / Rift Valley Lakes -->
-          <g class="mini-beacon" transform="translate(132, 122)">
-            <circle r="10" class="beacon-pulse beacon-pulse--delay1" stroke="#75E2E0" stroke-width="1.2" fill="none"/>
-            <circle r="3.5" fill="#ffffff" filter="url(#globeGlow)"/>
-          </g>
-          <!-- Asia / Southeast Asia -->
-          <g class="mini-beacon" transform="translate(162, 102)">
-            <circle r="10" class="beacon-pulse beacon-pulse--delay2" stroke="#75E2E0" stroke-width="1.2" fill="none"/>
-            <circle r="3.5" fill="#ffffff" filter="url(#globeGlow)"/>
-          </g>
-          <!-- Oceania / Australia -->
-          <g class="mini-beacon" transform="translate(178, 148)">
-            <circle r="9" class="beacon-pulse beacon-pulse--delay3" stroke="#75E2E0" stroke-width="1.2" fill="none"/>
-            <circle r="3" fill="#ffffff" filter="url(#globeGlow)"/>
-          </g>
-
-          <!-- Cardinal / Coordinate Ticks -->
-          <circle cx="120" cy="120" r="90" stroke="rgba(117, 226, 224, 0.5)" stroke-width="1.5" fill="none"/>
-          <line x1="120" y1="24" x2="120" y2="30" stroke="#75E2E0" stroke-width="2"/>
-          <line x1="120" y1="210" x2="120" y2="216" stroke="#75E2E0" stroke-width="2"/>
-          <line x1="24" y1="120" x2="30" y2="120" stroke="#75E2E0" stroke-width="2"/>
-          <line x1="210" y1="120" x2="216" y2="120" stroke="#75E2E0" stroke-width="2"/>
-        </svg>
+    <div class="aqua-discovery-visual" id="miniGlobeVisual">
+      <div class="mini-globe-3d-wrap" id="miniGlobeContainer" onclick="window.location.href='aqua-world.html'" title="คลิกเพื่อสำรวจ Aqua World เต็มจอ" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){window.location.href='aqua-world.html'}">
+        <div class="mini-globe-canvas-host" id="miniGlobeCanvasHost"></div>
+        <div class="mini-globe-halo"></div>
+        <div class="mini-globe-hud-ring"></div>
+        <div class="mini-globe-hud-ring mini-globe-hud-ring--outer"></div>
+        <div class="mini-globe-badge">
+          <i class="ph-fill ph-globe-hemisphere-west"></i>
+          <span>3D VIRTUAL EARTH · ลากเพื่อหมุน</span>
+        </div>
       </div>
     </div>
   </div>

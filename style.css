@@ -2648,7 +2648,7 @@ nav.scrolled .nav-link-aqua-world.active {
   box-shadow: 0 12px 32px rgba(117, 226, 224, 0.55);
 }
 
-/* Mini Globe Visual in Discovery Card */
+/* Mini Virtual Globe 3D in Discovery Card */
 .aqua-discovery-visual {
   position: relative;
   z-index: 1;
@@ -2656,26 +2656,59 @@ nav.scrolled .nav-link-aqua-world.active {
   justify-content: center;
   align-items: center;
 }
-.mini-globe-visual {
+.mini-globe-3d-wrap {
   position: relative;
-  width: 230px;
-  height: 230px;
+  width: 260px;
+  height: 260px;
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.mini-globe-ring {
+.mini-globe-3d-wrap:active {
+  cursor: grabbing;
+}
+.mini-globe-3d-wrap:hover {
+  transform: scale(1.03);
+}
+.mini-globe-canvas-host {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 2;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.mini-globe-canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+.mini-globe-halo {
+  position: absolute;
+  inset: -16px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(117, 226, 224, 0.28) 0%, rgba(44, 172, 173, 0.08) 50%, transparent 72%);
+  filter: blur(10px);
+  pointer-events: none;
+  z-index: 1;
+}
+.mini-globe-hud-ring {
   position: absolute;
   inset: -12px;
-  border: 1px dashed rgba(117, 226, 224, 0.35);
   border-radius: 50%;
+  border: 1px dashed rgba(117, 226, 224, 0.38);
   animation: ringRotate 28s linear infinite;
   pointer-events: none;
+  z-index: 1;
 }
-.mini-globe-ring--inner {
-  inset: -4px;
+.mini-globe-hud-ring--outer {
+  inset: -22px;
   border: 1px dotted rgba(117, 226, 224, 0.22);
-  animation: ringRotateReverse 18s linear infinite;
+  animation: ringRotateReverse 20s linear infinite;
 }
 @keyframes ringRotate {
   from { transform: rotate(0deg); }
@@ -2685,33 +2718,33 @@ nav.scrolled .nav-link-aqua-world.active {
   from { transform: rotate(360deg); }
   to   { transform: rotate(0deg); }
 }
-.mini-globe-svg {
-  width: 100%;
-  height: 100%;
-  filter: drop-shadow(0 0 25px rgba(44, 172, 173, 0.35));
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+.mini-globe-badge {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(3, 18, 25, 0.88);
+  border: 1px solid rgba(117, 226, 224, 0.45);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: #75E2E0;
+  white-space: nowrap;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55), 0 0 12px rgba(117, 226, 224, 0.25);
+  pointer-events: none;
+  transition: all 0.3s ease;
 }
-.aqua-discovery-card:hover .mini-globe-svg {
-  transform: scale(1.05);
-}
-.globe-land {
-  transition: fill 0.3s ease, stroke 0.3s ease;
-}
-.aqua-discovery-card:hover .globe-land {
-  fill: rgba(44, 172, 173, 0.48);
-  stroke: rgba(117, 226, 224, 0.9);
-}
-.beacon-pulse {
-  transform-origin: center;
-  animation: beaconWave 2.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
-}
-.beacon-pulse--delay1 { animation-delay: 0.55s; }
-.beacon-pulse--delay2 { animation-delay: 1.1s; }
-.beacon-pulse--delay3 { animation-delay: 1.65s; }
-
-@keyframes beaconWave {
-  0% { transform: scale(0.3); opacity: 1; }
-  100% { transform: scale(2.3); opacity: 0; }
+.mini-globe-3d-wrap:hover .mini-globe-badge {
+  border-color: rgba(117, 226, 224, 0.8);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.65), 0 0 18px rgba(117, 226, 224, 0.45);
 }
 
 /* ── 4. FISH MODAL ORIGIN STRIP ── */
