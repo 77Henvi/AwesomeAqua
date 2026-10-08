@@ -106,7 +106,7 @@ export class OceanHeroEngine {
     let targetScaleX = 1;
     let rafId = null;
 
-    const creatureStage = document.getElementById('heroCreatureStage');
+    const creatureStage = document.getElementById('cinematicCreatureStage') || document.getElementById('heroCreatureStage');
     let stageCurX = 0, stageCurY = 0, stageTargetX = 0, stageTargetY = 0;
 
     const onMouseMove = (e) => {
