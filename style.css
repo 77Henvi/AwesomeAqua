@@ -273,10 +273,10 @@
   .cinematic-creature-stage {
     position: absolute;
     top: 50%;
-    right: 4%;
+    right: 2%;
     transform: translateY(-50%);
-    width: clamp(380px, 46vw, 700px);
-    height: clamp(340px, 42vw, 560px);
+    width: clamp(520px, 58vw, 980px);
+    height: clamp(440px, 52vw, 820px);
     pointer-events: none;
     z-index: 1;
     display: flex;
@@ -286,10 +286,10 @@
   }
   .cinematic-creature-glow {
     position: absolute;
-    inset: 10%;
+    inset: 4%;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(117, 226, 224, 0.28) 0%, rgba(44, 172, 173, 0.12) 50%, transparent 70%);
-    filter: blur(55px);
+    background: radial-gradient(circle, rgba(117, 226, 224, 0.35) 0%, rgba(44, 172, 173, 0.16) 50%, transparent 70%);
+    filter: blur(65px);
   }
   .cinematic-creature-wrap {
     position: relative;
@@ -302,27 +302,29 @@
   }
   @keyframes logoGracefulFloat {
     0%   { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); }
-    50%  { transform: translate3d(-10px, -14px, 0) rotate(-1.5deg) scale(1.02); }
-    100% { transform: translate3d(8px, 12px, 0) rotate(1deg) scale(0.99); }
+    50%  { transform: translate3d(-12px, -16px, 0) rotate(-1.5deg) scale(1.03); }
+    100% { transform: translate3d(10px, 14px, 0) rotate(1deg) scale(0.98); }
   }
   .cinematic-logo-img,
   .cinematic-creature-img {
-    max-width: 82%;
-    max-height: 82%;
+    width: 100%;
+    height: 100%;
+    max-width: 96%;
+    max-height: 96%;
     object-fit: contain;
-    filter: drop-shadow(0 0 25px rgba(117, 226, 224, 0.6)) drop-shadow(0 0 60px rgba(44, 172, 173, 0.35));
-    opacity: 0.92;
+    filter: drop-shadow(0 0 30px rgba(117, 226, 224, 0.65)) drop-shadow(0 0 75px rgba(44, 172, 173, 0.4));
+    opacity: 0.94;
     transition: filter 0.4s ease, transform 0.4s ease;
     animation: logoPulseGlow 6s ease-in-out infinite alternate;
   }
   @keyframes logoPulseGlow {
     0% {
-      filter: drop-shadow(0 0 20px rgba(117, 226, 224, 0.45)) drop-shadow(0 0 50px rgba(44, 172, 173, 0.25));
-      opacity: 0.88;
+      filter: drop-shadow(0 0 24px rgba(117, 226, 224, 0.5)) drop-shadow(0 0 60px rgba(44, 172, 173, 0.3));
+      opacity: 0.9;
     }
     100% {
-      filter: drop-shadow(0 0 35px rgba(117, 226, 224, 0.8)) drop-shadow(0 0 80px rgba(117, 226, 224, 0.45));
-      opacity: 0.98;
+      filter: drop-shadow(0 0 42px rgba(117, 226, 224, 0.85)) drop-shadow(0 0 95px rgba(117, 226, 224, 0.5));
+      opacity: 1;
     }
   }
 
