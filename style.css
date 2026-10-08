@@ -251,54 +251,32 @@
     to   { transform: translateX(-50%); }
   }
 
-  /* 3D Depth Swimming Ocean Creatures */
+  /* Interactive Cursor Swimmer: Follows mouse on Desktop, hidden on Mobile */
   .ocean-creatures {
     position: absolute;
     inset: 0;
     z-index: 2;
     pointer-events: none;
-    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  .ocean-swimmer-depth {
+  .ocean-swimmer-cursor {
     position: absolute;
+    top: 0;
+    left: 0;
+    width: 110px;
+    height: 58px;
     pointer-events: none;
-    will-change: transform, opacity, filter;
+    z-index: 4;
+    will-change: transform;
+    margin-left: -55px;
+    margin-top: -29px;
+    filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.55));
   }
-  .ocean-swimmer--hero-clownfish {
-    top: 32%;
-    left: 50%;
-    width: 130px;
-    height: 70px;
-    margin-left: -65px;
-    animation: swimDepth3D 15s cubic-bezier(0.42, 0, 0.58, 1) infinite;
-  }
-  @keyframes swimDepth3D {
-    0% {
-      transform: translate3d(-340px, 110px, 0) scale(0.32) rotate(14deg);
-      filter: blur(5px) brightness(0.4);
-      opacity: 0.2;
-    }
-    28% {
-      transform: translate3d(-130px, 25px, 0) scale(0.72) rotate(6deg);
-      filter: blur(1.5px) brightness(0.85);
-      opacity: 0.9;
-    }
-    50% {
-      transform: translate3d(20px, -20px, 0) scale(1.18) rotate(-4deg);
-      filter: blur(0px) brightness(1.25) drop-shadow(0 14px 28px rgba(0,0,0,0.55));
-      opacity: 1;
-    }
-    72% {
-      transform: translate3d(180px, 35px, 0) scale(0.75) rotate(-12deg);
-      filter: blur(1.8px) brightness(0.8);
-      opacity: 0.85;
-    }
-    100% {
-      transform: translate3d(360px, 130px, 0) scale(0.3) rotate(-18deg);
-      filter: blur(6px) brightness(0.35);
-      opacity: 0.15;
+  @media (max-width: 768px) {
+    .ocean-creatures {
+      display: none !important;
     }
   }
+
   .swimmer-body-3d {
     width: 100%;
     height: 100%;
@@ -320,32 +298,6 @@
   .fish-svg-detailed {
     width: 100%;
     height: 100%;
-  }
-
-  .ocean-swimmer--hero-tang {
-    top: 48%;
-    left: 50%;
-    width: 95px;
-    height: 50px;
-    margin-left: -48px;
-    animation: swimDepthTang 22s cubic-bezier(0.4, 0, 0.6, 1) infinite 4s;
-  }
-  @keyframes swimDepthTang {
-    0% {
-      transform: translate3d(320px, 80px, 0) scaleX(-1) scale(0.28) rotate(-10deg);
-      filter: blur(5px) brightness(0.35);
-      opacity: 0.15;
-    }
-    48% {
-      transform: translate3d(-30px, -10px, 0) scaleX(-1) scale(0.92) rotate(4deg);
-      filter: blur(0.5px) brightness(1.15) drop-shadow(0 10px 20px rgba(0,0,0,0.45));
-      opacity: 0.95;
-    }
-    100% {
-      transform: translate3d(-360px, 90px, 0) scaleX(-1) scale(0.3) rotate(14deg);
-      filter: blur(5px) brightness(0.4);
-      opacity: 0.15;
-    }
   }
 
   /* Bioluminescent Hero Bubbles */
@@ -407,7 +359,7 @@
 
   /* Hero Content Layout */
   .hero-content {
-    max-width: 920px;
+    max-width: 960px;
     z-index: 3;
     position: relative;
   }
@@ -417,39 +369,11 @@
     flex-direction: column;
     align-items: center;
   }
-  .hero-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: rgba(44, 172, 173, 0.18);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    color: var(--ocean-sky);
-    border: 1px solid rgba(117, 226, 224, 0.38);
-    padding: 0.45rem 1.25rem;
-    border-radius: 100px;
-    font-size: 0.82rem;
-    font-weight: 600;
-    margin-bottom: 1.5rem;
-    letter-spacing: 0.5px;
-  }
-  .hero-tag-pulse {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--ocean-sky);
-    box-shadow: 0 0 10px var(--ocean-sky);
-    animation: tagPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-  @keyframes tagPulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.35; transform: scale(1.3); }
-  }
 
-  /* ── SeaGuard Clean Animated Water Typography ── */
+  /* ── SeaGuard-Inspired Geometric Bold Water Typography ── */
   .ocean-text-wrapper {
     position: relative;
-    margin: 0.5rem auto 1.2rem;
+    margin: 0 auto 1.25rem;
     user-select: none;
     display: flex;
     justify-content: center;
@@ -460,10 +384,10 @@
     display: inline-block;
   }
   .ocean-text-layer {
-    font-family: var(--font-display);
-    font-size: clamp(3.2rem, 8.5vw, 6.4rem);
+    font-family: 'Plus Jakarta Sans', 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: clamp(3.4rem, 8.5vw, 6.8rem);
     font-weight: 900;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.05em;
     line-height: 1;
     text-transform: uppercase;
     display: block;
@@ -471,17 +395,17 @@
   }
   .ocean-text--upper {
     color: #ffffff;
-    text-shadow: 0 6px 30px rgba(0, 0, 0, 0.6), 0 0 50px rgba(117, 226, 224, 0.4);
-    clip-path: polygon(0% 0%, 100% 0%, 100% 50%, 0% 50%);
+    text-shadow: 0 4px 28px rgba(0, 0, 0, 0.5), 0 0 35px rgba(255, 255, 255, 0.3);
+    clip-path: polygon(0% 0%, 100% 0%, 100% 48%, 0% 48%);
   }
   .ocean-text--lower {
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, #75E2E0 0%, #2CACAD 50%, #0284c7 100%);
+    background: linear-gradient(180deg, #38bdf8 0%, #0284c7 45%, #034870 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    clip-path: polygon(0% 49%, 100% 49%, 100% 100%, 0% 100%);
-    filter: drop-shadow(0 0 28px rgba(44, 172, 173, 0.8));
+    clip-path: polygon(0% 47%, 100% 47%, 100% 100%, 0% 100%);
+    filter: drop-shadow(0 0 20px rgba(56, 189, 248, 0.45));
     animation: fluidWaveRipple 5s ease-in-out infinite alternate;
   }
   @keyframes fluidWaveRipple {
@@ -490,28 +414,28 @@
   }
   .ocean-wave-flare {
     position: absolute;
-    top: 50%;
-    left: 10%;
-    right: 10%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.7) 35%, rgba(117,226,224,0.9) 50%, rgba(255,255,255,0.7) 65%, transparent 100%);
-    box-shadow: 0 0 16px rgba(117, 226, 224, 0.7);
+    top: 48%;
+    left: 8%;
+    right: 8%;
+    height: 1.5px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.7) 25%, rgba(117,226,224,0.95) 50%, rgba(255,255,255,0.7) 75%, transparent 100%);
+    box-shadow: 0 0 14px rgba(117, 226, 224, 0.85);
     transform: translateY(-50%);
     pointer-events: none;
   }
 
   .hero-tagline {
-    font-family: var(--font-display);
-    font-size: clamp(1.35rem, 2.8vw, 2rem);
-    font-weight: 700;
+    font-family: 'Noto Sans Thai', 'Plus Jakarta Sans', sans-serif;
+    font-size: clamp(1.2rem, 2.5vw, 1.75rem);
+    font-weight: 600;
     color: #ffffff;
     line-height: 1.35;
     margin-bottom: 0.75rem;
     text-shadow: 0 2px 18px rgba(0, 0, 0, 0.5);
   }
   .hero-desc {
-    color: rgba(255, 255, 255, 0.85);
-    font-size: 1.02rem;
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 1rem;
     line-height: 1.65;
     max-width: 520px;
     margin: 0 auto 2rem;

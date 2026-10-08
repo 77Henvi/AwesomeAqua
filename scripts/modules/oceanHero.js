@@ -1,20 +1,20 @@
 /**
  * scripts/modules/oceanHero.js
- * SeaGuard-inspired Split-Level Deep Ocean Hero Engine
- * Awesome Aqua — Animated Text Overlay & Living Ocean Environment
+ * SeaGuard-inspired Living Ocean Hero Engine
+ * Awesome Aqua — Interactive Mouse-Following Swimmer & Ocean Environment
  */
 
 export class OceanHeroEngine {
   constructor() {
     this.section = document.getElementById('heroOceanSection');
     this.bubbleWrap = document.getElementById('heroBubbles');
-    this.creaturesWrap = document.getElementById('oceanCreatures');
+    this.swimmer = document.getElementById('oceanSwimmerCursor');
     this.isVisible = true;
 
     if (!this.section) return;
 
     this.initBubbles();
-    this.initMouseParallax();
+    this.initCursorSwimmer();
     this.initObserver();
   }
 
@@ -23,12 +23,12 @@ export class OceanHeroEngine {
     this.bubbleWrap.innerHTML = '';
 
     const isMobile = window.innerWidth < 768;
-    const bubbleCount = isMobile ? 12 : 22;
+    const bubbleCount = isMobile ? 10 : 20;
     const frag = document.createDocumentFragment();
 
     for (let i = 0; i < bubbleCount; i++) {
       const b = document.createElement('div');
-      const size = 5 + Math.random() * 12;
+      const size = 5 + Math.random() * 11;
       b.className = 'hero-bubble';
       b.style.width = `${size}px`;
       b.style.height = `${size}px`;
@@ -36,7 +36,7 @@ export class OceanHeroEngine {
       b.style.animationDuration = `${7 + Math.random() * 9}s`;
       b.style.animationDelay = `${Math.random() * 7}s`;
 
-      // Interactive popping
+      // Interactive bubble popping
       b.addEventListener('pointerdown', (e) => {
         e.stopPropagation();
         this.popBubble(b, e.clientX, e.clientY);
@@ -52,7 +52,6 @@ export class OceanHeroEngine {
     if (bubble.classList.contains('popping')) return;
     bubble.classList.add('popping');
 
-    // Spawn 6 luminous sparkles
     for (let j = 0; j < 6; j++) {
       const sp = document.createElement('div');
       sp.className = 'bubble-sparkle';
@@ -72,7 +71,6 @@ export class OceanHeroEngine {
 
     setTimeout(() => {
       bubble.remove();
-      // Respawn a new bubble
       this.spawnSingleBubble();
     }, 180);
   }
@@ -80,7 +78,7 @@ export class OceanHeroEngine {
   spawnSingleBubble() {
     if (!this.bubbleWrap) return;
     const b = document.createElement('div');
-    const size = 5 + Math.random() * 12;
+    const size = 5 + Math.random() * 11;
     b.className = 'hero-bubble';
     b.style.width = `${size}px`;
     b.style.height = `${size}px`;
@@ -96,38 +94,68 @@ export class OceanHeroEngine {
     this.bubbleWrap.appendChild(b);
   }
 
-  initMouseParallax() {
-    if (window.innerWidth < 1024) return;
+  initCursorSwimmer() {
+    if (!this.swimmer || window.innerWidth < 768) return;
 
-    let targetX = 0;
-    let targetY = 0;
-    let curX = 0;
-    let curY = 0;
+    let targetX = window.innerWidth * 0.52;
+    let targetY = window.innerHeight * 0.36;
+    let curX = targetX;
+    let curY = targetY;
+    let curRot = 0;
+    let scaleX = 1;
+    let targetScaleX = 1;
     let rafId = null;
 
     const onMouseMove = (e) => {
       if (!this.isVisible) return;
-      const nx = (e.clientX / window.innerWidth - 0.5) * 2;
-      const ny = (e.clientY / window.innerHeight - 0.5) * 2;
-      targetX = nx * 14;
-      targetY = ny * 10;
+      const rect = this.section.getBoundingClientRect();
+      if (e.clientY >= rect.top && e.clientY <= rect.bottom) {
+        targetX = e.clientX;
+        targetY = e.clientY - rect.top;
+      }
     };
 
     window.addEventListener('mousemove', onMouseMove, { passive: true });
 
-    const updateParallax = () => {
-      if (this.isVisible && !document.hidden) {
-        curX += (targetX - curX) * 0.06;
-        curY += (targetY - curY) * 0.06;
+    const updateSwimmer = (time) => {
+      if (this.isVisible && !document.hidden && window.innerWidth >= 768) {
+        const dx = targetX - curX;
+        const dy = targetY - curY;
+        const dist = Math.hypot(dx, dy);
 
-        if (this.creaturesWrap) {
-          this.creaturesWrap.style.transform = `translate3d(${curX * 0.7}px, ${curY * 0.5}px, 0)`;
+        // Smooth follow easing
+        const ease = Math.min(0.065, Math.max(0.025, dist * 0.00015));
+        curX += dx * ease;
+        curY += dy * ease;
+
+        // Determine orientation facing direction
+        if (dx > 4) {
+          targetScaleX = 1;
+        } else if (dx < -4) {
+          targetScaleX = -1;
         }
+
+        // Smooth scale flip
+        scaleX += (targetScaleX - scaleX) * 0.12;
+
+        // Banking tilt when swimming up/down
+        const targetRot = Math.max(-24, Math.min(24, dy * 0.25)) * (targetScaleX > 0 ? 1 : -1);
+        curRot += (targetRot - curRot) * 0.08;
+
+        // Ambient hovering wave offset when near cursor
+        const hoverFloatY = Math.sin(time * 0.003) * 5;
+        const hoverFloatX = Math.cos(time * 0.002) * 3;
+
+        // Depth scale (slight zoom when swimming fast)
+        const depthScale = 0.95 + Math.min(0.25, dist * 0.0008);
+
+        this.swimmer.style.transform = `translate3d(${curX + hoverFloatX}px, ${curY + hoverFloatY}px, 0) scale(${depthScale}) scaleX(${scaleX}) rotate(${curRot}deg)`;
       }
-      rafId = requestAnimationFrame(updateParallax);
+
+      rafId = requestAnimationFrame(updateSwimmer);
     };
 
-    rafId = requestAnimationFrame(updateParallax);
+    rafId = requestAnimationFrame(updateSwimmer);
   }
 
   initObserver() {
@@ -147,8 +175,6 @@ export function initOceanHero() {
   return new OceanHeroEngine();
 }
 
-// Backward compatibility alias for bubble injector
 export function injectHeroBubbles() {
-  const engine = new OceanHeroEngine();
-  return engine;
+  return new OceanHeroEngine();
 }

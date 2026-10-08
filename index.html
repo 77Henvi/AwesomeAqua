@@ -28,8 +28,8 @@
   <link rel="preconnect" href="https://vfihczafjrkcyncnosgj.supabase.co" crossorigin>
   <link rel="dns-prefetch" href="https://unpkg.com">
 
-  <!-- เพิ่ม Playfair Display ที่ขาดหายไป พร้อม font-display: swap -->
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@300;400;500;600;700&family=Playfair+Display:wght@700&family=Noto+Serif+Thai:wght@600;700&family=Noto+Sans+Thai:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <!-- Google Fonts: Plus Jakarta Sans (Modern Geometric Hero), Jost, Cormorant, Thai fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800;900&family=Outfit:wght@600;700;800;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@300;400;500;600;700&family=Playfair+Display:wght@700&family=Noto+Serif+Thai:wght@600;700&family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css?v=6">
   <link rel="stylesheet" href="ads.css">
   <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
@@ -145,10 +145,9 @@
       <div class="waterline-wave waterline-wave--front"></div>
     </div>
 
-    <!-- 3D Swimming Fish (Emerging gracefully from background depth to foreground) -->
+    <!-- Interactive Cursor Swimmer: Clownfish follows mouse on Desktop, hidden on Mobile -->
     <div class="ocean-creatures" id="oceanCreatures">
-      <!-- Main Depth Swimmer: Clownfish swimming from dark depths up to the surface near typography -->
-      <div class="ocean-swimmer-depth ocean-swimmer--hero-clownfish">
+      <div class="ocean-swimmer-cursor" id="oceanSwimmerCursor">
         <div class="swimmer-body-3d">
           <svg viewBox="0 0 160 85" class="fish-svg-detailed">
             <defs>
@@ -183,30 +182,11 @@
           </svg>
         </div>
       </div>
-
-      <!-- Secondary Depth Swimmer: Blue Tang gliding in background depth -->
-      <div class="ocean-swimmer-depth ocean-swimmer--hero-tang">
-        <div class="swimmer-body-3d">
-          <svg viewBox="0 0 140 70" class="fish-svg-detailed">
-            <path d="M110,35 C110,35 88,8 48,10 C24,12 8,28 2,35 C8,42 24,58 48,60 C88,62 110,35 110,35 Z" fill="#1D4ED8"/>
-            <path d="M48,10 C62,2 78,4 84,13 Z" fill="#FBBF24"/>
-            <path d="M110,35 L132,18 C128,30 128,42 132,54 Z" fill="#FBBF24"/>
-            <circle cx="22" cy="31" r="4" fill="#FFFFFF"/>
-            <circle cx="20.5" cy="31" r="2.2" fill="#0F172A"/>
-          </svg>
-        </div>
-      </div>
     </div>
   </div>
 
   <!-- Hero Content: Clean, Impactful SeaGuard Typography -->
   <div class="hero-content hero-content--center">
-    <div class="hero-tag">
-      <span class="hero-tag-pulse"></span>
-      <i class="ph ph-fish"></i>
-      <span data-i18n="heroTag">จำหน่ายปลาสวยงามและความรู้</span>
-    </div>
-
     <!-- Grand SeaGuard Water Wave Typography -->
     <div class="ocean-text-wrapper">
       <div class="ocean-brand-heading">
