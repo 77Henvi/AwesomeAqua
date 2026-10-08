@@ -106,12 +106,21 @@ export class OceanHeroEngine {
     let targetScaleX = 1;
     let rafId = null;
 
+    const creatureStage = document.getElementById('heroCreatureStage');
+    let stageCurX = 0, stageCurY = 0, stageTargetX = 0, stageTargetY = 0;
+
     const onMouseMove = (e) => {
       if (!this.isVisible) return;
       const rect = this.section.getBoundingClientRect();
       if (e.clientY >= rect.top && e.clientY <= rect.bottom) {
         targetX = e.clientX;
         targetY = e.clientY - rect.top;
+
+        // Subtle stage tilt
+        const normX = (e.clientX / window.innerWidth) - 0.5;
+        const normY = ((e.clientY - rect.top) / rect.height) - 0.5;
+        stageTargetX = normX * -18;
+        stageTargetY = normY * -14;
       }
     };
 
@@ -150,6 +159,13 @@ export class OceanHeroEngine {
         const depthScale = 0.95 + Math.min(0.25, dist * 0.0008);
 
         this.swimmer.style.transform = `translate3d(${curX + hoverFloatX}px, ${curY + hoverFloatY}px, 0) scale(${depthScale}) scaleX(${scaleX}) rotate(${curRot}deg)`;
+
+        // Parallax update on creature stage
+        if (creatureStage) {
+          stageCurX += (stageTargetX - stageCurX) * 0.05;
+          stageCurY += (stageTargetY - stageCurY) * 0.05;
+          creatureStage.style.transform = `translate3d(${stageCurX}px, calc(-50% + ${stageCurY}px), 0)`;
+        }
       }
 
       rafId = requestAnimationFrame(updateSwimmer);

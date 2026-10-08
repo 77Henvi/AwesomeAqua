@@ -129,94 +129,79 @@
 </div>
 
 
-<!-- ========== HERO: SEAGUARD SPLIT-LEVEL LIVING OCEAN ========== -->
-<section class="hero" id="heroOceanSection">
-  <!-- Deep Ocean Environment & Dynamic Water Surface -->
-  <div class="hero-ocean-scene">
-    <div class="ocean-sky-zone"></div>
-    <div class="ocean-depth-bg"></div>
-    <div class="ocean-sunshafts"></div>
-    <div class="ocean-caustic"></div>
+<!-- ========== HERO: CINEMATIC OCEAN ARCHIVE ========== -->
+<section class="hero-cinematic" id="heroOceanSection">
+  <!-- Deep Cinematic Ocean Environment Background -->
+  <div class="cinematic-ocean-bg">
+    <div class="cinematic-sunrays"></div>
+    <div class="cinematic-deep-gradient"></div>
     <div class="hero-bubbles" id="heroBubbles"></div>
-    
-    <!-- Seamless Liquid Surface Waves (No harsh horizontal borders) -->
-    <div class="ocean-waterline-wrap">
-      <div class="waterline-wave waterline-wave--back"></div>
-      <div class="waterline-wave waterline-wave--front"></div>
-    </div>
+    <div class="cinematic-caustic-layer"></div>
+    <div class="cinematic-water-vignette"></div>
+  </div>
 
-    <!-- Interactive Cursor Swimmer: Clownfish follows mouse on Desktop, hidden on Mobile -->
-    <div class="ocean-creatures" id="oceanCreatures">
-      <div class="ocean-swimmer-cursor" id="oceanSwimmerCursor">
-        <div class="swimmer-body-3d">
-          <svg viewBox="0 0 160 85" class="fish-svg-detailed">
-            <defs>
-              <linearGradient id="cfBodyGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#FF3D00"/>
-                <stop offset="35%" stop-color="#FF6E40"/>
-                <stop offset="65%" stop-color="#FF9100"/>
-                <stop offset="100%" stop-color="#E65100"/>
-              </linearGradient>
-              <linearGradient id="cfFinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#FFAB91"/>
-                <stop offset="100%" stop-color="#D84315"/>
-              </linearGradient>
-              <filter id="cfGlow" x="-20%" y="-20%" width="140%" height="140%">
-                <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="rgba(255, 87, 34, 0.45)"/>
-              </filter>
-            </defs>
-            <!-- Tail and Fins -->
-            <path class="fish-tail-wiggle" d="M125,42 L152,18 C146,32 146,52 152,66 Z" fill="url(#cfFinGrad)" stroke="#212121" stroke-width="1.2"/>
-            <path d="M65,14 C75,2 92,5 98,17 Z" fill="url(#cfFinGrad)" stroke="#212121" stroke-width="1.2"/>
-            <path d="M60,68 C70,80 88,78 94,66 Z" fill="url(#cfFinGrad)" stroke="#212121" stroke-width="1.2"/>
-            <!-- Fish Main Body -->
-            <path d="M125,42 C125,42 102,12 62,14 C32,16 10,34 3,42 C10,50 32,68 62,70 C102,72 125,42 125,42 Z" fill="url(#cfBodyGrad)" filter="url(#cfGlow)"/>
-            <!-- White Stripes with smooth black outlines -->
-            <path d="M52,15 C58,28 58,56 52,69 C45,68 42,60 44,42 C42,24 45,16 52,15 Z" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2"/>
-            <path d="M84,18 C88,30 88,54 84,65 C78,64 76,56 78,42 C76,28 78,20 84,18 Z" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2"/>
-            <path d="M118,33 C121,37 121,47 118,51 C114,50 113,47 114,42 C113,37 114,34 118,33 Z" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
-            <!-- Eye -->
-            <circle cx="28" cy="38" r="5.5" fill="#FFFFFF"/>
-            <circle cx="26.5" cy="38" r="3" fill="#1A1A1A"/>
-            <circle cx="25" cy="36.5" r="1.2" fill="#FFFFFF"/>
-          </svg>
-        </div>
-      </div>
+  <!-- Giant Majestic Aquatic Masterpiece Visual (Right Side Floating) -->
+  <div class="cinematic-creature-stage" id="cinematicCreatureStage">
+    <div class="cinematic-creature-glow"></div>
+    <div class="cinematic-creature-wrap" id="cinematicCreatureWrap">
+      <img src="images/fish7.jpg" alt="Awesome Aqua Majestic Masterpiece" class="cinematic-creature-img" id="heroCreatureImg">
+      <div class="cinematic-creature-mask"></div>
     </div>
   </div>
 
-  <!-- Hero Content: Clean, Impactful SeaGuard Typography -->
-  <div class="hero-content hero-content--center">
-    <!-- Grand SeaGuard Water Wave Typography -->
-    <div class="ocean-text-wrapper">
-      <div class="ocean-brand-heading">
-        <!-- Top Half: Above Water (Crisp Sunlit) -->
-        <span class="ocean-text-layer ocean-text--upper" aria-hidden="true">AWESOME AQUA</span>
-        <!-- Bottom Half: Submerged (Fluid Deep Ocean Wave Fill) -->
-        <span class="ocean-text-layer ocean-text--lower">AWESOME AQUA</span>
-        <!-- Ambient Liquid Wave Flare -->
-        <div class="ocean-wave-flare"></div>
+  <!-- Main Hero Content Container (Asymmetric Split Layout) -->
+  <div class="cinematic-hero-container">
+    <!-- Left Column: Editorial Typography & Storytelling -->
+    <div class="cinematic-hero-left fade-up">
+      <div class="cinematic-tag-row">
+        <span class="cinematic-tag-dot"></span>
+        <span class="cinematic-tag-text" data-i18n="heroTag">FEATURED COLLECTION</span>
+      </div>
+
+      <h1 class="cinematic-hero-title">
+        <span class="title-primary">Awesome</span>
+        <span class="title-accent">Aqua</span>
+      </h1>
+
+      <p class="cinematic-hero-desc" data-i18n="heroDesc">
+        คัดสรรปลาสวยงามคุณภาพดี พร้อมความรู้การดูแลรักษาปลาที่ถูกต้อง เพื่อการจัดตู้ปลาที่สมบูรณ์แบบ
+      </p>
+
+      <div class="cinematic-hero-actions">
+        <button class="cinematic-btn-explore" onclick="scrollToSection('#fish')">
+          <div class="btn-play-circle">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+          </div>
+          <div class="btn-explore-labels">
+            <span class="btn-main-lbl" data-i18n="heroCta">ดูปลาทั้งหมด</span>
+            <span class="btn-sub-lbl">Explore Collection</span>
+          </div>
+        </button>
+
+        <button class="btn-glass-secondary cinematic-btn-chat" onclick="openMessenger()">
+          <i class="ph ph-chat-circle-dots"></i>
+          <span>สอบถามในแชท</span>
+        </button>
       </div>
     </div>
 
-    <!-- Clean Subtitle & Description (No duplication / No clutter) -->
-    <h2 class="hero-tagline" data-i18n="heroTitle">
-      คัดสรรปลาสวยงามเกรดพิเศษ ส่งตรงถึงบ้าน
-    </h2>
+    <!-- Right Column: Minimalist Editorial Stats (Matching Ocean Archive) -->
+    <div class="cinematic-hero-right fade-up">
+      <div class="cinematic-stat-item">
+        <span class="stat-category-lbl" data-i18n="bentoCollectorLabel">CURATED SPECIES</span>
+        <div class="stat-number-val">20+</div>
+        <span class="stat-detail-lbl" data-i18n="statTypesLabel">ชนิดปลาในร้าน</span>
+        <div class="stat-accent-bar"></div>
+      </div>
 
-    <p class="hero-desc" data-i18n="heroDesc">
-      คัดสรรปลาสวยงามคุณภาพดี พร้อมความรู้การดูแลรักษาปลาที่ถูกต้อง
-    </p>
-
-    <div class="hero-btns">
-      <button class="btn btn-primary hero-cta-btn" onclick="scrollToSection('#fish')">
-        <i class="ph-bold ph-compass"></i>
-        <span data-i18n="heroCta">ดูปลาทั้งหมด</span>
-      </button>
-      <button class="btn btn-glass-secondary" onclick="openMessenger()">
-        <i class="ph ph-chat-circle-dots"></i>
-        <span>สอบถามในแชท</span>
-      </button>
+      <div class="cinematic-stat-item cinematic-stat-item--link" onclick="window.location.href='aqua-world.html'" role="button" tabindex="0" title="สำรวจ Aqua World">
+        <span class="stat-category-lbl">GLOBAL HABITATS</span>
+        <div class="stat-number-val">50+</div>
+        <span class="stat-detail-lbl">ถิ่นกำเนิดทั่วโลก</span>
+        <div class="stat-accent-bar"></div>
+      </div>
     </div>
   </div>
 </section>
